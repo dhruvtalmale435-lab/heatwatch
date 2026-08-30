@@ -5,10 +5,59 @@
  */
 
 export class ModelExplainerEngine {
-  constructor() {}
+  constructor() {
+    this.backendAvailable = null;
+  }
 
   /**
-   * Run live ML inference on user-adjusted features
+   * Run live ML inference (calling backend trained model if active, else client fallback)
+   */
+  async inferProbabilitiesLive(features) {
+    try {
+      const response = await fetch('/api/ml/attribute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(features)
+      });
+      if (response.ok) {
+        const data = await response.json();
+        this.backendAvailable = true;
+        
+        // Map backend classes to UI colors
+        const colorMap = {
+          "Refinery / Petrochemical Flare": "#00f0ff",
+          "Super Thermal Power Plant": "#38bdf8",
+          "Vegetation Wildfire": "#f97316",
+          "Agricultural Stubble Burning": "#eab308",
+          "Coal Mining Seam Fire": "#a855f7",
+          "Solar Glint / False Positive": "#94a3b8"
+        };
+
+        const classes = (data.classes || []).map(c => ({
+          name: c.name,
+          prob: c.prob,
+          color: colorMap[c.name] || "#00f0ff"
+        }));
+
+        const topClass = classes[0] || { name: data.predicted_class_name, prob: data.confidence, color: "#00f0ff" };
+        const localInference = this.inferProbabilities(features);
+
+        return {
+          classes,
+          topClass,
+          shapContributions: localInference.shapContributions,
+          source: data.model_source
+        };
+      }
+    } catch (e) {
+      this.backendAvailable = false;
+    }
+
+    return this.inferProbabilities(features);
+  }
+
+  /**
+   * Client-side deterministic inference fallback (runs 100% offline & on GitHub Pages)
    */
   inferProbabilities(features) {
     const { frp, tempK, distRefineryM, builtupPct, forestPct, croplandPct, nightlight } = features;

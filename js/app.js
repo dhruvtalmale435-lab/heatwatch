@@ -1395,6 +1395,90 @@ class HeatWatchApp {
     }
   }
 
+  setupPyrometryAndModelSimulator() {
+    const tempSlider = document.getElementById('slider-planck-temp');
+    const tempLabel = document.getElementById('label-planck-temp');
+    if (tempSlider && tempLabel) {
+      tempSlider.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value);
+        tempLabel.textContent = `${val} K`;
+        this.analyticsInstance.renderPlanckCurveChart('canvas-planck-curve', val);
+      });
+    }
+
+    // Sliders for ML Feature Explainer
+    const frpSlider = document.getElementById('sim-slider-frp');
+    const distSlider = document.getElementById('sim-slider-dist');
+    const builtupSlider = document.getElementById('sim-slider-builtup');
+    const forestSlider = document.getElementById('sim-slider-forest');
+
+    const updateLabelsAndInfer = () => {
+      const frp = parseFloat(frpSlider?.value || 68);
+      const dist = parseFloat(distSlider?.value || 210);
+      const builtup = parseFloat(builtupSlider?.value || 76);
+      const forest = parseFloat(forestSlider?.value || 3);
+
+      const valFrp = document.getElementById('val-sim-frp');
+      const valDist = document.getElementById('val-sim-dist');
+      const valBuiltup = document.getElementById('val-sim-builtup');
+      const valForest = document.getElementById('val-sim-forest');
+
+      if (valFrp) valFrp.textContent = `${frp} MW`;
+      if (valDist) valDist.textContent = `${dist} m`;
+      if (valBuiltup) valBuiltup.textContent = `${builtup}%`;
+      if (valForest) valForest.textContent = `${forest}%`;
+
+      this.updateModelSimulator({
+        frp,
+        tempK: 368.5,
+        distRefineryM: dist,
+        builtupPct: builtup,
+        forestPct: forest,
+        croplandPct: Math.max(0, 100 - builtup - forest),
+        nightlight: (builtup / 100) * 85
+      });
+    };
+
+    [frpSlider, distSlider, builtupSlider, forestSlider].forEach(slider => {
+      if (slider) slider.addEventListener('input', updateLabelsAndInfer);
+    });
+
+    // Run initial inference
+    updateLabelsAndInfer();
+  }
+
+  async updateModelSimulator(features = { frp: 68, tempK: 368.5, distRefineryM: 210, builtupPct: 76, forestPct: 3, croplandPct: 0, nightlight: 75 }) {
+    const result = await this.modelExplainer.inferProbabilitiesLive(features);
+    const predictedClassEl = document.getElementById('sim-predicted-class');
+    const barsContainer = document.getElementById('sim-probability-bars');
+    const shapContainer = document.getElementById('sim-shap-list');
+
+    if (predictedClassEl && result.topClass) {
+      predictedClassEl.textContent = `${result.topClass.name} (${(result.topClass.prob * 100).toFixed(1)}%)`;
+      predictedClassEl.style.color = result.topClass.color || "#00f0ff";
+    }
+
+    if (barsContainer && result.classes) {
+      barsContainer.innerHTML = result.classes.map(c => `
+        <div style="flex:1; display:flex; flex-direction:column; gap:2px;">
+          <div style="height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden;">
+            <div style="width:${(c.prob * 100).toFixed(1)}%; height:100%; background:${c.color}; border-radius:3px; transition:width 0.25s ease;"></div>
+          </div>
+          <span style="font-size:0.62rem; color:var(--text-dim); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${c.name.split('/')[0]} ${(c.prob * 100).toFixed(0)}%</span>
+        </div>
+      `).join('');
+    }
+
+    if (shapContainer && result.shapContributions) {
+      shapContainer.innerHTML = result.shapContributions.map(shap => `
+        <div style="display:flex; justify-content:space-between; font-size:0.75rem; padding:0.25rem 0.5rem; background:rgba(0,0,0,0.25); border-radius:4px; border-left:3px solid ${shap.impact === 'positive' ? '#10b981' : '#f43f5e'};">
+          <span style="color:#e2e8f0;">${shap.feature}</span>
+          <span style="font-family:var(--font-mono); font-weight:700; color:${shap.impact === 'positive' ? '#10b981' : '#f43f5e'};">${shap.value}</span>
+        </div>
+      `).join('');
+    }
+  }
+
   startClock() {
     const clockEl = document.getElementById('ticker-live-clock');
     if (clockEl) {
