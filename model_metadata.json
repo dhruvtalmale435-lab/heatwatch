@@ -1,0 +1,30 @@
+{
+  "model_type": "RandomForestClassifier",
+  "n_classes": 6,
+  "features": [
+    "frp",
+    "bright_ti4",
+    "bright_ti5",
+    "temp_ratio_i4_i5",
+    "scan",
+    "track",
+    "dist_to_facility_m",
+    "is_inside_facility",
+    "builtup_pct_1km",
+    "treecover_pct_1km",
+    "cropland_pct_1km",
+    "bare_soil_pct_1km",
+    "nightlight_radiance",
+    "persistence_days_90d"
+  ],
+  "accuracy": 1.0,
+  "f1_score": 1.0,
+  "categories": {
+    "0": "Refinery / Petrochemical Flare",
+    "1": "Super Thermal Power Plant",
+    "2": "Coal Mining Seam Fire",
+    "3": "Vegetation Wildfire",
+    "4": "Agricultural Stubble Burning",
+    "5": "Solar Glint / False Positive"
+  }
+}
