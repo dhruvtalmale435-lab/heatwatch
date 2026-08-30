@@ -20,12 +20,14 @@ export class HeatWatchAnalytics {
     };
   }
 
-  // Update FRP Baseline Time-Series Chart
-  renderFrpTimeSeriesChart(canvasId, objectId) {
+  // Update FRP Baseline Time-Series Chart (with 90-day day scrubber highlight)
+  renderFrpTimeSeriesChart(canvasId, objectId, highlightedDayIndex = 90) {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
 
-    const dataPoints = HISTORICAL_FRP_DATA[objectId] || HISTORICAL_FRP_DATA["OBJ-1045"];
+    const dataPoints = HISTORICAL_FRP_DATA[objectId] || HISTORICAL_FRP_DATA["OBJ-1045"] || [];
+    if (!dataPoints.length) return;
+
     const labels = dataPoints.map(d => d.day);
     const frpValues = dataPoints.map(d => d.frp);
     const baselineValues = dataPoints.map(d => d.baseline);
@@ -46,15 +48,28 @@ export class HeatWatchAnalytics {
             borderColor: '#00f0ff',
             backgroundColor: 'rgba(0, 240, 255, 0.12)',
             fill: true,
-            tension: 0.3,
+            tension: 0.25,
             borderWidth: 2.5,
             pointBackgroundColor: (context) => {
               const index = context.dataIndex;
+              if (index === highlightedDayIndex - 1) return '#ffffff';
               const val = context.dataset.data[index];
-              return val > 30 ? '#ff4747' : '#00f0ff';
+              return val > (baselineValues[index] * 1.7) ? '#ff4747' : '#00f0ff';
             },
-            pointRadius: 5,
-            pointHoverRadius: 7
+            pointBorderColor: (context) => {
+              const index = context.dataIndex;
+              return index === highlightedDayIndex - 1 ? '#00f0ff' : 'transparent';
+            },
+            pointBorderWidth: (context) => {
+              const index = context.dataIndex;
+              return index === highlightedDayIndex - 1 ? 3 : 1;
+            },
+            pointRadius: (context) => {
+              const index = context.dataIndex;
+              if (index === highlightedDayIndex - 1) return 8;
+              return index % 5 === 0 ? 3 : 0;
+            },
+            pointHoverRadius: 8
           },
           {
             label: '90-Day Baseline Mean',
@@ -93,13 +108,25 @@ export class HeatWatchAnalytics {
             titleColor: '#00f0ff',
             bodyColor: '#fff',
             borderColor: 'rgba(0, 240, 255, 0.3)',
-            borderWidth: 1
+            borderWidth: 1,
+            callbacks: {
+              afterLabel: function(context) {
+                const dayObj = dataPoints[context.dataIndex];
+                if (dayObj) {
+                  return `Date: ${dayObj.date} | Status: ${dayObj.status.toUpperCase()}`;
+                }
+              }
+            }
           }
         },
         scales: {
           x: {
             grid: { color: 'rgba(255, 255, 255, 0.05)' },
-            ticks: { color: '#6b7280', font: { family: 'JetBrains Mono', size: 10 } }
+            ticks: {
+              color: '#6b7280',
+              font: { family: 'JetBrains Mono', size: 9 },
+              maxTicksLimit: 12
+            }
           },
           y: {
             grid: { color: 'rgba(255, 255, 255, 0.05)' },

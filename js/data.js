@@ -1197,3 +1197,82 @@ export const DEMO_STORY_STEPS = [
     zoomLevel: 14
   }
 ];
+
+/**
+ * 90-Day Historical Time-Series Generator
+ * Generates day-wise FRP, 90-day rolling baseline mean, and 2x anomaly thresholds
+ * across the full 90-day observation window (June 01 - August 28, 2026).
+ */
+export const HISTORICAL_FRP_DATA = {};
+
+function generate90DayHistoricalData() {
+  const startDate = new Date("2026-06-01T00:00:00Z");
+  
+  THERMAL_OBJECTS.forEach(obj => {
+    const list = [];
+    const baseMean = obj.thermal.historicalMeanFRP || 18.0;
+    const currentFRP = obj.thermal.currentFRP || 25.0;
+    const isSurge = obj.status === "high_priority";
+    const isWildfire = obj.primaryCategory === "wildfire";
+    const isAgri = obj.primaryCategory === "agricultural";
+
+    for (let dayIdx = 0; dayIdx < 90; dayIdx++) {
+      const curDate = new Date(startDate.getTime() + dayIdx * 86400000);
+      const dateStr = curDate.toISOString().substring(0, 10);
+      const dayLabel = `Day ${dayIdx + 1} (${curDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`;
+
+      let frpVal;
+      let status = "normal";
+
+      if (isSurge) {
+        // Acute surge in last 5 days
+        if (dayIdx >= 85) {
+          const progress = (dayIdx - 85) / 4.0;
+          frpVal = baseMean + (currentFRP - baseMean) * progress + (Math.sin(dayIdx * 3) * 2.0);
+          status = dayIdx >= 87 ? "anomaly" : "elevated";
+        } else {
+          frpVal = baseMean + (Math.sin(dayIdx * 0.7) * 2.2) + ((Math.random() - 0.5) * 1.5);
+        }
+      } else if (isWildfire) {
+        // Zero in dry season, flare-up in late summer
+        if (dayIdx < 78) {
+          frpVal = Math.max(0, (Math.random() - 0.7) * 2.0);
+        } else {
+          const wildfireProgress = (dayIdx - 78) / 11.0;
+          frpVal = 10.0 + (currentFRP - 10.0) * wildfireProgress + (Math.sin(dayIdx) * 5.0);
+          status = "wildfire_active";
+        }
+      } else if (isAgri) {
+        // Seasonal harvest burning
+        if (dayIdx < 70) {
+          frpVal = Math.max(0, (Math.random() - 0.8) * 1.0);
+        } else {
+          const harvestProgress = (dayIdx - 70) / 19.0;
+          frpVal = 8.0 + (currentFRP - 8.0) * harvestProgress + (Math.cos(dayIdx) * 4.0);
+          status = "seasonal_burn";
+        }
+      } else {
+        // Stable industrial baseline
+        frpVal = baseMean + (Math.sin(dayIdx * 0.5) * (baseMean * 0.12)) + ((Math.random() - 0.5) * 2.0);
+      }
+
+      frpVal = Math.max(0, Math.round(frpVal * 10) / 10);
+      const threshold = Math.round(baseMean * 2.0 * 10) / 10;
+
+      list.push({
+        dayIndex: dayIdx + 1,
+        day: dayLabel,
+        date: dateStr,
+        frp: frpVal,
+        baseline: baseMean,
+        threshold: threshold,
+        tempK: Math.round(300 + (frpVal * 1.05)),
+        status: status
+      });
+    }
+
+    HISTORICAL_FRP_DATA[obj.id] = list;
+  });
+}
+
+generate90DayHistoricalData();

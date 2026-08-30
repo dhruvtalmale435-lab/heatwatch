@@ -4,7 +4,7 @@
  * ST-DBSCAN clusters, ESA WorldCover buffers, and NASA static anomaly masks.
  */
 
-import { THERMAL_OBJECTS, RAW_FIRMS_DETECTIONS, OSM_FACILITIES, STUDY_REGIONS, ALL_INDIA_FACILITIES } from './data.js';
+import { THERMAL_OBJECTS, RAW_FIRMS_DETECTIONS, OSM_FACILITIES, STUDY_REGIONS, ALL_INDIA_FACILITIES, HISTORICAL_FRP_DATA } from './data.js';
 
 export class HeatWatchMap {
   constructor(containerId, onSelectObjectCallback) {
@@ -294,6 +294,66 @@ export class HeatWatchMap {
 
       this.markers[obj.id] = marker;
       this.layers.thermalClusters.addLayer(marker);
+    });
+  }
+
+  updateHistoricalClusters(dayIndex) {
+    if (!HISTORICAL_FRP_DATA) return;
+    
+    THERMAL_OBJECTS.forEach(obj => {
+      const historyList = HISTORICAL_FRP_DATA[obj.id] || [];
+      const record = historyList[dayIndex - 1];
+      const marker = this.markers[obj.id];
+      if (!record || !marker) return;
+
+      const ratio = Math.round((record.frp / Math.max(record.baseline, 1)) * 100) / 100;
+      let markerColor = '#00f0ff';
+      let pulseClass = '';
+
+      if (obj.categoryGroup === 'forest_fire' || obj.primaryCategory === 'wildfire') {
+        markerColor = record.frp > 10 ? '#f97316' : '#64748b';
+        if (record.frp > 10) pulseClass = `<div class="marker-pulse-ring" style="background: rgba(249, 115, 22, 0.4); border: 2px solid #f97316;"></div>`;
+      } else if (obj.categoryGroup === 'agriculture_fire' || obj.primaryCategory === 'agriculture') {
+        markerColor = record.frp > 10 ? '#eab308' : '#64748b';
+        if (record.frp > 10) pulseClass = `<div class="marker-pulse-ring" style="background: rgba(234, 179, 8, 0.35); border: 2px solid #eab308;"></div>`;
+      } else if (obj.categoryGroup === 'mining_fire') {
+        markerColor = '#a855f7';
+        pulseClass = `<div class="marker-pulse-ring" style="background: rgba(168, 85, 247, 0.4); border: 2px solid #a855f7;"></div>`;
+      } else if (ratio >= 2.5) {
+        markerColor = '#ff4747';
+        pulseClass = `<div class="marker-pulse-ring" style="background: rgba(255, 71, 71, 0.4); border: 2px solid #ff4747;"></div>`;
+      } else if (ratio >= 1.5) {
+        markerColor = '#f59e0b';
+        pulseClass = `<div class="marker-pulse-ring" style="background: rgba(245, 158, 11, 0.3); border: 2px solid #f59e0b;"></div>`;
+      } else {
+        markerColor = '#00f0ff';
+        pulseClass = '';
+      }
+
+      const customIcon = L.divIcon({
+        className: 'custom-cluster-marker',
+        html: `
+          <div style="position: relative; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">
+            ${pulseClass}
+            <div style="width: 16px; height: 16px; border-radius: 50%; background: ${markerColor}; border: 2px solid #ffffff; box-shadow: 0 0 14px ${markerColor};"></div>
+          </div>
+        `,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14]
+      });
+
+      marker.setIcon(customIcon);
+      marker.setTooltipContent(`
+        <div style="font-family: 'Inter', sans-serif;">
+          <div style="font-weight: 700; color: ${markerColor}; font-size: 0.85rem;">${obj.id}: ${obj.name}</div>
+          <div style="font-size: 0.72rem; color: #9ca3af; margin-top: 2px;">
+            ${record.day} &bull; ${record.date}
+          </div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; margin-top: 4px; color: #fff;">
+            FRP: <strong>${record.frp} MW</strong> (${ratio}x Baseline) &bull; ${record.tempK} K
+          </div>
+        </div>
+      `);
     });
   }
 

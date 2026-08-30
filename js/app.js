@@ -3,7 +3,7 @@
  * Coordinates GIS Map, Analytics, Inspector HUD, Alert Center, and Guided Demo
  */
 
-import { THERMAL_OBJECTS, STUDY_REGIONS, OSM_FACILITIES, ALL_INDIA_FACILITIES } from './data.js';
+import { THERMAL_OBJECTS, STUDY_REGIONS, OSM_FACILITIES, ALL_INDIA_FACILITIES, HISTORICAL_FRP_DATA } from './data.js';
 import { HeatWatchMap } from './map.js';
 import { HeatWatchAnalytics } from './analytics.js';
 import { DemoStoryEngine } from './demo-story.js';
@@ -68,6 +68,7 @@ class HeatWatchApp {
     this.setupFacilitySearch();
     this.setupLiveFetchButton();
     this.setupPyrometryAndModelSimulator();
+    this.setupTimelineScrubber();
 
     // 7. Initial render of selected object (#OBJ-1045)
     this.updateInspectorHUD(this.selectedObject);
@@ -1476,6 +1477,173 @@ class HeatWatchApp {
           <span style="font-family:var(--font-mono); font-weight:700; color:${shap.impact === 'positive' ? '#10b981' : '#f43f5e'};">${shap.value}</span>
         </div>
       `).join('');
+    }
+  }
+
+  setupTimelineScrubber() {
+    const slider = document.getElementById('map-timeline-slider');
+    const playBtn = document.getElementById('btn-timeline-play');
+    const playIcon = document.getElementById('icon-timeline-play');
+    const playLabel = document.getElementById('label-timeline-play');
+    const prevBtn = document.getElementById('btn-timeline-prev');
+    const nextBtn = document.getElementById('btn-timeline-next');
+    const dateBadge = document.getElementById('scrubber-date-badge');
+    const dayBadge = document.getElementById('scrubber-day-badge');
+    const liveIndicator = document.getElementById('scrubber-live-indicator');
+    const speedChips = document.querySelectorAll('.speed-chip');
+
+    let isPlaying = false;
+    let playInterval = null;
+    let playbackSpeed = 1;
+
+    const startDate = new Date("2026-06-01T00:00:00Z");
+
+    const updateDayUI = (dayIndex) => {
+      const curDate = new Date(startDate.getTime() + (dayIndex - 1) * 86400000);
+      const dateStr = curDate.toISOString().substring(0, 10);
+      
+      if (dateBadge) dateBadge.textContent = dateStr;
+      if (dayBadge) dayBadge.textContent = `Day ${dayIndex} of 90`;
+      
+      if (liveIndicator) {
+        if (dayIndex === 90) {
+          liveIndicator.textContent = "LIVE PASS";
+          liveIndicator.className = "scrubber-live-indicator";
+        } else {
+          liveIndicator.textContent = "HISTORICAL";
+          liveIndicator.className = "scrubber-live-indicator historical";
+        }
+      }
+
+      this.applyHistoricalDay(dayIndex);
+    };
+
+    if (slider) {
+      slider.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value);
+        updateDayUI(val);
+      });
+    }
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => {
+        if (slider) {
+          let val = Math.max(1, parseInt(slider.value) - 1);
+          slider.value = val;
+          updateDayUI(val);
+        }
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => {
+        if (slider) {
+          let val = Math.min(90, parseInt(slider.value) + 1);
+          slider.value = val;
+          updateDayUI(val);
+        }
+      });
+    }
+
+    speedChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        speedChips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        playbackSpeed = parseFloat(chip.getAttribute('data-speed') || 1);
+        if (isPlaying) {
+          stopPlayback();
+          startPlayback();
+        }
+      });
+    });
+
+    const startPlayback = () => {
+      isPlaying = true;
+      if (playBtn) playBtn.classList.add('playing');
+      if (playLabel) playLabel.textContent = "Pause";
+      if (playIcon) playIcon.setAttribute('data-lucide', 'pause');
+      if (window.lucide) lucide.createIcons();
+
+      const intervalMs = Math.round(350 / playbackSpeed);
+      playInterval = setInterval(() => {
+        if (!slider) return;
+        let val = parseInt(slider.value);
+        if (val >= 90) {
+          val = 1;
+        } else {
+          val++;
+        }
+        slider.value = val;
+        updateDayUI(val);
+        if (val === 90) {
+          stopPlayback();
+        }
+      }, intervalMs);
+    };
+
+    const stopPlayback = () => {
+      isPlaying = false;
+      if (playInterval) {
+        clearInterval(playInterval);
+        playInterval = null;
+      }
+      if (playBtn) playBtn.classList.remove('playing');
+      if (playLabel) playLabel.textContent = "Play";
+      if (playIcon) playIcon.setAttribute('data-lucide', 'play');
+      if (window.lucide) lucide.createIcons();
+    };
+
+    if (playBtn) {
+      playBtn.addEventListener('click', () => {
+        if (isPlaying) {
+          stopPlayback();
+        } else {
+          startPlayback();
+        }
+      });
+    }
+  }
+
+  applyHistoricalDay(dayIndex) {
+    if (!this.selectedObject) return;
+    const historyList = HISTORICAL_FRP_DATA[this.selectedObject.id] || [];
+    const record = historyList[dayIndex - 1];
+    if (!record) return;
+
+    // Update physical telemetry in Inspector HUD for selected day
+    const frpEl = document.getElementById('hud-stat-frp');
+    const frpDevEl = document.getElementById('hud-stat-frp-dev');
+    const tempEl = document.getElementById('hud-stat-temp');
+    const statusTag = document.getElementById('hud-obj-severity');
+
+    if (frpEl) frpEl.textContent = `${record.frp} MW`;
+    if (tempEl) tempEl.textContent = `${record.tempK} K`;
+
+    const ratio = Math.round((record.frp / Math.max(record.baseline, 1)) * 100) / 100;
+    if (frpDevEl) {
+      frpDevEl.textContent = `${ratio}× Baseline`;
+      frpDevEl.style.color = ratio > 2.0 ? '#ff4747' : '#00f0ff';
+    }
+
+    if (statusTag) {
+      if (ratio >= 2.5) {
+        statusTag.textContent = "HIGH-PRIORITY ANOMALY";
+        statusTag.className = "severity-tag high-priority";
+      } else if (ratio >= 1.5) {
+        statusTag.textContent = "ELEVATED THERMAL FLUX";
+        statusTag.className = "severity-tag elevated";
+      } else {
+        statusTag.textContent = "NORMAL OPERATIONAL BASELINE";
+        statusTag.className = "severity-tag verified-clean";
+      }
+    }
+
+    // Refresh 90-Day Baseline Chart with highlighted day marker
+    this.analyticsInstance.renderFrpTimeSeriesChart('canvas-frp-baseline', this.selectedObject.id, dayIndex);
+
+    // Refresh Map markers with day-wise FRP & color
+    if (this.mapInstance && typeof this.mapInstance.updateHistoricalClusters === 'function') {
+      this.mapInstance.updateHistoricalClusters(dayIndex);
     }
   }
 

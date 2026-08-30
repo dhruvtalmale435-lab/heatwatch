@@ -339,11 +339,43 @@
           </div>
         </div>
 
-        <!-- Time Scrubber / Temporal Playback -->
-        <div class="map-time-scrubber">
-          <i data-lucide="history" style="color:var(--accent-cyan); width:16px; height:16px;"></i>
-          <input type="range" id="map-timeline-slider" class="time-scrubber-slider" min="0" max="100" value="100">
-          <span class="scrubber-label" id="scrubber-time-display">LIVE: Today 03:45 UTC</span>
+        <!-- 90-Day Satellite Historical Timeline & Playback Scrubber -->
+        <div class="map-time-scrubber" id="map-time-scrubber">
+          <div class="scrubber-header-row">
+            <div class="scrubber-left-controls">
+              <button class="scrubber-btn play-btn" id="btn-timeline-play" title="Play / Pause 90-Day Historical Playback">
+                <i data-lucide="play" id="icon-timeline-play"></i>
+                <span id="label-timeline-play">Play</span>
+              </button>
+              <button class="scrubber-btn step-btn" id="btn-timeline-prev" title="Step Back 1 Day">
+                <i data-lucide="skip-back"></i>
+              </button>
+              <button class="scrubber-btn step-btn" id="btn-timeline-next" title="Step Forward 1 Day">
+                <i data-lucide="skip-forward"></i>
+              </button>
+              <div class="scrubber-speed-group">
+                <button class="speed-chip active" data-speed="1">1x</button>
+                <button class="speed-chip" data-speed="2">2x</button>
+                <button class="speed-chip" data-speed="5">5x</button>
+              </div>
+            </div>
+            
+            <div class="scrubber-right-status">
+              <span class="scrubber-live-indicator" id="scrubber-live-indicator">LIVE PASS</span>
+              <span class="scrubber-date-badge" id="scrubber-date-badge">2026-08-28</span>
+              <span class="scrubber-day-badge" id="scrubber-day-badge">Day 90 of 90</span>
+            </div>
+          </div>
+
+          <div class="scrubber-slider-wrap">
+            <input type="range" id="map-timeline-slider" class="time-scrubber-slider" min="1" max="90" value="90" step="1">
+            <div class="scrubber-track-labels">
+              <span>Day 1 (Jun 01)</span>
+              <span>Day 30 (Jun 30)</span>
+              <span>Day 60 (Jul 30)</span>
+              <span class="surge-marker">⚠️ Day 85-90 (Acute Surge)</span>
+            </div>
+          </div>
         </div>
 
         <!-- Right Sidebar: Thermal Object & Telemetry Inspector -->
