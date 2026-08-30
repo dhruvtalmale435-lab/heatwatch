@@ -818,9 +818,35 @@ class HeatWatchApp {
 
     // Re-render Canvas Charts in Sidebar
     if (this.analyticsInstance) {
-      this.analyticsInstance.renderFrpTimeSeriesChart('sidebar-frp-chart', obj.id);
+      this.analyticsInstance.renderFrpTimeSeriesChart('sidebar-frp-chart', obj.id, 90);
       if (obj.landCover) this.analyticsInstance.renderLandCoverDoughnut('sidebar-landcover-chart', obj.landCover);
       if (obj.anomalyFormula) this.analyticsInstance.renderAnomalyRadar('sidebar-radar-chart', obj.anomalyFormula);
+    }
+
+    // Run Live ML Model Inference for this selected hotspot
+    const features = {
+      frp: obj.thermal ? obj.thermal.currentFRP : 25.0,
+      tempK: obj.thermal ? obj.thermal.currentBrightnessTempK : 345.0,
+      distRefineryM: obj.matchedFacility ? obj.matchedFacility.distanceMeters : 5000.0,
+      builtupPct: obj.landCover ? obj.landCover.industrialBuiltUp : 10.0,
+      forestPct: obj.landCover ? obj.landCover.vegetationTree : 10.0,
+      croplandPct: obj.landCover ? obj.landCover.cropland : 10.0,
+      nightlight: obj.nighttimeLight ? obj.nighttimeLight.radianceScore : 10.0
+    };
+
+    this.modelExplainer.inferProbabilitiesLive(features).then(mlRes => {
+      if (mlRes && mlRes.topClass) {
+        setTxt('hud-obj-category', `${mlRes.topClass.name} • ${obj.subtype || 'Thermal Source'}`);
+        setTxt('hud-score-pct', `${(mlRes.topClass.prob * 100).toFixed(1)}%`);
+        const scoreBar = document.getElementById('hud-score-bar');
+        if (scoreBar) scoreBar.style.width = `${mlRes.topClass.prob * 100}%`;
+      }
+    });
+
+    // Make sure inspector sidebar is visible
+    const inspectorEl = document.getElementById('map-sidebar-inspector');
+    if (inspectorEl) {
+      inspectorEl.classList.remove('collapsed');
     }
   }
 

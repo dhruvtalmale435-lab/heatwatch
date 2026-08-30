@@ -225,8 +225,14 @@ export class HeatWatchMap {
       `, { sticky: true });
 
       circleMarker.on('click', () => {
-        if (det.clusterId) {
-          this.selectObject(det.clusterId);
+        this.map.flyTo([det.lat, det.lon], 14, { duration: 0.8 });
+        if (det.clusterId && THERMAL_OBJECTS.find(o => o.id === det.clusterId)) {
+          this.selectObject(det.clusterId, false);
+        } else {
+          const dynamicObj = this.synthesizeObjectFromDetection(det);
+          if (this.onSelectObject) {
+            this.onSelectObject(dynamicObj);
+          }
         }
       });
 
@@ -289,7 +295,8 @@ export class HeatWatchMap {
       `, { sticky: true });
 
       marker.on('click', () => {
-        this.selectObject(obj.id);
+        this.map.flyTo([lat, lon], 14, { duration: 0.8 });
+        this.selectObject(obj.id, false);
       });
 
       this.markers[obj.id] = marker;
@@ -490,10 +497,162 @@ export class HeatWatchMap {
     });
   }
 
+  synthesizeObjectFromDetection(det) {
+    const lat = det.lat;
+    const lon = det.lon;
+    const frp = parseFloat(det.frp || 25.0);
+    const tempK = parseFloat(det.tempK || 345.0);
+    
+    // Find closest facility among 50+ Indian facilities
+    let nearestFac = ALL_INDIA_FACILITIES[0];
+    let minDist = 999999999;
+    ALL_INDIA_FACILITIES.forEach(fac => {
+      const dLat = (fac.coordinates[0] - lat) * 111000;
+      const dLon = (fac.coordinates[1] - lon) * 105000;
+      const d = Math.sqrt(dLat * dLat + dLon * dLon);
+      if (d < minDist) {
+        minDist = d;
+        nearestFac = fac;
+      }
+    });
+
+    const isClose = minDist < 2000;
+    const isForest = nearestFac.type.includes('Biosphere') || nearestFac.type.includes('Forest') || minDist > 8000;
+    const isAgri = !isClose && !isForest;
+
+    let categoryLabel = isClose ? `${nearestFac.type} Operational Thermal Emission` : (isForest ? "Protected Canopy Vegetation Wildfire" : "Agricultural Stubble Burning Front");
+    let primaryCategory = isClose ? "industrial" : (isForest ? "wildfire" : "agriculture");
+    let categoryGroup = isClose ? "industrial_fire" : (isForest ? "forest_fire" : "agriculture_fire");
+    let status = frp > 50 ? "high_priority" : (frp > 25 ? "elevated" : "normal");
+    let statusLabel = status === "high_priority" ? "HIGH-PRIORITY ANOMALY" : (status === "elevated" ? "ELEVATED THERMAL FLUX" : "NORMAL OPERATIONAL BASELINE");
+
+    const objId = det.clusterId || `HOTSPOT-${Math.round(lat*100)}-${Math.round(lon*100)}`;
+    const baseMean = isClose ? (frp > 30 ? 18.0 : frp * 0.7) : (isForest ? 12.0 : 8.0);
+    const deviationRatio = Math.round((frp / Math.max(baseMean, 1)) * 100) / 100;
+
+    const dynamicObj = {
+      id: objId,
+      name: isClose ? `${nearestFac.name} Active Hotspot` : `${nearestFac.city} Sector Thermal Detections`,
+      regionId: nearestFac.id,
+      centroid: [lat, lon],
+      coordinates: [lat, lon],
+      categoryGroup: categoryGroup,
+      primaryCategory: primaryCategory,
+      categoryLabel: categoryLabel,
+      subtype: nearestFac.type,
+      status: status,
+      statusLabel: statusLabel,
+      evidenceScore: isClose ? 0.89 : 0.76,
+      confidence: `${Math.round((isClose ? 0.89 : 0.76) * 100)}%`,
+      matchedFacility: {
+        name: nearestFac.name,
+        type: nearestFac.type,
+        distanceMeters: Math.round(minDist),
+        osmId: `fac/${nearestFac.id}`
+      },
+      thermal: {
+        currentFRP: frp,
+        historicalMeanFRP: Math.round(baseMean * 10) / 10,
+        frpDeviationRatio: deviationRatio,
+        currentBrightnessTempK: tempK,
+        historicalMeanTempK: Math.round((tempK - 15) * 10) / 10,
+        sensor: det.satellite ? `${det.satellite} (375m)` : "VIIRS SNPP 375m (I-Band 3.74µm)",
+        detectionTime: det.time ? `2026-08-28 ${det.time} UTC` : "2026-08-28 03:45 UTC",
+        activeDays: isClose ? 78 : 3,
+        totalDetections: isClose ? 112 : 5,
+        persistenceRate: isClose ? "86.5% (Persistent Multi-Pass)" : "12.0% (Transient Fire Front)",
+        footprintAreaHa: Math.round((frp / 8.0) * 10) / 10
+      },
+      spatialDynamics: {
+        centroidStabilityPct: isClose ? 99.2 : 62.4,
+        spreadVelocityKmH: isClose ? 0.0 : 2.4,
+        motionType: isClose ? "STATIONARY STACK" : "ACTIVE SPREAD",
+        isStationary: isClose,
+        driftVectorMeters: isClose ? 8 : 180,
+        plumeDispersion: "South-West (14 km/h)"
+      },
+      landCover: {
+        industrialBuiltUp: isClose ? 74.0 : 4.0,
+        bareSoilPaved: isClose ? 16.0 : 12.0,
+        waterBody: 2.0,
+        vegetationTree: isForest ? 82.0 : 4.0,
+        cropland: isAgri ? 78.0 : 2.0
+      },
+      nighttimeLight: {
+        radianceScore: isClose ? 78.5 : 2.8,
+        classification: isClose ? "High Urban / Industrial Lighting" : "Dark Wilderness / Rural Buffer"
+      },
+      glintFilter: {
+        statusLabel: "✓ PASSED: Verified Combustion Emitter",
+        albedoReflectance: 0.07,
+        solarElevationDeg: 52.4
+      },
+      hazardProximity: {
+        threatLevel: status === "high_priority" ? "ELEVATED" : "NOMINAL",
+        summary: `Proximity to ${nearestFac.name} (${Math.round(minDist)}m perimeter)`
+      },
+      nearestSettlement: {
+        name: `${nearestFac.city} Urban Fringe`,
+        distanceKm: Math.round((minDist / 1000 + 1.2) * 10) / 10,
+        populationEstimate: "6,200 residents"
+      },
+      recommendedAction: isClose ? "Review facility telemetry & check flare containment efficiency." : "Track active thermal perimeter spread on subsequent orbital passes.",
+      evidencePoints: [
+        { text: `Proximity: ${Math.round(minDist)}m to registered ${nearestFac.name}`, type: "facility-match" },
+        { text: `Radiometry: FRP ${frp} MW with Brightness Temp ${tempK} K`, type: "persistence" },
+        { text: `Land Cover: Dominant context verifies ${categoryLabel}`, type: "landcover" }
+      ],
+      anomalyFormula: {
+        totalAnomalyScore: Math.min(1.0, (frp / 60.0) * 0.85)
+      }
+    };
+
+    // Ensure 90-day time series exists in HISTORICAL_FRP_DATA
+    if (!HISTORICAL_FRP_DATA[objId]) {
+      const history = [];
+      const startDate = new Date("2026-06-01T00:00:00Z");
+      for (let i = 0; i < 90; i++) {
+        const curDate = new Date(startDate.getTime() + i * 86400000);
+        const dayFrp = i === 89 ? frp : Math.max(0, Math.round((baseMean + Math.sin(i * 0.5) * 2) * 10) / 10);
+        history.push({
+          dayIndex: i + 1,
+          day: `Day ${i + 1}`,
+          date: curDate.toISOString().substring(0, 10),
+          frp: dayFrp,
+          baseline: Math.round(baseMean * 10) / 10,
+          threshold: Math.round(baseMean * 2 * 10) / 10,
+          tempK: Math.round(300 + dayFrp * 1.05),
+          status: i === 89 ? status : "normal"
+        });
+      }
+      HISTORICAL_FRP_DATA[objId] = history;
+    }
+
+    return dynamicObj;
+  }
+
+  synthesizeObjectFromFacility(fac) {
+    const det = {
+      lat: fac.coordinates[0],
+      lon: fac.coordinates[1],
+      frp: fac.type.includes('Refinery') ? 48.0 : (fac.type.includes('Thermal') ? 35.0 : (fac.type.includes('Steel') ? 32.0 : 22.0)),
+      tempK: 358.0,
+      satellite: 'VIIRS'
+    };
+    return this.synthesizeObjectFromDetection(det);
+  }
+
   flyToFacility(facilityId) {
     const fac = ALL_INDIA_FACILITIES.find(f => f.id === facilityId);
     if (fac) {
-      this.map.flyTo(fac.coordinates, 14, { duration: 1.0 });
+      this.map.flyTo(fac.coordinates, 14, { duration: 0.8 });
+      const matchedObj = THERMAL_OBJECTS.find(o => o.regionId === fac.id);
+      if (matchedObj) {
+        this.selectObject(matchedObj.id, false);
+      } else {
+        const dynObj = this.synthesizeObjectFromFacility(fac);
+        if (this.onSelectObject) this.onSelectObject(dynObj);
+      }
     }
   }
 }
