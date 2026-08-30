@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HeatWatch — Satellite Industrial Thermal Intelligence & Anomaly Platform</title>
+  <meta name="description" content="Satellite-based industrial thermal intelligence and anomaly-prioritization platform converting NASA FIRMS detections into facility-aware thermal objects with historical baseline analysis and explainable AI.">
+
+  <!-- External Libraries -->
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ==========================================================================
+       1. Top Header & Navigation Bar
+       ========================================================================== -->
+  <header class="app-header">
+    <div class="brand-container">
+      <div class="brand-logo">
+        <i data-lucide="flame" class="brand-flame-icon"></i>
+        <span class="brand-name">Heat<span class="brand-accent">Watch</span></span>
+        <span class="brand-dot"></span>
+      </div>
+    </div>
+
+    <!-- Streamlined MVP Navigation Tabs (Focused on 3 Core SIH Deliverables) -->
+    <nav class="nav-tabs" role="tablist">
+      <button class="nav-tab-btn active" data-view="command-map" id="tab-command-map">
+        <i data-lucide="map"></i> Command Map
+      </button>
+      <button class="nav-tab-btn" data-view="analytics-tab" id="tab-analytics">
+        <i data-lucide="activity"></i> Analytics & Baseline
+      </button>
+      <button class="nav-tab-btn" data-view="alerts-tab" id="tab-alerts">
+        <i data-lucide="bell"></i> Alert Center <span class="tab-badge" id="header-alert-count">2</span>
+      </button>
+
+      <!-- Clickable More Analysis Tools Dropdown (Nests Non-MVP / Secondary Tools) -->
+      <div class="nav-dropdown-wrap" id="wrap-more-tools">
+        <button class="nav-tab-btn dropdown-trigger-btn" id="btn-more-tools" type="button" aria-haspopup="true" aria-expanded="false">
+          <i data-lucide="layers"></i> More Analysis Tools <i data-lucide="chevron-down" style="width:13px; height:13px; margin-left:3px;"></i>
+        </button>
+        <div class="nav-dropdown-menu" id="menu-more-tools">
+          <button class="dropdown-item-btn" data-view="pyrometry-tab" id="btn-menu-pyrometry">
+            <i data-lucide="flame" style="color:var(--accent-flare);"></i>
+            <div class="dropdown-item-text">
+              <strong>Sub-Pixel Pyrometry & Emissions</strong>
+              <small>Planck curve fitting & World Bank CO₂ flaring</small>
+            </div>
+          </button>
+          <button class="dropdown-item-btn" data-view="comparison-tab" id="btn-menu-comparison">
+            <i data-lucide="split" style="color:#60a5fa;"></i>
+            <div class="dropdown-item-text">
+              <strong>NASA FIRMS Benchmark Matrix</strong>
+              <small>Static 2025 mask vs. AI anomaly engine</small>
+            </div>
+          </button>
+          <button class="dropdown-item-btn" data-view="api-tab" id="btn-menu-api">
+            <i data-lucide="code-2" style="color:var(--accent-cyan);"></i>
+            <div class="dropdown-item-text">
+              <strong>REST API & GeoJSON Playground</strong>
+              <small>Automated endpoints for disaster authorities</small>
+            </div>
+          </button>
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item-btn" id="btn-menu-spectral">
+            <i data-lucide="satellite" style="color:#38bdf8;"></i>
+            <div class="dropdown-item-text">
+              <strong>Sentinel-2 SWIR & SAR Verification</strong>
+              <small>20m infrared thermal emitter validation</small>
+            </div>
+          </button>
+          <button class="dropdown-item-btn" id="btn-menu-settings">
+            <i data-lucide="settings" style="color:#a78bfa;"></i>
+            <div class="dropdown-item-text">
+              <strong>API Keys & Ingestion Settings</strong>
+              <small>NASA FIRMS, Earth Engine, Overpass</small>
+            </div>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Header Action Controls -->
+    <div class="header-actions">
+      <div class="mode-toggle-group">
+        <button class="mode-btn active" id="btn-mode-live" title="Connect to simulated near-real-time satellite stream">LIVE STREAM</button>
+        <button class="mode-btn" id="btn-mode-demo" title="Load offline curated historical scenario dataset">OFFLINE DEMO</button>
+      </div>
+
+      <button class="btn-primary" id="btn-fetch-live-firms" title="Query live NASA FIRMS API for India">
+        <i data-lucide="satellite"></i> Query Live FIRMS
+      </button>
+
+      <button class="btn-secondary" id="btn-guided-demo" title="Start Interactive 8-Step Presentation Tour">
+        <i data-lucide="play-circle"></i> SIH Tour
+      </button>
+
+      <button class="btn-secondary" id="btn-header-dossier" title="Export 1-Page Official Incident Triage Dossier">
+        <i data-lucide="file-text"></i> Export Dossier
+      </button>
+
+      <button class="btn-secondary" id="btn-export-geojson" title="Download full GeoJSON FeatureCollection">
+        <i data-lucide="download"></i> GeoJSON
+      </button>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       2. Telemetry Live Ticker
+       ========================================================================== -->
+  <div class="telemetry-ticker">
+    <div class="ticker-status-item">
+      <span class="status-dot"></span>
+      <span>INGESTION STATUS: <strong class="ticker-metric" id="ticker-data-source">NASA LANCE NRT (Live Stream)</strong></span>
+    </div>
+    <div class="ticker-status-item">
+      <span>SATELLITES: <strong class="ticker-metric">VIIRS SNPP (375m) &bull; NOAA-20 &bull; MODIS Terra &bull; Sentinel-2 MSI</strong></span>
+    </div>
+    <div class="ticker-status-item">
+      <span>ANOMALY ENGINE: <span class="status-dot anomaly"></span> <strong class="ticker-metric" style="color:#ff4747;">2 HIGH PRIORITY ALERTS</strong></span>
+    </div>
+    <div class="ticker-status-item">
+      <i data-lucide="clock" style="width:12px; height:12px;"></i>
+      <span id="ticker-live-clock">2026-08-28 03:55:00 UTC</span>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       3. Main Application Views Container
+       ========================================================================== -->
+  <main class="app-main">
+
+    <!-- ------------------------------------------------------------------------
+         VIEW 1: Command Map (GIS Command Center)
+         ------------------------------------------------------------------------ -->
+    <section class="view-section active" id="view-command-map">
+      <div class="map-view-container">
+        
+        <!-- Interactive Leaflet Canvas -->
+        <div id="gis-map-canvas"></div>
+
+        <!-- Floating Classification Segregation & Sorting Ribbon (Draggable & Collapsible) -->
+        <div class="map-floating-panel map-category-ribbon draggable-panel collapsed" id="map-category-ribbon">
+          <div class="ribbon-drag-handle" id="ribbon-drag-handle" title="Touch / Drag to move anywhere on map">
+            <i data-lucide="grip-vertical" style="width:14px; height:14px; color:var(--text-muted);"></i>
+          </div>
+          <div class="ribbon-label" id="ribbon-label-toggle" style="cursor:pointer;" title="Click to collapse / expand">
+            <i data-lucide="filter" style="width:13px; height:13px; color:var(--accent-cyan);"></i>
+            <span>SOURCE SEGREGATION:</span>
+            <i data-lucide="chevron-left" id="icon-ribbon-chevron" style="width:12px; height:12px; margin-left:2px; transition:transform 0.2s ease;"></i>
+          </div>
+          <div class="ribbon-collapsible-content" id="ribbon-collapsible-content">
+            <div class="ribbon-chips-container" id="category-filter-chips">
+              <button class="category-chip active" data-category="all" title="Show all thermal detections across India">
+                <span>All Sources</span>
+                <span class="chip-count" id="chip-count-all">7</span>
+              </button>
+              <button class="category-chip" data-category="industrial_fire" title="Accidental industrial fires, explosions, and flare surges">
+                <span class="chip-dot" style="background:#ff4747;"></span>
+                <span>🏭 Industrial Fires</span>
+                <span class="chip-count" id="chip-count-ind">2</span>
+              </button>
+              <button class="category-chip" data-category="routine_flare" title="Persistent routine industrial gas flaring">
+                <span class="chip-dot" style="background:#00f0ff;"></span>
+                <span>🔥 Routine Flares</span>
+                <span class="chip-count" id="chip-count-flare">1</span>
+              </button>
+              <button class="category-chip" data-category="mining_fire" title="Subterranean coal seam fires and open-cast mining">
+                <span class="chip-dot" style="background:#a855f7;"></span>
+                <span>⛏️ Coal Mining</span>
+                <span class="chip-count" id="chip-count-mining">1</span>
+              </button>
+              <button class="category-chip" data-category="forest_fire" title="Active advancing forest canopy wildfires">
+                <span class="chip-dot" style="background:#f97316;"></span>
+                <span>🌲 Forest Wildfires</span>
+                <span class="chip-count" id="chip-count-forest">1</span>
+              </button>
+              <button class="category-chip" data-category="agriculture_fire" title="Seasonal agricultural stubble & crop residue burning">
+                <span class="chip-dot" style="background:#eab308;"></span>
+                <span>🌾 Agri Stubble</span>
+                <span class="chip-count" id="chip-count-agri">1</span>
+              </button>
+              <button class="category-chip" data-category="glint_filtered" title="False alarm suppression over solar PV panels and high albedo surfaces">
+                <span class="chip-dot" style="background:#64748b;"></span>
+                <span>☀️ Glint Filtered</span>
+                <span class="chip-count" id="chip-count-glint">1</span>
+              </button>
+            </div>
+            <div class="ribbon-sort-box">
+              <label for="select-map-sort" style="font-size:0.68rem; font-weight:700; color:var(--text-muted);">SORT:</label>
+              <select id="select-map-sort" class="sort-dropdown">
+                <option value="frp_desc">🔥 Highest FRP (MW)</option>
+                <option value="surge_desc">📈 Anomaly Surge (x)</option>
+                <option value="confidence_desc">🎯 Confidence (%)</option>
+                <option value="velocity_desc">⚡ Spread Velocity (km/h)</option>
+                <option value="recent">⏱️ Most Recent</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating Region & Facility Search Selector -->
+        <div class="map-floating-panel map-region-selector">
+          <!-- Search Box -->
+          <div class="selector-row-search">
+            <div class="search-input-wrap">
+              <i data-lucide="search"></i>
+              <input type="text" id="input-facility-search" placeholder="Search 50+ Indian industrial plants, mines, cities...">
+            </div>
+            <div id="facility-search-results" class="search-results-dropdown"></div>
+          </div>
+
+          <!-- Focus Facility Select Row -->
+          <div class="selector-control-row">
+            <div class="selector-label-group">
+              <i data-lucide="map-pin"></i>
+              <label for="select-study-region">FOCUS:</label>
+            </div>
+            <select id="select-study-region" class="region-dropdown">
+              <option value="all_india">🇮🇳 All-India Overview (50+ Facilities)</option>
+            </select>
+          </div>
+          
+          <!-- Satellite Basemap Select Row -->
+          <div class="selector-control-row selector-satellite-row">
+            <div class="selector-label-group">
+              <i data-lucide="satellite"></i>
+              <label for="select-basemap-style">SATELLITE:</label>
+            </div>
+            <select id="select-basemap-style" class="region-dropdown">
+              <option value="nasa_viirs" selected>🛰️ NASA GIBS VIIRS True Color (Official FIRMS Map)</option>
+              <option value="nasa_modis">🛰️ NASA GIBS MODIS Terra (Daily 250m)</option>
+              <option value="nasa_night">🌙 NASA GIBS VIIRS Earth at Night</option>
+              <option value="nasa_bluemarble">🌍 NASA Blue Marble (Global Topography)</option>
+              <option value="sentinel2">🛰️ Copernicus Sentinel-2 (10m Optical)</option>
+              <option value="sentinel2_swir">🔥 Sentinel-2 SWIR (B12 Infrared)</option>
+              <option value="satellite">📸 High-Res Imagery (1m Aerial)</option>
+              <option value="osm">🗺️ OpenStreetMap Standard</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Floating Multimodal Layer Control (Draggable & Collapsible) -->
+        <div class="map-floating-panel map-layers-panel draggable-panel collapsed" id="map-layers-panel">
+          <div class="panel-heading-row" id="btn-toggle-layers" style="cursor:pointer; margin-bottom:0;" title="Click to collapse / expand layers">
+            <div style="display:flex; align-items:center; gap:0.35rem;">
+              <div class="ribbon-drag-handle" id="layers-drag-handle" title="Touch / Drag to move anywhere on map" style="padding:0 2px;">
+                <i data-lucide="grip-vertical" style="width:13px; height:13px; color:var(--text-muted);"></i>
+              </div>
+              <i data-lucide="layers" style="width:14px; height:14px; color:var(--accent-cyan);"></i>
+              <span>Multimodal Layers</span>
+            </div>
+            <i data-lucide="chevron-down" id="icon-layers-chevron" style="width:13px; height:13px; transition:transform 0.2s ease;"></i>
+          </div>
+
+          <div class="layers-collapsible-body" id="layers-collapsible-body" style="margin-top:0.5rem;">
+            <label class="layer-toggle-item">
+              <span>Raw NASA FIRMS Points</span>
+              <label class="custom-switch">
+                <input type="checkbox" id="toggle-layer-firms" checked>
+                <span class="slider"></span>
+              </label>
+            </label>
+
+            <label class="layer-toggle-item">
+              <span>Thermal Objects (Clustered)</span>
+              <label class="custom-switch">
+                <input type="checkbox" id="toggle-layer-clusters" checked>
+                <span class="slider"></span>
+              </label>
+            </label>
+
+            <label class="layer-toggle-item">
+              <span>OSM Industrial Facilities</span>
+              <label class="custom-switch">
+                <input type="checkbox" id="toggle-layer-osm" checked>
+                <span class="slider"></span>
+              </label>
+            </label>
+
+            <label class="layer-toggle-item">
+              <span>ESA WorldCover (1km Buffers)</span>
+              <label class="custom-switch">
+                <input type="checkbox" id="toggle-layer-worldcover" checked>
+                <span class="slider"></span>
+              </label>
+            </label>
+
+            <label class="layer-toggle-item">
+              <span>NASA Static Anomaly Mask</span>
+              <label class="custom-switch">
+                <input type="checkbox" id="toggle-layer-nasa">
+                <span class="slider"></span>
+              </label>
+            </label>
+
+            <label class="layer-toggle-item">
+              <span>2km Population Risk Buffers</span>
+              <label class="custom-switch">
+                <input type="checkbox" id="toggle-layer-buffers" checked>
+                <span class="slider"></span>
+              </label>
+            </label>
+          </div>
+        </div>
+
+        <!-- Floating Map Legend (Draggable & Collapsible) -->
+        <div class="map-floating-panel map-legend-panel draggable-panel collapsed" id="map-legend-panel">
+          <div class="panel-heading-row" id="btn-toggle-legend" style="cursor:pointer; margin-bottom:0;" title="Click to collapse / expand legend">
+            <div style="display:flex; align-items:center; gap:0.35rem;">
+              <div class="ribbon-drag-handle" id="legend-drag-handle" title="Touch / Drag to move anywhere on map" style="padding:0 2px;">
+                <i data-lucide="grip-vertical" style="width:13px; height:13px; color:var(--text-muted);"></i>
+              </div>
+              <span style="font-weight:700; font-size:0.7rem; text-transform:uppercase; color:var(--text-muted);">Symbology Legend</span>
+            </div>
+            <i data-lucide="chevron-down" id="icon-legend-chevron" style="width:13px; height:13px; transition:transform 0.2s ease;"></i>
+          </div>
+
+          <div class="legend-collapsible-body" id="legend-collapsible-body">
+            <div class="legend-item"><div class="legend-chip chip-anomaly"></div><span>High-Priority Anomaly</span></div>
+            <div class="legend-item"><div class="legend-chip chip-industrial"></div><span>Normal Industrial Source</span></div>
+            <div class="legend-item"><div class="legend-chip chip-flare"></div><span>Routine Gas Flare</span></div>
+            <div class="legend-item"><div class="legend-chip chip-wildfire"></div><span>Vegetation Wildfire</span></div>
+            <div class="legend-item"><div class="legend-chip chip-agri"></div><span>Agricultural Burning</span></div>
+            <div class="legend-item"><div class="legend-chip chip-osm"></div><span>OSM Facility Boundary</span></div>
+            <div class="legend-item"><div class="legend-chip chip-nasa"></div><span>NASA Static Anomaly Point</span></div>
+          </div>
+        </div>
+
+        <!-- Time Scrubber / Temporal Playback -->
+        <div class="map-time-scrubber">
+          <i data-lucide="history" style="color:var(--accent-cyan); width:16px; height:16px;"></i>
+          <input type="range" id="map-timeline-slider" class="time-scrubber-slider" min="0" max="100" value="100">
+          <span class="scrubber-label" id="scrubber-time-display">LIVE: Today 03:45 UTC</span>
+        </div>
+
+        <!-- Right Sidebar: Thermal Object & Telemetry Inspector -->
+        <aside class="map-sidebar-inspector" id="map-sidebar-inspector">
+          <div class="sidebar-header">
+            <div class="object-badge-row">
+              <span class="object-id-code" id="hud-obj-id">OBJ-1045</span>
+              <span class="severity-tag high-priority" id="hud-obj-severity">HIGH-PRIORITY ANOMALY</span>
+            </div>
+            <h2 class="object-title" id="hud-obj-title">Jamnagar Polypropylene Cracker Flare Complex #4</h2>
+            <p class="object-subtitle" id="hud-obj-category">Probable Persistent Industrial Source &bull; Petrochemical</p>
+          </div>
+
+          <div class="sidebar-content">
+            <!-- Telemetry Metrics Grid -->
+            <div class="hud-section-card">
+              <div class="section-card-title">
+                <span>Satellite Physical Telemetry</span>
+                <i data-lucide="gauge" style="width:14px; height:14px;"></i>
+              </div>
+              <div class="telemetry-stats-grid">
+                <div class="stat-box">
+                  <div class="stat-box-label">Current FRP</div>
+                  <div class="stat-box-val highlight-surge" id="hud-stat-frp">68.4 MW</div>
+                  <div class="stat-box-sub" id="hud-stat-frp-dev" style="color:#ff8888;">3.76× Baseline</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-box-label">Brightness Temp</div>
+                  <div class="stat-box-val" id="hud-stat-temp">368.5 K</div>
+                  <div class="stat-box-sub">VIIRS 375m Band I4</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-box-label">Temporal Persistence</div>
+                  <div class="stat-box-val" id="hud-stat-persistence" style="font-size:0.95rem;">92.4%</div>
+                  <div class="stat-box-sub" id="hud-stat-active-days">94 Days (142 Detections)</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-box-label">Nearest Facility</div>
+                  <div class="stat-box-val" id="hud-stat-facility-dist" style="font-size:0.95rem;">210 m</div>
+                  <div class="stat-box-sub" id="hud-stat-facility-name" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">RIL Mega-Refinery</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recommendation 2: Spatial Dynamics & Centroid Stability Tracking -->
+            <div class="hud-section-card">
+              <div class="section-card-title">
+                <span>Spatial Dynamics & Spread Velocity</span>
+                <span class="dynamics-pill" id="hud-motion-badge" style="font-size:0.65rem; padding:2px 7px; border-radius:4px; background:rgba(0,240,255,0.15); color:var(--accent-cyan); font-family:var(--font-mono); font-weight:700;">STATIONARY STACK</span>
+              </div>
+              <div class="telemetry-stats-grid">
+                <div class="stat-box">
+                  <div class="stat-box-label">Centroid Stability</div>
+                  <div class="stat-box-val" id="hud-stat-stability" style="color:var(--accent-cyan);">99.4%</div>
+                  <div class="stat-box-sub" id="hud-stat-drift-sub">Stack Fixed (&lt;15m)</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-box-label">Spread Velocity</div>
+                  <div class="stat-box-val" id="hud-stat-velocity" style="color:#fff;">0.0 km/h</div>
+                  <div class="stat-box-sub" id="hud-stat-motion-type">Zero Lateral Spread</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-box-label">Centroid Drift</div>
+                  <div class="stat-box-val" id="hud-stat-drift" style="font-size:0.95rem;">12 m</div>
+                  <div class="stat-box-sub">Multi-Satellite Mean</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-box-label">Plume Dispersion</div>
+                  <div class="stat-box-val" id="hud-stat-plume-dir" style="font-size:0.85rem; color:#f59e0b;">SW (18 km/h)</div>
+                  <div class="stat-box-sub">Atmospheric Vector</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recommendation 1: False Positive & Solar Glint Rejection Engine -->
+            <div class="hud-section-card glint-verified-card" style="background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.25);">
+              <div class="section-card-title" style="color:#10b981;">
+                <span>False Positive & Solar Glint Filter</span>
+                <i data-lucide="shield-check" style="width:14px; height:14px;"></i>
+              </div>
+              <div style="margin-bottom:4px;">
+                <span class="glint-status-badge" id="hud-glint-badge" style="font-size:0.68rem; font-family:var(--font-mono); font-weight:700; color:#10b981; background:rgba(16,185,129,0.15); padding:2px 6px; border-radius:3px; display:inline-block;">✓ PASSED: CONFIRMED THERMAL EMITTER</span>
+              </div>
+              <p style="font-size:0.7rem; color:var(--text-muted); line-height:1.35;" id="hud-glint-desc">
+                Albedo (0.08) & multi-spectral radiance confirm active combustion. Solar rooftop/desert glint ruled out.
+              </p>
+            </div>
+
+            <!-- Recommendation 3: Critical Infrastructure Proximity & Buffer Threat -->
+            <div class="hud-section-card hazard-card" id="hud-hazard-card" style="background:rgba(255,71,71,0.06); border:1px solid rgba(255,71,71,0.25);">
+              <div class="section-card-title" style="color:#ff8888;">
+                <span>Infrastructure Hazard Proximity</span>
+                <span class="threat-tag" id="hud-hazard-threat" style="font-size:0.65rem; font-family:var(--font-mono); padding:2px 6px; border-radius:3px; background:rgba(255,71,71,0.2); color:#ff4747; font-weight:700;">CRITICAL_SURGE</span>
+              </div>
+              <p style="font-size:0.72rem; color:#fca5a5; line-height:1.35;" id="hud-hazard-summary">
+                Critical internal surge within licensed refinery perimeter; adjacent storage tank sector threatened.
+              </p>
+            </div>
+
+            <!-- Brain 1: Multi-Modal Evidence & XGBoost Attribution -->
+            <div class="hud-section-card">
+              <div class="section-card-title">
+                <span>Brain 1: Multi-Modal Source Attribution</span>
+                <span style="font-family:var(--font-mono); color:var(--accent-cyan);" id="hud-score-pct">91%</span>
+              </div>
+              <div class="score-progress-wrap">
+                <div class="score-progress-header">
+                  <span style="color:var(--text-muted);">Attribution Evidence Confidence</span>
+                  <span style="color:#fff; font-weight:600;">High Confidence</span>
+                </div>
+                <div class="score-bar-bg">
+                  <div class="score-bar-fill" id="hud-score-bar" style="width:91%;"></div>
+                </div>
+              </div>
+              <p style="font-size:0.7rem; color:var(--text-dim); margin-top:6px;">
+                Calculated from Facility Match (35%) + Built-up Context (25%) + Nightlights (20%) + Persistence (20%).
+              </p>
+            </div>
+
+            <!-- Brain 2: Behavioural Anomaly Gauge & Radar -->
+            <div class="hud-section-card">
+              <div class="section-card-title">
+                <span>Brain 2: Behavioural Anomaly Engine</span>
+                <span style="font-family:var(--font-mono); color:var(--accent-thermal);" id="hud-anomaly-pct">88%</span>
+              </div>
+              <div class="score-progress-wrap">
+                <div class="score-progress-header">
+                  <span style="color:var(--text-muted);">Baseline Deviation Severity</span>
+                  <span style="color:#ff4747; font-weight:700;">Critical Anomaly</span>
+                </div>
+                <div class="score-bar-bg">
+                  <div class="score-bar-fill anomaly-fill" id="hud-anomaly-bar" style="width:88%;"></div>
+                </div>
+              </div>
+              <div class="chart-canvas-wrap" style="height:140px; margin-top:8px;">
+                <canvas id="sidebar-radar-chart"></canvas>
+              </div>
+            </div>
+
+            <!-- 90-Day Baseline Telemetry Chart -->
+            <div class="hud-section-card">
+              <div class="section-card-title">
+                <span>90-Day FRP Baseline vs Surge</span>
+                <i data-lucide="trending-up" style="width:14px; height:14px;"></i>
+              </div>
+              <div class="chart-canvas-wrap" style="height:150px;">
+                <canvas id="sidebar-frp-chart"></canvas>
+              </div>
+            </div>
+
+            <!-- ESA WorldCover Land-Cover Composition -->
+            <div class="hud-section-card">
+              <div class="section-card-title">
+                <span>ESA WorldCover (1km Buffer)</span>
+                <i data-lucide="pie-chart" style="width:14px; height:14px;"></i>
+              </div>
+              <div class="chart-canvas-wrap" style="height:140px;">
+                <canvas id="sidebar-landcover-chart"></canvas>
+              </div>
+            </div>
+
+            <!-- Collapsible Secondary Physical Science: Planck Pyrometry & GHG Flaring -->
+            <details class="hud-accordion" style="margin-bottom:0.75rem; border:1px solid rgba(255,152,0,0.25); border-radius:8px; background:rgba(255,152,0,0.04); overflow:hidden;">
+              <summary style="padding:0.6rem 0.85rem; font-size:0.75rem; font-weight:600; color:var(--accent-flare); cursor:pointer; display:flex; justify-content:space-between; align-items:center; user-select:none;">
+                <span>🔥 Advanced Radiometric & GHG Physics (Secondary)</span>
+                <i data-lucide="chevron-down" style="width:12px; height:12px;"></i>
+              </summary>
+              <div style="padding:0.75rem; border-top:1px solid rgba(255,152,0,0.15);">
+                <div class="telemetry-stats-grid">
+                  <div class="stat-box">
+                    <div class="stat-box-label">Planck Emitter Temp</div>
+                    <div class="stat-box-val" id="hud-pyro-temp" style="font-size:0.92rem; color:#ffaa00;">1,620 K</div>
+                    <div class="stat-box-sub" id="hud-pyro-celsius">1,346.8 °C (Flame)</div>
+                  </div>
+                  <div class="stat-box">
+                    <div class="stat-box-label">Estimated Flared Gas</div>
+                    <div class="stat-box-val" id="hud-pyro-gas" style="font-size:0.92rem; color:#fff;">165,528 m³</div>
+                    <div class="stat-box-sub">Daily Gas Volume</div>
+                  </div>
+                  <div class="stat-box">
+                    <div class="stat-box-label">CO2 GHG Emission</div>
+                    <div class="stat-box-val" id="hud-pyro-co2" style="font-size:0.92rem; color:#ff8888;">455.2 T/day</div>
+                    <div class="stat-box-sub">GGFR Model</div>
+                  </div>
+                  <div class="stat-box">
+                    <div class="stat-box-label">Sub-Pixel Flame Area</div>
+                    <div class="stat-box-val" id="hud-pyro-area" style="font-size:0.92rem; color:var(--accent-cyan);">17.4 m²</div>
+                    <div class="stat-box-sub">Active Flame Core</div>
+                  </div>
+                </div>
+              </div>
+            </details>
+
+            <!-- Explainable Evidence Checklist -->
+            <div class="hud-section-card">
+              <div class="section-card-title">
+                <span>Explainable AI Evidence Trail</span>
+                <i data-lucide="check-circle-2" style="width:14px; height:14px;"></i>
+              </div>
+              <div class="evidence-list" id="hud-evidence-list">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- NASA Static Mask Comparison Box -->
+            <div class="hud-section-card nasa-compare-card">
+              <div class="section-card-title" style="color:#60a5fa;">
+                <span>NASA FIRMS 2025 vs HeatWatch</span>
+                <i data-lucide="git-compare" style="width:14px; height:14px;"></i>
+              </div>
+              <div class="compare-row">
+                <span class="compare-label">NASA Static Mask:</span>
+                <span class="compare-val nasa" id="hud-nasa-label">Static Thermal Anomaly</span>
+              </div>
+              <div class="compare-row">
+                <span class="compare-label">HeatWatch Verdict:</span>
+                <span class="compare-val heatwatch" id="hud-heatwatch-label">Abnormal Industrial Incident</span>
+              </div>
+              <div class="compare-row">
+                <span class="compare-label">Assessment:</span>
+                <span class="compare-val" id="hud-compare-status" style="color:#00f0ff;">Severity Escalation</span>
+              </div>
+              <p style="font-size:0.72rem; color:#93c5fd; margin-top:6px; line-height:1.35;" id="hud-compare-desc">
+                NASA classifies as routine static background. HeatWatch exposes a sudden 4.4x surge and uncontained spatial flare-up.
+              </p>
+            </div>
+
+            <!-- Human Verification Status (Active Learning Loop) -->
+            <div class="hud-section-card" style="background:rgba(0, 240, 255, 0.05); border:1px solid rgba(0, 240, 255, 0.2);">
+              <div class="section-card-title" style="color:var(--accent-cyan);">
+                <span>Human Verification & Retraining</span>
+                <i data-lucide="shield-check" style="width:14px; height:14px;"></i>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; margin-bottom:0.4rem;">
+                <span style="color:var(--text-muted);">Audit Status:</span>
+                <strong id="hud-verification-status" style="color:#10b981;">✓ Verified: Industrial Plant</strong>
+              </div>
+              <p style="font-size:0.68rem; color:var(--text-dim);">
+                Operator verified ground truth. Queued into active learning dataset for XGBoost continuous retraining.
+              </p>
+            </div>
+
+            <!-- Action Recommendation & Buttons -->
+            <div class="action-box">
+              <strong style="color:#ff8888; display:block; margin-bottom:4px;">RECOMMENDED ACTION:</strong>
+              <p id="hud-action-text">Urgent field verification required. Cross-check refinery valve pressure.</p>
+              <p style="font-size:0.7rem; color:#fca5a5; margin-top:4px;" id="hud-exposure-text">
+                Nearest: Moti Khavdi Settlement (1.8 km, ~14,500 residents)
+              </p>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
+              <button class="btn-primary" id="btn-open-dossier-sidebar" style="justify-content:center;">
+                <i data-lucide="file-text"></i> Export 1-Page Incident Dossier
+              </button>
+              <button class="btn-secondary" id="btn-open-spectral-modal" style="justify-content:center;">
+                <i data-lucide="satellite"></i> Sentinel-2 Spectral Verification
+              </button>
+            </div>
+
+          </div>
+        </aside>
+
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------------------
+         VIEW 2: Analytics & Baseline Deep-Dive
+         ------------------------------------------------------------------------ -->
+    <section class="view-section" id="view-analytics-tab">
+      <div class="analytics-view-container">
+        
+        <div class="analytics-header-row">
+          <div>
+            <h2 style="font-family:var(--font-heading); font-size:1.5rem; font-weight:700;">Regional Thermal Telemetry & Baselines</h2>
+            <p style="font-size:0.85rem; color:var(--text-muted);">Historical time-series analysis, multi-year persistence profiles, and anomaly deviation distributions</p>
+          </div>
+        </div>
+
+        <!-- 4 KPI Cards -->
+        <div class="analytics-grid-4col">
+          <div class="kpi-card">
+            <span class="kpi-title">Monitored Thermal Objects</span>
+            <span class="kpi-value">6 Facilities</span>
+            <span class="kpi-sub">Across 6 Industrial Study Corridors</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Critical Anomalies</span>
+            <span class="kpi-value" style="color:var(--accent-thermal);">2 Active</span>
+            <span class="kpi-sub">>2.0× Historical Baseline Threshold</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Peak Fire Radiative Power</span>
+            <span class="kpi-value" style="color:var(--accent-cyan);">340.8 MW</span>
+            <span class="kpi-sub">Simlipal Wildfire Outbreak</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Attribution Accuracy (F1)</span>
+            <span class="kpi-value" style="color:var(--accent-forest);">94.2%</span>
+            <span class="kpi-sub">Benchmarked on Ground-Verified Corridors</span>
+          </div>
+        </div>
+
+        <!-- Charts Split Row -->
+        <div class="charts-split-grid">
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <span class="chart-card-title">Cross-Facility FRP vs 90-Day Baseline (MW)</span>
+              <span style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-mono);">VIIRS 375m Telemetry</span>
+            </div>
+            <div class="chart-canvas-wrap" style="height:300px;">
+              <canvas id="canvas-regional-overview"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <span class="chart-card-title">Selected Facility 90-Day Time Series</span>
+              <span style="font-size:0.75rem; color:var(--accent-cyan); font-family:var(--font-mono);">OBJ-1045 Surge</span>
+            </div>
+            <div class="chart-canvas-wrap" style="height:300px;">
+              <canvas id="canvas-analytics-timeseries"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scientific Methodology Card -->
+        <div class="hud-section-card" style="padding:1.5rem;">
+          <h3 style="font-family:var(--font-heading); font-size:1.15rem; color:#fff; margin-bottom:0.75rem;">
+            Why HeatWatch Solves the True Research Gap Beyond NASA FIRMS 2025
+          </h3>
+          <p style="font-size:0.85rem; color:#d1d5db; line-height:1.5; margin-bottom:1rem;">
+            While NASA FIRMS introduced a static thermal anomaly layer in March 2025 using static inventories, it cannot determine whether an industrial flare is behaving normally or experiencing a dangerous escalation. Furthermore, newly constructed or unmapped industrial facilities are completely missing from static catalogs.
+          </p>
+          <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:1rem;">
+            <div style="background:rgba(0,0,0,0.3); padding:1rem; border-radius:8px; border-left:3px solid var(--accent-cyan);">
+              <strong style="color:var(--accent-cyan); font-size:0.85rem;">1. Object-Oriented Unit</strong>
+              <p style="font-size:0.78rem; color:var(--text-muted); margin-top:4px;">
+                Converts individual satellite pixels into persistent <strong>Thermal Objects</strong> retaining multi-year history, FRP statistics, and centroid stability.
+              </p>
+            </div>
+            <div style="background:rgba(0,0,0,0.3); padding:1rem; border-radius:8px; border-left:3px solid #ff4747;">
+              <strong style="color:#ff4747; font-size:0.85rem;">2. Independent Anomaly Engine</strong>
+              <p style="font-size:0.78rem; color:var(--text-muted); margin-top:4px;">
+                Evaluates acute FRP deviations, footprint expansions (+252%), and displacement from flare stacks to prioritize human verification.
+              </p>
+            </div>
+            <div style="background:rgba(0,0,0,0.3); padding:1rem; border-radius:8px; border-left:3px solid #a855f7;">
+              <strong style="color:#a855f7; font-size:0.85rem;">3. Unmapped Facility Discovery</strong>
+              <p style="font-size:0.78rem; color:var(--text-muted); margin-top:4px;">
+                Combines nighttime lights (VIIRS DNB) and ESA WorldCover to discover unregistered industrial activity absent from NASA static masks.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------------------
+         VIEW 3: Pyrometry, Gas Flaring & AI Feature Explainer
+         ------------------------------------------------------------------------ -->
+    <section class="view-section" id="view-pyrometry-tab">
+      <div class="analytics-view-container">
+        
+        <div class="analytics-header-row">
+          <div>
+            <h2 style="font-family:var(--font-heading); font-size:1.5rem; font-weight:700;">Sub-Pixel Pyrometry & AI Attribution Explainer</h2>
+            <p style="font-size:0.85rem; color:var(--text-muted);">Planck radiation curve spectral fitting, gas flaring GHG calculations, and real-time SHAP feature explainer</p>
+          </div>
+        </div>
+
+        <!-- Top 4 Physical Science Metrics -->
+        <div class="analytics-grid-4col">
+          <div class="kpi-card">
+            <span class="kpi-title">Planck Emitter Temp Range</span>
+            <span class="kpi-value" style="color:#ffaa00;">1,620 K</span>
+            <span class="kpi-sub">Gas Flare Flame Core (Elvidge et al.)</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">National Industrial Flaring</span>
+            <span class="kpi-value" style="color:var(--accent-cyan);">2.84 BCM/yr</span>
+            <span class="kpi-sub">Estimated Flared Natural Gas Volume</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Daily Flaring CO2 Burden</span>
+            <span class="kpi-value" style="color:var(--accent-thermal);">7,810 T/day</span>
+            <span class="kpi-sub">Based on World Bank GGFR Conversion</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Sub-Pixel Source Area</span>
+            <span class="kpi-value" style="color:var(--accent-forest);">17.4 m²</span>
+            <span class="kpi-sub">Extracted from VIIRS 375m Pixel</span>
+          </div>
+        </div>
+
+        <!-- Split Grid: Planck Curve & Interactive ML Playground -->
+        <div class="charts-split-grid" style="grid-template-columns: 1fr 1fr;">
+          <!-- Left: Planck Radiation Curve -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <span class="chart-card-title">Planck Spectral Radiance Distribution B(λ, T)</span>
+              <div style="display:flex; align-items:center; gap:0.5rem;">
+                <label style="font-size:0.72rem; color:var(--text-muted);">TEMP:</label>
+                <input type="range" id="slider-planck-temp" min="500" max="2200" value="1620" step="50" style="width:110px; accent-color:var(--accent-flare);">
+                <span id="label-planck-temp" style="font-family:var(--font-mono); font-size:0.75rem; color:var(--accent-flare);">1620 K</span>
+              </div>
+            </div>
+            <div class="chart-canvas-wrap" style="height:280px;">
+              <canvas id="canvas-planck-curve"></canvas>
+            </div>
+            <p style="font-size:0.72rem; color:var(--text-dim); margin-top:8px;">
+              Governed by Planck's Law: $B(\lambda, T) = \frac{2hc^2}{\lambda^5 (e^{hc/\lambda k_B T} - 1)}$. Peak radiance shifts toward SWIR ($1.6 - 2.2\,\mu\text{m}$) for high-temperature flares and MWIR ($3.74\,\mu\text{m}$) for biomass.
+            </p>
+          </div>
+
+          <!-- Right: Interactive AI Attribution & SHAP Explainer -->
+          <div class="chart-card" style="background:rgba(18, 27, 45, 0.9);">
+            <div class="chart-card-header">
+              <span class="chart-card-title">Interactive AI Model & SHAP Explainer</span>
+              <span class="sih-badge">XGBoost / Random Forest</span>
+            </div>
+
+            <!-- Feature Sliders Grid -->
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem; margin-bottom:1rem;">
+              <div>
+                <div style="display:flex; justify-content:space-between; font-size:0.72rem; color:var(--text-muted);">
+                  <span>Fire Radiative Power (FRP)</span>
+                  <strong id="val-sim-frp" style="color:#00f0ff;">68 MW</strong>
+                </div>
+                <input type="range" id="sim-slider-frp" min="1" max="150" value="68" style="width:100%; accent-color:#00f0ff;">
+              </div>
+
+              <div>
+                <div style="display:flex; justify-content:space-between; font-size:0.72rem; color:var(--text-muted);">
+                  <span>Distance to Mapped Facility</span>
+                  <strong id="val-sim-dist" style="color:#00f0ff;">210 m</strong>
+                </div>
+                <input type="range" id="sim-slider-dist" min="50" max="5000" value="210" step="50" style="width:100%; accent-color:#00f0ff;">
+              </div>
+
+              <div>
+                <div style="display:flex; justify-content:space-between; font-size:0.72rem; color:var(--text-muted);">
+                  <span>ESA Built-Up Land %</span>
+                  <strong id="val-sim-builtup" style="color:#00f0ff;">76%</strong>
+                </div>
+                <input type="range" id="sim-slider-builtup" min="0" max="100" value="76" style="width:100%; accent-color:#00f0ff;">
+              </div>
+
+              <div>
+                <div style="display:flex; justify-content:space-between; font-size:0.72rem; color:var(--text-muted);">
+                  <span>ESA Tree / Forest %</span>
+                  <strong id="val-sim-forest" style="color:#00f0ff;">3%</strong>
+                </div>
+                <input type="range" id="sim-slider-forest" min="0" max="100" value="3" style="width:100%; accent-color:#00f0ff;">
+              </div>
+            </div>
+
+            <!-- Dynamic Model Output Prediction -->
+            <div style="background:rgba(0,0,0,0.35); border:1px solid var(--border-glow); border-radius:8px; padding:0.85rem; margin-bottom:0.75rem;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">AI Attribution Verdict:</span>
+                <strong id="sim-predicted-class" style="color:#00f0ff; font-family:var(--font-heading); font-size:1.05rem;">Petrochemical / Refinery</strong>
+              </div>
+              <div style="display:flex; gap:0.5rem;" id="sim-probability-bars">
+                <!-- Probability bars rendered dynamically -->
+              </div>
+            </div>
+
+            <!-- SHAP Contribution Explanations -->
+            <div style="font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.35rem;">
+              SHAP Feature Contributions:
+            </div>
+            <div id="sim-shap-list" style="display:flex; flex-direction:column; gap:0.3rem;">
+              <!-- Dynamic SHAP list -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------------------
+         VIEW 4: Regional Alert Center & Triage Workflow
+         ------------------------------------------------------------------------ -->
+    <section class="view-section" id="view-alerts-tab">
+      <div class="alerts-view-container">
+        
+        <div class="analytics-header-row">
+          <div>
+            <h2 style="font-family:var(--font-heading); font-size:1.5rem; font-weight:700;">Regional Alert & Incident Triage Center</h2>
+            <p style="font-size:0.85rem; color:var(--text-muted);">Real-time queue with human-in-the-loop verification feeding verified ground truth into model retraining</p>
+          </div>
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <button class="btn-primary" id="btn-triage-confirm-ind" style="background:#00f0ff; color:#020617; font-weight:700;">
+              <i data-lucide="check-circle-2"></i> ✓ Confirm Industrial
+            </button>
+            <button class="btn-secondary" id="btn-triage-confirm-wild">
+              <i data-lucide="flame"></i> ✓ Confirm Wildfire
+            </button>
+            <button class="btn-secondary" id="btn-triage-dispatch">
+              <i data-lucide="send"></i> Dispatch Drone
+            </button>
+          </div>
+        </div>
+
+        <div class="alert-table-card">
+          <!-- Alert Category Tabs & Search Row -->
+          <div class="alert-table-controls-row">
+            <div class="alert-category-tabs" id="alerts-category-tabs">
+              <button class="alert-tab-btn active" data-category="all">All Alerts (7)</button>
+              <button class="alert-tab-btn" data-category="industrial_fire">🏭 Industrial Fires (2)</button>
+              <button class="alert-tab-btn" data-category="routine_flare">🔥 Routine Flares (1)</button>
+              <button class="alert-tab-btn" data-category="mining_fire">⛏️ Coal Mining (1)</button>
+              <button class="alert-tab-btn" data-category="forest_fire">🌲 Forest Wildfires (1)</button>
+              <button class="alert-tab-btn" data-category="agriculture_fire">🌾 Agri Stubble (1)</button>
+              <button class="alert-tab-btn" data-category="glint_filtered">☀️ Glint Filtered (1)</button>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <input type="text" id="input-alert-search" placeholder="Filter alerts by name or state..." class="alert-search-input">
+            </div>
+          </div>
+
+          <table class="table-custom">
+            <thead>
+              <tr>
+                <th>Object ID</th>
+                <th>Thermal Entity & Location</th>
+                <th>Priority Status</th>
+                <th>Current FRP (Deviation)</th>
+                <th>Actionable Intelligence Summary</th>
+                <th>Triage Actions</th>
+              </tr>
+            </thead>
+            <tbody id="alerts-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------------------
+         VIEW 4: NASA Comparison Matrix & SIH Novelty
+         ------------------------------------------------------------------------ -->
+    <section class="view-section" id="view-comparison-tab">
+      <div class="comparison-view-container">
+        
+        <div class="analytics-header-row">
+          <div>
+            <h2 style="font-family:var(--font-heading); font-size:1.5rem; font-weight:700;">NASA FIRMS Static Mask vs HeatWatch AI Benchmark</h2>
+            <p style="font-size:0.85rem; color:var(--text-muted);">Scientific comparison proving why HeatWatch extends and augments NASA's 2025 release</p>
+          </div>
+        </div>
+
+        <!-- 2-Column Comparison Matrix -->
+        <div class="matrix-grid">
+          <div class="matrix-column-card nasa-col">
+            <h3 style="font-family:var(--font-heading); font-size:1.2rem; color:#93c5fd; display:flex; align-items:center; gap:0.5rem;">
+              <i data-lucide="database"></i> NASA FIRMS (2025 Static Mask)
+            </h3>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">
+              Authoritative global thermal detection infrastructure with static source screening.
+            </p>
+            <div class="matrix-feature-list">
+              <div class="matrix-item">
+                <div class="matrix-item-title">Detection Unit</div>
+                <div class="matrix-item-desc">Individual satellite pixels (375m VIIRS / 1km MODIS) without historical context.</div>
+              </div>
+              <div class="matrix-item">
+                <div class="matrix-item-title">Static Source Mask</div>
+                <div class="matrix-item-desc">Relies on pre-existing static catalogs. Treats any persistent factory flare as safe static background.</div>
+              </div>
+              <div class="matrix-item">
+                <div class="matrix-item-title">Behavioural Anomaly Scoring</div>
+                <div class="matrix-item-desc">None. A 4x flare escalation is marked with the exact same static label as normal daily operation.</div>
+              </div>
+              <div class="matrix-item">
+                <div class="matrix-item-title">Unmapped Facilities</div>
+                <div class="matrix-item-desc">Cannot attribute thermal anomalies at newly built or unmapped industrial complexes.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="matrix-column-card heatwatch-col">
+            <h3 style="font-family:var(--font-heading); font-size:1.2rem; color:var(--accent-cyan); display:flex; align-items:center; gap:0.5rem;">
+              <i data-lucide="shield-check"></i> HeatWatch Multimodal Intelligence
+            </h3>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">
+              Facility-aware decision support layer adding spatial context, historical baselines, and alerts.
+            </p>
+            <div class="matrix-feature-list">
+              <div class="matrix-item strong">
+                <div class="matrix-item-title">Detection Unit</div>
+                <div class="matrix-item-desc">Spatiotemporal <strong>Thermal Objects</strong> with multi-year detection count, active days, and stability.</div>
+              </div>
+              <div class="matrix-item strong">
+                <div class="matrix-item-title">Facility-Aware Context</div>
+                <div class="matrix-item-desc">OSM infrastructure matching + ESA WorldCover 10m land composition for explainable attribution.</div>
+              </div>
+              <div class="matrix-item strong">
+                <div class="matrix-item-title">Behavioural Anomaly Scoring</div>
+                <div class="matrix-item-desc">Calculates 90-day baseline FRP and flags acute surges, spatial spread, and abnormal hours as High-Priority.</div>
+              </div>
+              <div class="matrix-item strong">
+                <div class="matrix-item-title">Unmapped Facilities</div>
+                <div class="matrix-item-desc">Discovers unmapped industrial heat emitters using VIIRS Nighttime Lights and multi-month persistence.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comparative Table -->
+        <div class="alert-table-card">
+          <div style="padding:1rem 1.25rem; font-weight:700; font-size:0.9rem; color:#fff; border-bottom:1px solid var(--border-subtle);">
+            Facility-Level Comparison Matrix
+          </div>
+          <table class="table-custom">
+            <thead>
+              <tr>
+                <th>Thermal Entity</th>
+                <th>NASA Static Classification</th>
+                <th>HeatWatch AI Attribution</th>
+                <th>Status Assessment</th>
+                <th>Scientific & Operational Value-Add</th>
+              </tr>
+            </thead>
+            <tbody id="nasa-matrix-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------------------
+         VIEW 5: REST API Playground & Export Hub
+         ------------------------------------------------------------------------ -->
+    <section class="view-section" id="view-api-tab">
+      <div class="comparison-view-container">
+        
+        <div class="analytics-header-row">
+          <div>
+            <h2 style="font-family:var(--font-heading); font-size:1.5rem; font-weight:700;">HeatWatch Frozen REST API Explorer</h2>
+            <p style="font-size:0.85rem; color:var(--text-muted);">Standardized GeoJSON & telemetry contracts for seamless government and emergency dispatch integration</p>
+          </div>
+          <button class="btn-primary" onclick="window.heatwatchApp.apiPlayground.exportGeoJson()">
+            <i data-lucide="download"></i> Download Full GeoJSON
+          </button>
+        </div>
+
+        <div class="hud-section-card">
+          <div class="api-endpoint-selector">
+            <button class="api-method-btn active" data-endpoint="GET /api/hotspots">GET /api/hotspots</button>
+            <button class="api-method-btn" data-endpoint="GET /api/hotspots/OBJ-1045">GET /api/hotspots/OBJ-1045</button>
+            <button class="api-method-btn" data-endpoint="GET /api/statistics">GET /api/statistics</button>
+            <button class="api-method-btn" data-endpoint="POST /api/verification">POST /api/verification</button>
+            <button class="api-method-btn" data-endpoint="GET /api/facilities">GET /api/facilities</button>
+            <button class="api-method-btn" data-endpoint="GET /api/alerts">GET /api/alerts</button>
+            <button class="api-method-btn" data-endpoint="GET /api/compare/nasa">GET /api/compare/nasa</button>
+            <button class="api-method-btn" data-endpoint="POST /api/ingest/firms">POST /api/ingest/firms</button>
+            <button class="api-method-btn" data-endpoint="GET /api/health">GET /api/health</button>
+          </div>
+
+          <div class="code-terminal-box" id="api-terminal-output">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================================================
+       4. Floating Interactive Guided Demo Bar (8-Step Story)
+       ========================================================================== -->
+  <div class="demo-story-floating-bar" id="demo-story-bar">
+    <div class="demo-bar-top">
+      <div style="display:flex; align-items:center; gap:0.6rem;">
+        <span class="demo-step-badge" id="demo-step-num">STEP 1 OF 8</span>
+        <span class="demo-title" id="demo-step-title">1. Ingest Raw NASA FIRMS Detections</span>
+      </div>
+      <button class="modal-close-btn" id="btn-close-demo" title="Exit Presentation Tour">&times;</button>
+    </div>
+
+    <p class="demo-desc" id="demo-step-desc">
+      Satellite detects high-temperature infrared pixels over the Jamnagar industrial belt. Raw FIRMS only tells you WHERE heat is detected, leaving its nature ambiguous.
+    </p>
+
+    <div style="font-family:var(--font-mono); font-size:0.75rem; color:var(--accent-cyan); margin-bottom:0.75rem;" id="demo-action-highlight">
+      Target Action: Show raw FIRMS points on the map without any facility context.
+    </div>
+
+    <div class="demo-controls-row">
+      <div class="demo-progress-dots" id="demo-progress-dots">
+        <!-- 8 dots generated by JS -->
+      </div>
+      <div style="display:flex; gap:0.5rem;">
+        <button class="btn-secondary" id="btn-prev-step" style="padding:0.35rem 0.75rem; font-size:0.78rem;">&larr; Previous</button>
+        <button class="btn-secondary" id="btn-autoplay-demo" style="padding:0.35rem 0.75rem; font-size:0.78rem;">▶ Auto Play</button>
+        <button class="btn-primary" id="btn-next-step" style="padding:0.35rem 0.85rem; font-size:0.78rem;">Next Step &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       5. Sentinel-2 Optical / SWIR & Sentinel-1 SAR Multi-Spectral Modal
+       ========================================================================== -->
+  <div class="modal-backdrop" id="modal-spectral-inspector">
+    <div class="modal-window" style="max-width:960px;">
+      <div class="modal-header">
+        <div>
+          <span class="sih-badge" style="margin-bottom:4px; display:inline-block;">COPERNICUS SENTINEL-2 & SENTINEL-1 SAR MULTISPECTRAL ENGINE</span>
+          <h2 class="modal-title" id="modal-spec-obj-id">OBJ-1045 — Jamnagar Petrochemical Complex</h2>
+        </div>
+        <button class="modal-close-btn" id="btn-close-spectral-modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- 4-Way Multi-Sensor Satellite Instrument Selector -->
+        <div style="display:flex; gap:0.4rem; background:rgba(0,0,0,0.3); padding:4px; border-radius:8px; border:1px solid var(--border-subtle); flex-wrap:wrap;">
+          <button class="api-method-btn active" id="btn-spec-view-swir" style="flex:1; min-width:140px; text-align:center;">
+            🔥 Sentinel-2 SWIR (20m Infrared)
+          </button>
+          <button class="api-method-btn" id="btn-spec-view-rgb" style="flex:1; min-width:140px; text-align:center;">
+            🛰️ Sentinel-2 (10m Optical)
+          </button>
+          <button class="api-method-btn" id="btn-spec-view-gibs" style="flex:1; min-width:140px; text-align:center;">
+            🛰️ NASA GIBS (Daily VIIRS)
+          </button>
+          <button class="api-method-btn" id="btn-spec-view-sar" style="flex:1; min-width:140px; text-align:center;">
+            📡 Sentinel-1 SAR Radar
+          </button>
+        </div>
+
+        <div class="spectral-split-grid" style="grid-template-columns: 1fr 1fr;">
+          <!-- Primary Satellite Viewer -->
+          <div class="spectral-img-card">
+            <div class="spectral-img-canvas" id="spec-primary-canvas" style="background: radial-gradient(circle at 60% 40%, rgba(255, 71, 71, 0.85) 0%, rgba(255, 152, 0, 0.45) 35%, #0a1120 75%);">
+              <span class="spectral-badge" id="spec-primary-badge">Sentinel-2 SWIR False Color (B12 / B11 / B8A)</span>
+              <div style="position:absolute; bottom:10px; right:10px; font-family:var(--font-mono); font-size:0.7rem; color:#fff; background:rgba(0,0,0,0.85); padding:3px 8px; border-radius:4px;" id="spec-primary-caption">
+                20m Resolution &bull; 2.19µm Active Thermal Emitter Penetration
+              </div>
+            </div>
+          </div>
+
+          <!-- Secondary SAR / Optical Comparison -->
+          <div class="spectral-img-card">
+            <div class="spectral-img-canvas" id="spec-secondary-canvas" style="background: radial-gradient(circle at 50% 50%, rgba(148, 163, 184, 0.5) 0%, rgba(30, 41, 59, 0.9) 45%, #020617 80%);">
+              <span class="spectral-badge" id="spec-secondary-badge">Sentinel-1 C-Band SAR Backscatter (VV+VH)</span>
+              <div style="position:absolute; bottom:10px; right:10px; font-family:var(--font-mono); font-size:0.7rem; color:#fff; background:rgba(0,0,0,0.85); padding:3px 8px; border-radius:4px;" id="spec-secondary-caption">
+                10m Resolution &bull; Penetrates Cloud & Smoke to Map Facility Steel Geometry
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hud-section-card" style="background:rgba(0,0,0,0.3);">
+          <div class="section-card-title">Copernicus Multispectral & Radar Radiance Indices</div>
+          <div class="telemetry-stats-grid" style="grid-template-columns:repeat(3, 1fr);">
+            <div class="stat-box">
+              <div class="stat-box-label">Sentinel-2 MSI Acquisition</div>
+              <div class="stat-box-val" id="modal-spec-date" style="font-size:0.82rem; color:#fff;">2026-08-28 05:42 UTC</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-box-label">SWIR Radiance (B12 2.19µm)</div>
+              <div class="stat-box-val" id="modal-spec-swir" style="font-size:0.82rem; color:var(--accent-thermal);">0.94 (Extreme Heat Emitter)</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-box-label">Sentinel-1 SAR Backscatter</div>
+              <div class="stat-box-val" style="font-size:0.82rem; color:#38bdf8;">-8.4 dB (High Structural Volume)</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-box-label">Normalized Burn Ratio (NBR)</div>
+              <div class="stat-box-val" id="modal-spec-nbr" style="font-size:0.82rem; color:var(--accent-flare);">-0.42 (Active Thermal Boundary)</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-box-label">Smoke Aerosol Index</div>
+              <div class="stat-box-val" id="modal-spec-aerosol" style="font-size:0.82rem; color:#f59e0b;">2.8 (Active Plume)</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-box-label">Plume Dispersion Vector</div>
+              <div class="stat-box-val" id="modal-spec-plume" style="font-size:0.82rem; color:#38bdf8;">South-West (18 km/h)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-box">
+          <strong style="color:var(--accent-cyan); display:block; margin-bottom:2px;">COPERNICUS MULTIMODAL VERDICT:</strong>
+          Sentinel-2 SWIR infrared confirms localized active thermal radiation exceeding 1,200K, while Sentinel-1 SAR Radar confirms the thermal expansion has breached the designated flare stack boundary by +252% into adjacent infrastructure. Immediate ground verification advised.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       6. API Keys & Ingestion Settings Modal
+       ========================================================================== -->
+  <div class="modal-backdrop" id="modal-settings">
+    <div class="modal-window" style="max-width:650px;">
+      <div class="modal-header">
+        <div>
+          <span class="sih-badge" style="margin-bottom:4px; display:inline-block;">API & INGESTION CONFIGURATION</span>
+          <h2 class="modal-title">API Keys & Data Sources</h2>
+        </div>
+        <button class="modal-close-btn" id="btn-close-settings-modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- NASA FIRMS Key Input -->
+        <div class="hud-section-card" style="background:rgba(0,0,0,0.3);">
+          <div class="section-card-title" style="color:var(--accent-cyan);">
+            <span>1. NASA FIRMS API MAP KEY</span>
+            <span style="font-size:0.7rem; color:var(--text-forest);">100% Free</span>
+          </div>
+          <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:0.75rem;">
+            To fetch real-time live satellite hotspots directly from NASA (VIIRS 375m & MODIS), paste your NASA FIRMS Map Key below. If you don't have one, get it free in 30 seconds at <a href="https://firms.modaps.eosdis.nasa.gov/api/map_key/" target="_blank" style="color:var(--accent-cyan); text-decoration:underline;">firms.modaps.eosdis.nasa.gov/api/map_key/</a>.
+          </p>
+          <div style="display:flex; gap:0.5rem;">
+            <input type="text" id="input-firms-key" placeholder="Paste your 32-character NASA FIRMS Map Key here..." style="flex:1; background:var(--bg-secondary); border:1px solid var(--border-subtle); color:#fff; padding:0.6rem 0.85rem; border-radius:6px; font-family:var(--font-mono); font-size:0.82rem; outline:none;">
+            <button class="btn-primary" id="btn-save-firms-key">Save Key</button>
+          </div>
+          <div id="settings-key-status" style="font-size:0.72rem; margin-top:6px; font-family:var(--font-mono); color:var(--accent-forest);">
+            Status: Active in Local Storage
+          </div>
+        </div>
+
+        <!-- 2. Copernicus Sentinel Hub Configuration -->
+        <div class="hud-section-card" style="background:rgba(0,0,0,0.3);">
+          <div class="section-card-title" style="color:var(--accent-cyan);">
+            <span>2. Copernicus Sentinel Hub / Planet Instance ID</span>
+            <span style="font-size:0.7rem; color:var(--accent-forest);">Public Data</span>
+          </div>
+          <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:0.75rem;">
+            Powers 10m Sentinel-2 Optical/SWIR False Color ($2.19\,\mu\text{m}$) and Sentinel-1 SAR Radar imagery.
+          </p>
+          <div style="display:flex; gap:0.5rem;">
+            <input type="text" id="input-sentinel-id" value="60de79ca-16a7-4afd-bcbd-0261bf0156fa" placeholder="Instance ID..." style="flex:1; background:var(--bg-secondary); border:1px solid var(--border-subtle); color:#fff; padding:0.6rem 0.85rem; border-radius:6px; font-family:var(--font-mono); font-size:0.82rem; outline:none;">
+            <button class="btn-primary" id="btn-save-sentinel-id">Save</button>
+          </div>
+        </div>
+
+        <!-- 3. Google Earth Engine Project ID -->
+        <div class="hud-section-card" style="background:rgba(0,0,0,0.3);">
+          <div class="section-card-title" style="color:var(--accent-cyan);">
+            <span>3. Google Earth Engine Project ID</span>
+            <span style="font-size:0.7rem; color:var(--accent-forest);">Active Project</span>
+          </div>
+          <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:0.75rem;">
+            Used for planetary-scale ESA WorldCover (10m) and VIIRS Nightlights raster extractions.
+          </p>
+          <div style="display:flex; gap:0.5rem;">
+            <input type="text" id="input-gee-project" value="firedetection-506905" placeholder="GEE Project ID..." style="flex:1; background:var(--bg-secondary); border:1px solid var(--border-subtle); color:#fff; padding:0.6rem 0.85rem; border-radius:6px; font-family:var(--font-mono); font-size:0.82rem; outline:none;">
+            <button class="btn-primary" id="btn-save-gee-project">Save</button>
+          </div>
+        </div>
+
+        <!-- 4. OpenStreetMap Info -->
+        <div class="hud-section-card" style="background:rgba(0,0,0,0.3);">
+          <div class="section-card-title">
+            <span>4. OpenStreetMap (Overpass API)</span>
+            <span style="font-size:0.7rem; color:var(--accent-forest);">No Key Required</span>
+          </div>
+          <p style="font-size:0.78rem; color:var(--text-muted);">
+            Fetches industrial polygons, refineries, flare stacks, chimneys, and power stations via the free Overpass public API (<code style="color:var(--accent-cyan); font-family:var(--font-mono);">https://overpass-api.de/api/interpreter</code>).
+          </p>
+        </div>
+
+        <!-- ESA WorldCover Info -->
+        <div class="hud-section-card" style="background:rgba(0,0,0,0.3);">
+          <div class="section-card-title">
+            <span>3. ESA WorldCover (10m Land Cover)</span>
+            <span style="font-size:0.7rem; color:var(--accent-forest);">Open Data (CC-BY 4.0)</span>
+          </div>
+          <p style="font-size:0.78rem; color:var(--text-muted);">
+            Global 10-meter land cover classifications (built-up, tree canopy, cropland, bare soil) are accessed freely via AWS Open Data / Earth Engine STAC catalog.
+          </p>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:0.5rem;">
+          <button class="btn-secondary" id="btn-close-settings-modal-footer">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       7. Official 1-Page Incident Triage Dossier Modal (Print & PDF Ready)
+       ========================================================================== -->
+  <div class="modal-backdrop" id="modal-incident-dossier">
+    <div class="modal-window dossier-modal-window" style="max-width:820px;">
+      <div class="modal-header dossier-header no-print">
+        <div>
+          <span class="sih-badge" style="background:#ff4747; color:#fff;">OFFICIAL EMERGENCY TRIAGE DOSSIER</span>
+          <h2 class="modal-title" style="margin-top:2px;">Disaster Response Incident Record</h2>
+        </div>
+        <div style="display:flex; gap:0.5rem; align-items:center;">
+          <button class="btn-primary" id="btn-print-dossier" style="background:#2563eb;">
+            <i data-lucide="printer"></i> Print / Save as PDF
+          </button>
+          <button class="modal-close-btn" id="btn-close-dossier-modal">&times;</button>
+        </div>
+      </div>
+
+      <div class="modal-body dossier-body" id="dossier-printable-area">
+        <!-- Printable Dossier Sheet -->
+        <div class="dossier-sheet">
+          <div class="dossier-sheet-header">
+            <div class="dossier-emblem-wrap">
+              <div class="dossier-emblem">HW-GIS</div>
+              <div>
+                <h3 class="dossier-gov-title">NATIONAL DISASTER EMERGENCY RESPONSE &bull; SATELLITE THERMAL INTELLIGENCE</h3>
+                <p class="dossier-gov-sub">Automated Facility-Aware Thermal Anomaly & Fire Segregation Dossier &bull; SIH-2026</p>
+              </div>
+            </div>
+            <div class="dossier-qr-box">
+              <span class="dossier-code-tag" id="dos-ref-code">REF: HW-IND-2026-1045</span>
+              <div style="font-family:var(--font-mono); font-size:0.65rem; color:#64748b;">SHA-256 VERIFIED</div>
+            </div>
+          </div>
+
+          <div class="dossier-alert-banner" id="dos-severity-banner">
+            <div class="dos-banner-left">
+              <span class="dos-status-pill" id="dos-status-tag">HIGH-PRIORITY ESCALATION</span>
+              <h2 class="dos-incident-name" id="dos-object-name">Jamnagar Polypropylene Cracker Flare Complex #4</h2>
+            </div>
+            <div class="dos-banner-right">
+              <div class="dos-metric-hero" id="dos-frp-hero">68.4 MW</div>
+              <div class="dos-metric-sub" id="dos-surge-hero">3.76× 90-Day Baseline</div>
+            </div>
+          </div>
+
+          <!-- 2x2 Grid of Dossier Sections -->
+          <div class="dossier-grid">
+            <!-- Section A: Geospatial & Ingestion Coordinates -->
+            <div class="dossier-card">
+              <h4 class="dos-card-title"><i data-lucide="map-pin" style="width:13px; height:13px;"></i> 1. Geospatial & Satellite Metadata</h4>
+              <table class="dos-table">
+                <tr><td>Incident ID:</td><td><strong id="dos-id">OBJ-1045</strong></td></tr>
+                <tr><td>GPS Coordinates:</td><td><span class="mono-txt" id="dos-coords">22.3615° N, 69.8640° E</span></td></tr>
+                <tr><td>State / District:</td><td><span id="dos-region">Gujarat (Jamnagar Industrial Belt)</span></td></tr>
+                <tr><td>Detection Timestamp:</td><td><span class="mono-txt" id="dos-time">2026-08-28 02:18:00 UTC</span></td></tr>
+                <tr><td>Satellite Constellation:</td><td><span id="dos-sensors">VIIRS SNPP 375m &bull; NOAA-20 &bull; Sentinel-2</span></td></tr>
+              </table>
+            </div>
+
+            <!-- Section B: AI Multi-Modal Classification -->
+            <div class="dossier-card">
+              <h4 class="dos-card-title"><i data-lucide="cpu" style="width:13px; height:13px;"></i> 2. AI Multi-Modal Source Segregation</h4>
+              <table class="dos-table">
+                <tr><td>Source Verdict:</td><td><strong style="color:#0284c7;" id="dos-category">Persistent Industrial Flare / Petrochemical</strong></td></tr>
+                <tr><td>Attribution Confidence:</td><td><span class="mono-txt" id="dos-conf">91.0% (XGBoost Multi-Modal)</span></td></tr>
+                <tr><td>OSM Matched Plant:</td><td><span id="dos-facility">RIL Mega-Refinery (210m from stack)</span></td></tr>
+                <tr><td>ESA Land-Cover:</td><td><span id="dos-landcover">76.4% Industrial Built-up &bull; 15.2% Paved</span></td></tr>
+                <tr><td>NASA 2025 Static Mask:</td><td><span style="color:#e11d48;" id="dos-nasa-diff">NASA marks Static Flare &rarr; HeatWatch escalates to Surge</span></td></tr>
+              </table>
+            </div>
+
+            <!-- Section C: Spatial Dynamics & False Positive Rejection -->
+            <div class="dossier-card">
+              <h4 class="dos-card-title"><i data-lucide="shield-check" style="width:13px; height:13px;"></i> 3. Glint Filter & Motion Dynamics</h4>
+              <table class="dos-table">
+                <tr><td>Solar Glint Filter:</td><td><span class="badge-success" id="dos-glint">✓ PASSED: Confirmed Thermal Emitter (0.02 Glint Risk)</span></td></tr>
+                <tr><td>Centroid Stability:</td><td><span class="mono-txt" id="dos-stability">99.4% (Stationary Industrial Emitter)</span></td></tr>
+                <tr><td>Spread Velocity:</td><td><span class="mono-txt" id="dos-velocity">0.0 km/h (Fixed Flare Core)</span></td></tr>
+                <tr><td>Smoke Plume Vector:</td><td><span id="dos-plume">South-West (18 km/h Wind Dispersion)</span></td></tr>
+                <tr><td>Thermal Footprint Area:</td><td><span id="dos-footprint">8.4 Hectares (+281% Expansion)</span></td></tr>
+              </table>
+            </div>
+
+            <!-- Section D: Infrastructure & Settlement Vulnerability -->
+            <div class="dossier-card">
+              <h4 class="dos-card-title"><i data-lucide="alert-triangle" style="width:13px; height:13px;"></i> 4. Vulnerability & Emergency Response</h4>
+              <table class="dos-table">
+                <tr><td>Nearest Settlement:</td><td><strong id="dos-settlement">Moti Khavdi Village (1.8 km, ~14,500 pop)</strong></td></tr>
+                <tr><td>Critical Asset Risk:</td><td><span id="dos-asset-threat">Storage Tank Farm Sector B (210m)</span></td></tr>
+                <tr><td>Encroachment Status:</td><td><span id="dos-encroachment" style="color:#b91c1c; font-weight:600;">Critical Internal Surge within Licensed Perimeter</span></td></tr>
+                <tr><td>Response Protocol:</td><td><span>DDMA Level-2 Alert &bull; Notify District Collector & CFO</span></td></tr>
+                <tr><td>Recommended Action:</td><td><span style="font-size:0.75rem; color:#b91c1c;" id="dos-action">Urgent plant safety telemetry audit. Verify emergency release valve pressure.</span></td></tr>
+              </table>
+            </div>
+          </div>
+
+          <!-- Official Field Dispatch Checklist -->
+          <div class="dossier-card" style="margin-top:0.75rem;">
+            <h4 class="dos-card-title"><i data-lucide="clipboard-check" style="width:13px; height:13px;"></i> 5. Standard Field Verification & Dispatch Checklist</h4>
+            <div class="dos-checklist-grid">
+              <label class="dos-chk"><input type="checkbox" checked disabled> <span>Automated satellite baseline surge detected (>3.0x threshold)</span></label>
+              <label class="dos-chk"><input type="checkbox" checked disabled> <span>Solar glint & rooftop false alarm rejected by spectral albedo</span></label>
+              <label class="dos-chk"><input type="checkbox"> <span>District Disaster Control Room (DDCR) notified via automated SMS/Email</span></label>
+              <label class="dos-chk"><input type="checkbox"> <span>Plant HSE Officer contacted for emergency flare venting confirmation</span></label>
+              <label class="dos-chk"><input type="checkbox"> <span>Regional Fire & Emergency Services quick response vehicle dispatched</span></label>
+              <label class="dos-chk"><input type="checkbox"> <span>Ground truth report filed back to HeatWatch Active Learning Ledger</span></label>
+            </div>
+          </div>
+
+          <!-- Sign-Off Footer -->
+          <div class="dossier-signoff">
+            <div class="signoff-box">
+              <div class="signoff-line"></div>
+              <span>Automated GIS Dispatch Officer</span>
+            </div>
+            <div class="signoff-box">
+              <div class="signoff-line"></div>
+              <span>District Fire & Disaster Authority Approval</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lucide Icon Activation & Application Controller Entry -->
+  <script type="module" src="js/app.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    });
+  </script>
+</body>
+</html>
