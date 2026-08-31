@@ -1077,53 +1077,16 @@ export const OSM_FACILITIES = ALL_INDIA_FACILITIES.map((fac, idx) => ({
   }
 }));
 
-export const HISTORICAL_FRP_DATA = {
-  "OBJ-1045": [
-    { day: "Day -90", frp: 17.8, baseline: 18.2, threshold: 36.4 },
-    { day: "Day -60", frp: 18.5, baseline: 18.2, threshold: 36.4 },
-    { day: "Day -30", frp: 17.9, baseline: 18.2, threshold: 36.4 },
-    { day: "Day -7",  frp: 19.4, baseline: 18.2, threshold: 36.4 },
-    { day: "Day -1",  frp: 38.2, baseline: 18.2, threshold: 36.4 },
-    { day: "TODAY",   frp: 68.4, baseline: 18.2, threshold: 36.4 } // 3.76x surge
-  ],
-  "OBJ-7011": [
-    { day: "Day -90", frp: 22.0, baseline: 24.5, threshold: 49.0 },
-    { day: "Day -60", frp: 25.1, baseline: 24.5, threshold: 49.0 },
-    { day: "Day -30", frp: 23.8, baseline: 24.5, threshold: 49.0 },
-    { day: "Day -7",  frp: 34.0, baseline: 24.5, threshold: 49.0 },
-    { day: "Day -1",  frp: 48.0, baseline: 24.5, threshold: 49.0 },
-    { day: "TODAY",   frp: 62.5, baseline: 24.5, threshold: 49.0 }
-  ],
-  "OBJ-1082": [
-    { day: "Day -90", frp: 14.2, baseline: 15.0, threshold: 30.0 },
-    { day: "Day -30", frp: 15.1, baseline: 15.0, threshold: 30.0 },
-    { day: "TODAY",   frp: 16.2, baseline: 15.0, threshold: 30.0 }
-  ],
-  "OBJ-2019": [
-    { day: "Day -90", frp: 24.0, baseline: 26.4, threshold: 52.8 },
-    { day: "Day -30", frp: 27.1, baseline: 26.4, threshold: 52.8 },
-    { day: "TODAY",   frp: 48.5, baseline: 26.4, threshold: 52.8 }
-  ],
-  "OBJ-3041": [
-    { day: "Day -30", frp: 0.0, baseline: 8.0, threshold: 16.0 },
-    { day: "Day -1",  frp: 45.0, baseline: 8.0, threshold: 16.0 },
-    { day: "TODAY",   frp: 148.5, baseline: 8.0, threshold: 16.0 } // Wildfire
-  ],
-  "OBJ-4012": [
-    { day: "Day -30", frp: 0.0, baseline: 12.0, threshold: 24.0 },
-    { day: "TODAY",   frp: 24.0, baseline: 12.0, threshold: 24.0 }
-  ]
-};
 
 export const DEMO_STORY_STEPS = [
   {
     step: 1,
-    title: "1. Ingest Raw NASA FIRMS Detections",
+    title: "1. Ingest Raw NASA FIRMS Detections (Deliverable 2)",
     description: "Satellite detects high-temperature infrared pixels over the Jamnagar industrial belt. Raw FIRMS only tells you WHERE heat is detected, leaving its nature ambiguous.",
-    actionHighlight: "Show raw FIRMS points on the map without any facility or land-use context.",
+    actionHighlight: "Show raw FIRMS points on high-resolution satellite imagery without any facility or land-use context.",
     targetObjectId: "OBJ-1045",
     mapLayers: { rawFirms: true, thermalClusters: false, osmFacilities: false, worldCoverBuffers: false, nasaStaticMask: false, riskBuffers: false },
-    zoomCoordinates: [22.4682, 70.0514],
+    zoomCoordinates: [22.3615, 69.8640],
     zoomLevel: 13
   },
   {
@@ -1133,7 +1096,7 @@ export const DEMO_STORY_STEPS = [
     actionHighlight: "Turn on OSM facilities layer (refinery polygons) and ESA WorldCover raster buffers.",
     targetObjectId: "OBJ-1045",
     mapLayers: { rawFirms: true, thermalClusters: false, osmFacilities: true, worldCoverBuffers: true, nasaStaticMask: false, riskBuffers: true },
-    zoomCoordinates: [22.4682, 70.0514],
+    zoomCoordinates: [22.3615, 69.8640],
     zoomLevel: 14
   },
   {
@@ -1143,37 +1106,37 @@ export const DEMO_STORY_STEPS = [
     actionHighlight: "Observe creation of Thermal Object #OBJ-1045 with 92.4% historical persistence.",
     targetObjectId: "OBJ-1045",
     mapLayers: { rawFirms: true, thermalClusters: true, osmFacilities: true, worldCoverBuffers: true, nasaStaticMask: false, riskBuffers: true },
-    zoomCoordinates: [22.4682, 70.0514],
+    zoomCoordinates: [22.3615, 69.8640],
     zoomLevel: 14
   },
   {
     step: 4,
-    title: "4. Brain 1: Explainable Source Attribution",
-    description: "The Evidence Engine evaluates 5 dimensions: Facility Match (30%), Persistence (25%), Built-up Context (15%), Land Cover (15%), and Consistency (15%), giving 91% Confidence for Petrochemical Refinery.",
-    actionHighlight: "Open Evidence Score breakdown showing why it is classified as Persistent Industrial Source.",
+    title: "4. Deliverable 1: Source Segregation & AI Attribution",
+    description: "The AI Engine evaluates 5 dimensions (Facility Distance, Temporal Persistence, Land Cover, Night Radiance, and Centroid Stability), proving 91% Confidence for Petrochemical Flare vs Forest/Crop Fires.",
+    actionHighlight: "Open Evidence Score breakdown showing why it is segregated as an Industrial Flare.",
     targetObjectId: "OBJ-1045",
     mapLayers: { rawFirms: false, thermalClusters: true, osmFacilities: true, worldCoverBuffers: true, nasaStaticMask: false, riskBuffers: true },
-    zoomCoordinates: [22.4682, 70.0514],
+    zoomCoordinates: [22.3615, 69.8640],
     zoomLevel: 14
   },
   {
     step: 5,
-    title: "5. Brain 2: Establish 90-Day Historical Baseline",
-    description: "A petrochemical flare isn't dangerous just because it emits heat every day. HeatWatch calculates a normal historical baseline (Mean FRP = 18.2 MW, designated flare stack footprint).",
+    title: "5. Establish 90-Day Baseline (Mean FRP = 18.2 MW)",
+    description: "A petrochemical flare is normal operational flaring every day. HeatWatch calculates a normal historical baseline (Mean FRP = 18.2 MW, designated flare stack footprint).",
     actionHighlight: "View 90-day time-series telemetry chart comparing historical mean against current surge.",
     targetObjectId: "OBJ-1045",
     mapLayers: { rawFirms: false, thermalClusters: true, osmFacilities: true, worldCoverBuffers: false, nasaStaticMask: false, riskBuffers: true },
-    zoomCoordinates: [22.4682, 70.0514],
+    zoomCoordinates: [22.3615, 69.8640],
     zoomLevel: 14
   },
   {
     step: 6,
-    title: "6. Acute Anomaly Detection: 3.8× Surge + Footprint Expansion",
+    title: "6. Acute Anomaly Detection: 3.76× Surge (68.4 MW)",
     description: "Today's satellite pass records 68.4 MW (3.76× baseline) with +281% spatial footprint expansion spreading into chemical storage tanks. Status flips from NORMAL to HIGH-PRIORITY ANOMALY.",
     actionHighlight: "Thermal status badge escalates to HIGH-PRIORITY ANOMALY (Anomaly Score 0.883).",
     targetObjectId: "OBJ-1045",
     mapLayers: { rawFirms: true, thermalClusters: true, osmFacilities: true, worldCoverBuffers: true, nasaStaticMask: false, riskBuffers: true },
-    zoomCoordinates: [22.4682, 70.0514],
+    zoomCoordinates: [22.3615, 69.8640],
     zoomLevel: 15
   },
   {
@@ -1183,7 +1146,7 @@ export const DEMO_STORY_STEPS = [
     actionHighlight: "Compare NASA label (Routine Static Mask) vs HeatWatch label (Critical Incident Outbreak).",
     targetObjectId: "OBJ-1045",
     mapLayers: { rawFirms: true, thermalClusters: true, osmFacilities: true, worldCoverBuffers: false, nasaStaticMask: true, riskBuffers: true },
-    zoomCoordinates: [22.4682, 70.0514],
+    zoomCoordinates: [22.3615, 69.8640],
     zoomLevel: 14
   },
   {
@@ -1193,7 +1156,7 @@ export const DEMO_STORY_STEPS = [
     actionHighlight: "Inspect Field Verification Action Plan, nearest community exposure (Moti Khavdi, 1.8km), and export GeoJSON report.",
     targetObjectId: "OBJ-1045",
     mapLayers: { rawFirms: true, thermalClusters: true, osmFacilities: true, worldCoverBuffers: true, nasaStaticMask: true, riskBuffers: true },
-    zoomCoordinates: [22.4682, 70.0514],
+    zoomCoordinates: [22.3615, 69.8640],
     zoomLevel: 14
   }
 ];

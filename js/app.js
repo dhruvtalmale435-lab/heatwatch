@@ -44,6 +44,7 @@ class HeatWatchApp {
 
     // 3. Initialize Live NASA Fetcher
     this.firmsFetcher = new NasaFirmsLiveFetcher((rawPoints, clusters) => {
+      this.liveClusters = clusters;
       this.mapInstance.renderRawFirmsPoints(rawPoints);
       this.mapInstance.renderThermalClusters(clusters);
       this.renderAlertsTable();
@@ -228,6 +229,16 @@ class HeatWatchApp {
         this.analyticsInstance.renderRegionalOverview('canvas-regional-overview');
         this.analyticsInstance.renderFrpTimeSeriesChart('canvas-analytics-timeseries', this.selectedObject.id);
       }, 100);
+    }
+
+    // Trigger alerts table refresh if switching to alerts tab
+    if (viewName === 'alerts-tab') {
+      this.renderAlertsTable();
+    }
+
+    // Trigger comparison matrix if switching to comparison tab
+    if (viewName === 'comparison-tab') {
+      this.renderNasaComparisonMatrix();
     }
 
     // Trigger pyrometry charts if switching to pyrometry tab
@@ -544,6 +555,13 @@ class HeatWatchApp {
         legendPanel.classList.toggle('collapsed');
       });
       makeDraggable(legendPanel, legendDragHandle || legendHeader);
+    }
+
+    // 4. Region & Facility Search Panel (Draggable)
+    const regionPanel = document.getElementById('map-region-selector');
+    const regionDragHandle = document.getElementById('region-selector-drag-handle');
+    if (regionPanel) {
+      makeDraggable(regionPanel, regionDragHandle || regionPanel);
     }
   }
 
@@ -1225,43 +1243,165 @@ class HeatWatchApp {
     const tbody = document.getElementById('alerts-table-body');
     if (!tbody) return;
 
-    // Filter to only entities with real active thermal activity or anomalies
-    const activeAlerts = THERMAL_OBJECTS.filter(o => o.status !== 'nominal');
+    // 1. Gather all active alerts (curated objects + any live satellite clusters)
+    let allAlerts = [...THERMAL_OBJECTS];
+    if (this.liveClusters && this.liveClusters.length > 0) {
+      this.liveClusters.forEach(cl => {
+        if (!allAlerts.find(o => o.id === cl.id)) {
+          allAlerts.push(cl);
+        }
+      });
+    }
 
-    tbody.innerHTML = activeAlerts.map(o => `
-      <tr>
-        <td style="font-family:var(--font-mono); font-weight:700; color:var(--accent-cyan);">${o.id}</td>
-        <td>
-          <div style="font-weight:600; color:#fff;">${o.name}</div>
-          <div style="font-size:0.7rem; color:var(--text-muted);">${o.matchedFacility.name} (${o.matchedFacility.distanceMeters}m away)</div>
-        </td>
-        <td>
-          <span class="severity-tag ${o.status === 'high_priority' ? 'high-priority' : o.status}">
-            ${o.statusLabel}
-          </span>
-        </td>
-        <td>
-          <strong style="color:${o.thermal.frpDeviationRatio > 2 ? '#ff4747' : '#00f0ff'};">${o.thermal.currentFRP} MW</strong>
-          <span style="font-size:0.7rem; color:#9ca3af;"> (${o.thermal.frpDeviationRatio}× Baseline)</span>
-        </td>
-        <td style="font-size:0.75rem; color:#d1d5db; max-width:280px;">
-          ${o.recommendedAction}
-        </td>
-        <td>
-          <button class="btn-secondary" style="padding:0.25rem 0.6rem; font-size:0.72rem;" onclick="window.heatwatchApp.selectAndInspect('${o.id}')">
-            Inspect GIS
-          </button>
-        </td>
-      </tr>
-    `).join('');
+    // 2. Compute category counts for tab badges
+    const counts = {
+      all: allAlerts.length,
+      industrial_fire: 0,
+      routine_flare: 0,
+      mining_fire: 0,
+      forest_fire: 0,
+      agriculture_fire: 0,
+      glint_filtered: 0
+    };
+
+    allAlerts.forEach(o => {
+      const cat = o.categoryGroup || o.primaryCategory;
+      if (cat === 'industrial_fire' || (o.primaryCategory === 'industrial' && o.status === 'high_priority')) counts.industrial_fire++;
+      else if (cat === 'routine_flare' || o.primaryCategory === 'industrial') counts.routine_flare++;
+      else if (cat === 'mining_fire' || o.primaryCategory === 'mining') counts.mining_fire++;
+      else if (cat === 'forest_fire' || o.primaryCategory === 'wildfire') counts.forest_fire++;
+      else if (cat === 'agriculture_fire' || o.primaryCategory === 'agriculture') counts.agriculture_fire++;
+      else if (cat === 'glint_filtered') counts.glint_filtered++;
+      else counts.routine_flare++;
+    });
+
+    // Update tab labels with live counts
+    const tabAll = document.querySelector('.alert-tab-btn[data-category="all"]');
+    if (tabAll) tabAll.textContent = `All Alerts (${counts.all})`;
+    const tabInd = document.querySelector('.alert-tab-btn[data-category="industrial_fire"]');
+    if (tabInd) tabInd.textContent = `🏭 Industrial Fires (${counts.industrial_fire})`;
+    const tabFlare = document.querySelector('.alert-tab-btn[data-category="routine_flare"]');
+    if (tabFlare) tabFlare.textContent = `🔥 Routine Flares (${counts.routine_flare})`;
+    const tabMine = document.querySelector('.alert-tab-btn[data-category="mining_fire"]');
+    if (tabMine) tabMine.textContent = `⛏️ Coal Mining (${counts.mining_fire})`;
+    const tabForest = document.querySelector('.alert-tab-btn[data-category="forest_fire"]');
+    if (tabForest) tabForest.textContent = `🌲 Forest Wildfires (${counts.forest_fire})`;
+    const tabAgri = document.querySelector('.alert-tab-btn[data-category="agriculture_fire"]');
+    if (tabAgri) tabAgri.textContent = `🌾 Agri Stubble (${counts.agriculture_fire})`;
+    const tabGlint = document.querySelector('.alert-tab-btn[data-category="glint_filtered"]');
+    if (tabGlint) tabGlint.textContent = `☀️ Glint Filtered (${counts.glint_filtered})`;
+
+    // Update Header Alert Badge with High Priority / Elevated count
+    const highPriorityCount = allAlerts.filter(o => o.status === 'high_priority' || o.status === 'elevated').length;
+    const headerBadge = document.getElementById('header-alert-count');
+    if (headerBadge) headerBadge.textContent = highPriorityCount;
+
+    // 3. Filter by active category
+    let displayedAlerts = allAlerts;
+    if (this.currentCategoryFilter && this.currentCategoryFilter !== 'all') {
+      displayedAlerts = displayedAlerts.filter(obj => {
+        const cat = obj.categoryGroup || obj.primaryCategory;
+        if (this.currentCategoryFilter === 'industrial_fire') return cat === 'industrial_fire' || (obj.primaryCategory === 'industrial' && obj.status === 'high_priority');
+        if (this.currentCategoryFilter === 'routine_flare') return cat === 'routine_flare' || (obj.primaryCategory === 'industrial' && obj.status !== 'high_priority');
+        if (this.currentCategoryFilter === 'mining_fire') return cat === 'mining_fire' || obj.primaryCategory === 'mining';
+        if (this.currentCategoryFilter === 'forest_fire') return cat === 'forest_fire' || obj.primaryCategory === 'wildfire';
+        if (this.currentCategoryFilter === 'agriculture_fire') return cat === 'agriculture_fire' || obj.primaryCategory === 'agriculture';
+        if (this.currentCategoryFilter === 'glint_filtered') return cat === 'glint_filtered';
+        return cat === this.currentCategoryFilter;
+      });
+    }
+
+    // 4. Filter by search query
+    if (this.alertSearchQuery && this.alertSearchQuery.trim()) {
+      const q = this.alertSearchQuery.toLowerCase().trim();
+      displayedAlerts = displayedAlerts.filter(o =>
+        o.id.toLowerCase().includes(q) ||
+        (o.name && o.name.toLowerCase().includes(q)) ||
+        (o.matchedFacility?.name && o.matchedFacility.name.toLowerCase().includes(q)) ||
+        (o.categoryLabel && o.categoryLabel.toLowerCase().includes(q)) ||
+        (o.subtype && o.subtype.toLowerCase().includes(q))
+      );
+    }
+
+    if (displayedAlerts.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">
+            <i data-lucide="shield-check" style="width:24px; height:24px; color:var(--accent-forest); margin-bottom:0.5rem;"></i><br/>
+            No active thermal alerts match the current filter criteria.
+          </td>
+        </tr>
+      `;
+      if (window.lucide) lucide.createIcons();
+      return;
+    }
+
+    tbody.innerHTML = displayedAlerts.map(o => {
+      const frp = o.thermal?.currentFRP || 0;
+      const dev = o.thermal?.frpDeviationRatio || 1.0;
+      const facName = o.matchedFacility?.name || o.name || 'Mapped Site';
+      const dist = o.matchedFacility?.distanceMeters !== undefined ? `${o.matchedFacility.distanceMeters}m away` : 'Regional Perimeter';
+      const statusClass = o.status === 'high_priority' ? 'high-priority' : (o.status === 'elevated' ? 'elevated' : 'normal');
+
+      return `
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.05); transition:background 0.2s ease;">
+          <td style="font-family:var(--font-mono); font-weight:700; color:var(--accent-cyan);">${o.id}</td>
+          <td>
+            <div style="font-weight:600; color:#fff;">${o.name}</div>
+            <div style="font-size:0.72rem; color:var(--text-muted);">${facName} (${dist})</div>
+          </td>
+          <td>
+            <span class="severity-tag ${statusClass}">
+              ${o.statusLabel || o.status.toUpperCase()}
+            </span>
+          </td>
+          <td>
+            <strong style="color:${dev >= 2.0 ? '#ff4747' : '#00f0ff'};">${frp} MW</strong>
+            <span style="font-size:0.72rem; color:#9ca3af;"> (${dev}× Baseline)</span>
+          </td>
+          <td style="font-size:0.75rem; color:#d1d5db; max-width:280px; line-height:1.4;">
+            ${o.recommendedAction || o.categoryLabel}
+          </td>
+          <td>
+            <div style="display:flex; gap:0.4rem; align-items:center;">
+              <button class="btn-secondary" style="padding:0.25rem 0.6rem; font-size:0.72rem;" onclick="window.heatwatchApp.selectAndInspect('${o.id}')" title="Inspect on GIS Map">
+                <i data-lucide="map-pin" style="width:11px; height:11px;"></i> Inspect
+              </button>
+              <button class="btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.72rem;" onclick="window.heatwatchApp.openIncidentDossierById('${o.id}')" title="Open 1-Page Incident Dossier">
+                <i data-lucide="file-text" style="width:11px; height:11px;"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    if (window.lucide) {
+      setTimeout(() => lucide.createIcons(), 50);
+    }
   }
 
   selectAndInspect(objectId) {
-    const obj = THERMAL_OBJECTS.find(o => o.id === objectId);
+    let obj = THERMAL_OBJECTS.find(o => o.id === objectId);
+    if (!obj && this.liveClusters) {
+      obj = this.liveClusters.find(o => o.id === objectId);
+    }
     if (obj) {
       this.switchView('command-map');
       this.handleSelectObject(obj);
-      this.mapInstance.map.flyTo(obj.coordinates, 14, { duration: 1.5 });
+      if (this.mapInstance && this.mapInstance.map) {
+        this.mapInstance.map.flyTo(obj.coordinates, 14, { duration: 1.0 });
+      }
+    }
+  }
+
+  openIncidentDossierById(objectId) {
+    let obj = THERMAL_OBJECTS.find(o => o.id === objectId);
+    if (!obj && this.liveClusters) {
+      obj = this.liveClusters.find(o => o.id === objectId);
+    }
+    if (obj) {
+      this.openIncidentDossier(obj);
     }
   }
 
@@ -1292,13 +1432,32 @@ class HeatWatchApp {
   }
 
   setupAlertCenterActions() {
+    // 1. Alert Category Filter Tabs Click Handlers
+    document.querySelectorAll('.alert-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const cat = btn.getAttribute('data-category');
+        this.setCategoryFilter(cat);
+      });
+    });
+
+    // 2. Alert Search Input Handler
+    const alertSearchInput = document.getElementById('input-alert-search');
+    if (alertSearchInput) {
+      alertSearchInput.addEventListener('input', (e) => {
+        this.alertSearchQuery = e.target.value;
+        this.renderAlertsTable();
+      });
+    }
+
+    // 3. Top Triage Quick Action Buttons
     const confirmIndBtn = document.getElementById('btn-triage-confirm-ind');
     const confirmWildBtn = document.getElementById('btn-triage-confirm-wild');
     const dispatchBtn = document.getElementById('btn-triage-dispatch');
 
     const submitFeedback = async (category) => {
-      const objId = this.selectedObject ? this.selectedObject.id : "OBJ-1045";
-      alert(`[✓ Ground Truth Verified]\n\nObject: ${objId}\nVerdict: ${category.toUpperCase()}\nStatus: Stored to Active Learning Audit Ledger.\nThis verified sample will be incorporated in the next model retraining cycle.`);
+      const obj = this.selectedObject || THERMAL_OBJECTS[0];
+      const objId = obj ? obj.id : "OBJ-1045";
+      alert(`[✓ Ground Truth Verified]\n\nObject: ${obj.name} (${objId})\nVerdict: ${category.toUpperCase()}\nStatus: Stored to Active Learning Audit Ledger.\nThis verified sample will be incorporated in the next model retraining cycle.`);
       
       try {
         await fetch('/api/verification', {
@@ -1307,12 +1466,13 @@ class HeatWatchApp {
           body: JSON.stringify({
             object_id: objId,
             verified_category: category,
-            verified_by: "District_Officer"
+            verified_by: "District_Disaster_Officer"
           })
         });
       } catch (e) {
         console.log(`Verification stored locally in ledger.`);
       }
+      this.renderAlertsTable();
     };
 
     if (confirmIndBtn) {
@@ -1323,7 +1483,8 @@ class HeatWatchApp {
     }
     if (dispatchBtn) {
       dispatchBtn.addEventListener('click', () => {
-        alert(`🚨 Emergency dispatch request issued to nearest field inspection unit for ${this.selectedObject ? this.selectedObject.name : 'Target Facility'}. Action dossier generated.`);
+        const targetName = this.selectedObject ? this.selectedObject.name : 'Jamnagar Flare Stack Sector 4';
+        alert(`🚨 EMERGENCY DISPATCH PROTOCOL TRIGGERED\n\nIncident: ${targetName}\nAction: Dispatched quick-response sensor UAV and notified District Control Room.\nOfficial Incident Dossier generated.`);
       });
     }
   }
@@ -1545,10 +1706,12 @@ class HeatWatchApp {
     };
 
     if (slider) {
-      slider.addEventListener('input', (e) => {
+      const handleSliderChange = (e) => {
         const val = parseInt(e.target.value);
         updateDayUI(val);
-      });
+      };
+      slider.addEventListener('input', handleSliderChange);
+      slider.addEventListener('change', handleSliderChange);
     }
 
     if (prevBtn) {

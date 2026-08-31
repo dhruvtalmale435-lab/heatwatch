@@ -58,28 +58,34 @@ class DevHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == '/api/health':
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
             status_obj = {
                 "status": "online",
                 "service": "HeatWatch Full-Stack Dev Server",
                 "ml_attribution_model_loaded": attribution_model is not None,
                 "ml_anomaly_engine_active": anomaly_engine is not None
             }
-            self.wfile.write(json.dumps(status_obj).encode('utf-8'))
-            return
-        elif self.path == '/api/statistics':
+            body = json.dumps(status_obj).encode('utf-8')
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', str(len(body)))
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
+            self.wfile.write(body)
+            self.wfile.flush()
+            return
+        elif self.path == '/api/statistics':
             stats = {
                 "total_verified_cases": len(VERIFIED_AUDIT_LEDGER),
                 "ledger": VERIFIED_AUDIT_LEDGER
             }
-            self.wfile.write(json.dumps(stats).encode('utf-8'))
+            body = json.dumps(stats).encode('utf-8')
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', str(len(body)))
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(body)
+            self.wfile.flush()
             return
         return super().do_GET()
 

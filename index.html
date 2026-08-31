@@ -152,7 +152,7 @@
         <div id="gis-map-canvas"></div>
 
         <!-- Floating Classification Segregation & Sorting Ribbon (Draggable & Collapsible) -->
-        <div class="map-floating-panel map-category-ribbon draggable-panel collapsed" id="map-category-ribbon">
+        <div class="map-floating-panel map-category-ribbon draggable-panel" id="map-category-ribbon">
           <div class="ribbon-drag-handle" id="ribbon-drag-handle" title="Touch / Drag to move anywhere on map">
             <i data-lucide="grip-vertical" style="width:14px; height:14px; color:var(--text-muted);"></i>
           </div>
@@ -198,21 +198,18 @@
                 <span class="chip-count" id="chip-count-glint">1</span>
               </button>
             </div>
-            <div class="ribbon-sort-box">
-              <label for="select-map-sort" style="font-size:0.68rem; font-weight:700; color:var(--text-muted);">SORT:</label>
-              <select id="select-map-sort" class="sort-dropdown">
-                <option value="frp_desc">🔥 Highest FRP (MW)</option>
-                <option value="surge_desc">📈 Anomaly Surge (x)</option>
-                <option value="confidence_desc">🎯 Confidence (%)</option>
-                <option value="velocity_desc">⚡ Spread Velocity (km/h)</option>
-                <option value="recent">⏱️ Most Recent</option>
-              </select>
-            </div>
           </div>
         </div>
 
-        <!-- Floating Region & Facility Search Selector -->
-        <div class="map-floating-panel map-region-selector">
+        <!-- Floating Region & Facility Search Selector (Draggable) -->
+        <div class="map-floating-panel map-region-selector draggable-panel" id="map-region-selector">
+          <div class="selector-drag-header" id="region-selector-drag-handle" title="Touch / Drag to move anywhere on map" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.35rem; cursor:grab; padding:2px 0;">
+            <div style="display:flex; align-items:center; gap:0.35rem; font-size:0.68rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">
+              <i data-lucide="grip-vertical" style="width:13px; height:13px; color:var(--text-muted);"></i>
+              <span>GIS Spatial Search</span>
+            </div>
+          </div>
+
           <!-- Search Box -->
           <div class="selector-row-search">
             <div class="search-input-wrap">
@@ -222,31 +219,46 @@
             <div id="facility-search-results" class="search-results-dropdown"></div>
           </div>
 
-          <!-- Focus Facility Select Row -->
-          <div class="selector-control-row">
-            <div class="selector-label-group">
-              <i data-lucide="map-pin"></i>
-              <label for="select-study-region">FOCUS:</label>
-            </div>
+          <!-- Region Quick Select -->
+          <div class="selector-row">
+            <label for="select-study-region"><i data-lucide="focus"></i> Focus:</label>
             <select id="select-study-region" class="region-dropdown">
-              <option value="all_india">🇮🇳 All-India Overview (50+ Facilities)</option>
+              <optgroup label="Core Demonstration Hubs">
+                <option value="all_india" selected>🇮🇳 All-India Overview (50+ Industrial Facilities)</option>
+                <option value="jamnagar">🏭 Jamnagar Petrochem (Gujarat)</option>
+                <option value="hazira">🔥 Hazira Heavy Industry & LNG Hub</option>
+                <option value="korba">⚡ Korba Super Thermal Power & Aluminum</option>
+                <option value="singrauli">⛏️ Singrauli Coal Basin & Pithead STPS</option>
+                <option value="jharia">🔥 Jharia Coalfield Mine Seam Fires</option>
+                <option value="simlipal">🌲 Simlipal Biosphere Wildfire (Forest)</option>
+                <option value="patiala">🌾 Patiala Agrarian Stubble (Punjab)</option>
+              </optgroup>
+              <optgroup label="All-India Critical Infrastructure (50+ Facilities)">
+                <option value="FAC-01">BPCL Kochi Refinery (Kerala)</option>
+                <option value="FAC-02">IOCL Paradip Mega Refinery (Odisha)</option>
+                <option value="FAC-03">Tata Steel Works Jamshedpur (Jharkhand)</option>
+                <option value="FAC-04">JSW Steel Vijayanagar Plant (Karnataka)</option>
+                <option value="FAC-05">SAIL Bhilai Steel Plant (Chhattisgarh)</option>
+                <option value="FAC-06">NTPC Vindhyachal Super Thermal (MP)</option>
+                <option value="FAC-07">NTPC Ramagundam STPS (Telangana)</option>
+                <option value="FAC-08">Vedanta Jharsuguda Aluminum Smelter (Odisha)</option>
+                <option value="FAC-09">Hindalco Mahan Aluminum Complex (MP)</option>
+                <option value="FAC-10">Bhadla Solar Park Ultra-Mega Phase-IV (Rajasthan)</option>
+              </optgroup>
             </select>
           </div>
-          
-          <!-- Satellite Basemap Select Row -->
-          <div class="selector-control-row selector-satellite-row">
-            <div class="selector-label-group">
-              <i data-lucide="satellite"></i>
-              <label for="select-basemap-style">SATELLITE:</label>
-            </div>
+
+          <!-- Satellite Layer Source -->
+          <div class="selector-row">
+            <label for="select-basemap-style"><i data-lucide="satellite"></i> Satellite:</label>
             <select id="select-basemap-style" class="region-dropdown">
-              <option value="nasa_viirs" selected>🛰️ NASA GIBS VIIRS True Color (Official FIRMS Map)</option>
+              <option value="satellite" selected>📸 High-Res Imagery (1m Aerial)</option>
+              <option value="nasa_viirs">🛰️ NASA GIBS VIIRS True Color (Official FIRMS Map)</option>
               <option value="nasa_modis">🛰️ NASA GIBS MODIS Terra (Daily 250m)</option>
               <option value="nasa_night">🌙 NASA GIBS VIIRS Earth at Night</option>
               <option value="nasa_bluemarble">🌍 NASA Blue Marble (Global Topography)</option>
               <option value="sentinel2">🛰️ Copernicus Sentinel-2 (10m Optical)</option>
               <option value="sentinel2_swir">🔥 Sentinel-2 SWIR (B12 Infrared)</option>
-              <option value="satellite">📸 High-Res Imagery (1m Aerial)</option>
               <option value="osm">🗺️ OpenStreetMap Standard</option>
             </select>
           </div>
@@ -339,43 +351,11 @@
           </div>
         </div>
 
-        <!-- 90-Day Satellite Historical Timeline & Playback Scrubber -->
-        <div class="map-time-scrubber" id="map-time-scrubber">
-          <div class="scrubber-header-row">
-            <div class="scrubber-left-controls">
-              <button class="scrubber-btn play-btn" id="btn-timeline-play" title="Play / Pause 90-Day Historical Playback">
-                <i data-lucide="play" id="icon-timeline-play"></i>
-                <span id="label-timeline-play">Play</span>
-              </button>
-              <button class="scrubber-btn step-btn" id="btn-timeline-prev" title="Step Back 1 Day">
-                <i data-lucide="skip-back"></i>
-              </button>
-              <button class="scrubber-btn step-btn" id="btn-timeline-next" title="Step Forward 1 Day">
-                <i data-lucide="skip-forward"></i>
-              </button>
-              <div class="scrubber-speed-group">
-                <button class="speed-chip active" data-speed="1">1x</button>
-                <button class="speed-chip" data-speed="2">2x</button>
-                <button class="speed-chip" data-speed="5">5x</button>
-              </div>
-            </div>
-            
-            <div class="scrubber-right-status">
-              <span class="scrubber-live-indicator" id="scrubber-live-indicator">LIVE PASS</span>
-              <span class="scrubber-date-badge" id="scrubber-date-badge">2026-08-28</span>
-              <span class="scrubber-day-badge" id="scrubber-day-badge">Day 90 of 90</span>
-            </div>
-          </div>
-
-          <div class="scrubber-slider-wrap">
-            <input type="range" id="map-timeline-slider" class="time-scrubber-slider" min="1" max="90" value="90" step="1">
-            <div class="scrubber-track-labels">
-              <span>Day 1 (Jun 01)</span>
-              <span>Day 30 (Jun 30)</span>
-              <span>Day 60 (Jul 30)</span>
-              <span class="surge-marker">⚠️ Day 85-90 (Acute Surge)</span>
-            </div>
-          </div>
+        <!-- Small Centered 90-Day Satellite Historical Slider -->
+        <div class="map-time-scrubber small-timeline-box" id="map-time-scrubber">
+          <span class="timeline-box-title">⏱️ 90d</span>
+          <input type="range" id="map-timeline-slider" class="time-scrubber-slider" min="1" max="90" value="90" step="1">
+          <span class="timeline-box-day" id="scrubber-day-badge">Day 90</span>
         </div>
 
         <!-- Right Sidebar: Thermal Object & Telemetry Inspector -->

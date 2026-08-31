@@ -118,8 +118,8 @@ export class HeatWatchMap {
       })
     };
 
-    // Default basemap is NASA GIBS VIIRS True Color (Official FIRMS Global Imagery)
-    this.activeBaseMap = this.baseMaps.nasa_viirs.addTo(this.map);
+    // Default basemap is High-Resolution Satellite World Imagery (1m Aerial)
+    this.activeBaseMap = this.baseMaps.satellite.addTo(this.map);
 
     // Layer Groups
     this.layers.rawFirms = L.layerGroup().addTo(this.map);

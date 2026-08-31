@@ -46,8 +46,13 @@ export class DemoStoryEngine {
     const stepData = DEMO_STORY_STEPS[index];
     if (!stepData) return;
 
-    // Apply map zoom and layer configurations
+    // Apply map zoom and layer configurations with High-Resolution Satellite Imagery
     if (this.mapInstance) {
+      if (this.mapInstance.setBaseMap) {
+        this.mapInstance.setBaseMap('satellite');
+        const basemapSelect = document.getElementById('select-basemap-style');
+        if (basemapSelect) basemapSelect.value = 'satellite';
+      }
       this.mapInstance.map.flyTo(stepData.zoomCoordinates, stepData.zoomLevel, { duration: 1.0 });
       this.mapInstance.applyLayerPreset(stepData.mapLayers);
       this.mapInstance.selectObject(stepData.targetObjectId, false);
