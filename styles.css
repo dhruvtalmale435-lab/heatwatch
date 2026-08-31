@@ -14,11 +14,11 @@
   --bg-card-hover: rgba(26, 36, 56, 0.95);
   --bg-glass: rgba(13, 19, 31, 0.94);
   --bg-glass-heavy: rgba(10, 15, 25, 0.97);
-  
+
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-glow: rgba(59, 130, 246, 0.35);
   --border-active: #3b82f6;
-  
+
   /* Telemetry Accent Colors - Professional & Grounded */
   --accent-cyan: #38bdf8;
   --accent-cyan-glow: rgba(56, 189, 248, 0.15);
@@ -33,31 +33,33 @@
   --accent-forest-glow: rgba(16, 185, 129, 0.18);
   --accent-mining: #8b5cf6;
   --accent-unmapped: #ec4899;
-  
+
   /* Text */
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
   --text-dim: #64748b;
   --text-cyan: #38bdf8;
   --text-highlight: #ffffff;
-  
+
   /* Fonts */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
-  
+
   /* Layout Dimensions */
   --header-height: 54px;
   --ticker-height: 30px;
   --sidebar-width: 390px;
-  
+
   /* Transitions */
   --ease-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --ease-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Reset & Box Sizing */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -80,13 +82,16 @@ body {
   width: 5px;
   height: 5px;
 }
+
 ::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, 0.2);
 }
+
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.12);
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent-cyan);
 }
@@ -245,8 +250,15 @@ body {
 }
 
 @keyframes dropdown-fade-in {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .dropdown-item-btn {
@@ -427,8 +439,17 @@ body {
 }
 
 @keyframes pulse-dot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.85); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.4;
+    transform: scale(0.85);
+  }
 }
 
 .ticker-metric {
@@ -1131,11 +1152,11 @@ body {
   border-radius: 50%;
 }
 
-input:checked + .slider {
+input:checked+.slider {
   background-color: var(--accent-cyan);
 }
 
-input:checked + .slider:before {
+input:checked+.slider:before {
   transform: translateX(14px);
   background-color: #060910;
 }
@@ -1388,15 +1409,44 @@ input:checked + .slider:before {
   border-radius: 3px;
 }
 
-.chip-anomaly { background: var(--accent-thermal); box-shadow: 0 0 6px var(--accent-thermal); }
-.chip-industrial { background: var(--accent-cyan); }
-.chip-flare { background: var(--accent-flare); }
-.chip-wildfire { background: var(--accent-wildfire); }
-.chip-agri { background: #eab308; }
-.chip-mining { background: var(--accent-mining); }
-.chip-unmapped { background: var(--accent-unmapped); }
-.chip-osm { background: rgba(59, 130, 246, 0.4); border: 1px dashed #60a5fa; }
-.chip-nasa { background: #3b82f6; border-radius: 50%; }
+.chip-anomaly {
+  background: var(--accent-thermal);
+  box-shadow: 0 0 6px var(--accent-thermal);
+}
+
+.chip-industrial {
+  background: var(--accent-cyan);
+}
+
+.chip-flare {
+  background: var(--accent-flare);
+}
+
+.chip-wildfire {
+  background: var(--accent-wildfire);
+}
+
+.chip-agri {
+  background: #eab308;
+}
+
+.chip-mining {
+  background: var(--accent-mining);
+}
+
+.chip-unmapped {
+  background: var(--accent-unmapped);
+}
+
+.chip-osm {
+  background: rgba(59, 130, 246, 0.4);
+  border: 1px dashed #60a5fa;
+}
+
+.chip-nasa {
+  background: #3b82f6;
+  border-radius: 50%;
+}
 
 
 
@@ -1492,8 +1542,15 @@ input:checked + .slider:before {
 }
 
 @keyframes tourCardPop {
-  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .tour-header {
@@ -1951,8 +2008,13 @@ input:checked + .slider:before {
   margin-top: -1px;
 }
 
-.ev-icon.check { color: var(--accent-forest); }
-.ev-icon.alert { color: var(--accent-thermal); }
+.ev-icon.check {
+  color: var(--accent-forest);
+}
+
+.ev-icon.alert {
+  color: var(--accent-thermal);
+}
 
 /* Score Progress Bar */
 .score-progress-wrap {
@@ -2264,8 +2326,15 @@ input:checked + .slider:before {
 }
 
 @keyframes slide-down {
-  from { opacity: 0; transform: translate(-50%, -15px); }
-  to { opacity: 1; transform: translate(-50%, 0); }
+  from {
+    opacity: 0;
+    transform: translate(-50%, -15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }
 
 .demo-bar-top {
@@ -2643,8 +2712,15 @@ input:checked + .slider:before {
 }
 
 @keyframes pulse-ring {
-  0% { transform: scale(0.6); opacity: 0.9; }
-  100% { transform: scale(2.0); opacity: 0; }
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: scale(2.0);
+    opacity: 0;
+  }
 }
 
 /* Responsive queries */
@@ -2652,9 +2728,11 @@ input:checked + .slider:before {
   .map-sidebar-inspector {
     width: 320px;
   }
+
   .analytics-grid-4col {
     grid-template-columns: repeat(2, 1fr);
   }
+
   .charts-split-grid {
     grid-template-columns: 1fr;
   }
@@ -2882,10 +2960,12 @@ input:checked + .slider:before {
   body * {
     visibility: hidden;
   }
+
   #modal-incident-dossier,
   #modal-incident-dossier * {
     visibility: visible;
   }
+
   #modal-incident-dossier {
     position: absolute;
     left: 0;
@@ -2894,6 +2974,7 @@ input:checked + .slider:before {
     background: transparent !important;
     padding: 0 !important;
   }
+
   .dossier-modal-window {
     max-width: 100% !important;
     box-shadow: none !important;
@@ -2901,6 +2982,7 @@ input:checked + .slider:before {
     background: transparent !important;
     padding: 0 !important;
   }
+
   .no-print {
     display: none !important;
   }
@@ -3024,3 +3106,261 @@ input:checked + .slider:before {
   background: rgba(255, 255, 255, 0.02);
 }
 
+/* ==========================================================================
+   Responsive Mobile & Tablet Design System
+   ========================================================================== */
+
+/* Tablet & Smaller Desktops (<= 1024px) */
+@media (max-width: 1024px) {
+  :root {
+    --sidebar-width: 340px;
+  }
+
+  .analytics-grid-4col {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .charts-split-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .spectral-split-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dossier-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile Devices (<= 768px) */
+@media (max-width: 768px) {
+  :root {
+    --sidebar-width: 100vw;
+  }
+
+  body {
+    height: 100%;
+    min-height: 100vh;
+  }
+
+  /* Header Mobile Stack */
+  .app-header {
+    height: auto;
+    min-height: 52px;
+    padding: 0.5rem 0.75rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .brand-container {
+    flex: 1;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+  }
+
+  .header-actions button {
+    padding: 0 0.55rem;
+    height: 28px;
+    font-size: 0.72rem;
+  }
+
+  /* Nav Tabs Horizontal Scrollable Ribbon */
+  .nav-tabs {
+    order: 3;
+    width: 100%;
+    height: 36px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    padding: 2px;
+    gap: 0.2rem;
+  }
+
+  .nav-tab-btn {
+    padding: 0 0.55rem;
+    height: 28px;
+    font-size: 0.72rem;
+    flex-shrink: 0;
+  }
+
+  /* Telemetry Live Ticker Mobile */
+  .telemetry-ticker {
+    height: auto;
+    min-height: 28px;
+    padding: 0.35rem 0.75rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    gap: 1rem;
+    justify-content: flex-start;
+  }
+
+  .ticker-status-item {
+    flex-shrink: 0;
+    font-size: 0.65rem;
+  }
+
+  /* Map View Fullscreen with Floating Drawer Sidebar */
+  #gis-map-canvas {
+    width: 100% !important;
+  }
+
+  .map-sidebar-inspector {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    max-width: 100vw;
+    z-index: 1200;
+    margin-right: 0;
+    transform: translateX(0);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(10, 14, 23, 0.98);
+    backdrop-filter: blur(20px);
+  }
+
+  .map-sidebar-inspector.collapsed {
+    transform: translateX(100%);
+    margin-right: 0;
+  }
+
+  .sidebar-toggle-tab {
+    left: -32px;
+    top: 4rem;
+  }
+
+  /* Floating HUD Panels Mobile */
+  .map-floating-panel {
+    max-width: calc(100vw - 1rem);
+  }
+
+  .map-region-selector {
+    top: 0.5rem;
+    left: 0.5rem;
+    width: calc(100vw - 1rem);
+  }
+
+  .map-layers-panel {
+    top: auto;
+    bottom: 1rem;
+    left: 0.5rem;
+    width: calc(100vw - 1rem);
+  }
+
+  /* Analytics Mobile View */
+  .analytics-view-container {
+    padding: 0.75rem 0.75rem 3rem 0.75rem;
+    gap: 0.85rem;
+  }
+
+  .analytics-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .analytics-header-row h2 {
+    font-size: 1.15rem !important;
+  }
+
+  #select-analytics-facility {
+    width: 100%;
+    min-width: 100% !important;
+  }
+
+  #analytics-facility-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.65rem;
+    padding: 0.75rem 1rem !important;
+  }
+
+  .analytics-grid-4col {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+
+  .kpi-card {
+    padding: 0.75rem 1rem;
+  }
+
+  .kpi-value {
+    font-size: 1.25rem;
+  }
+
+  .chart-canvas-wrap {
+    height: 240px;
+  }
+
+  /* Modals on Mobile */
+  .modal-backdrop {
+    padding: 0.5rem;
+    align-items: flex-end;
+  }
+
+  .modal-window {
+    max-width: 100vw;
+    width: 100%;
+    max-height: 88vh;
+    border-radius: 12px 12px 0 0;
+  }
+
+  /* SIH Tour Card on Mobile */
+  .sih-tour-overlay {
+    top: 3.8rem;
+    width: 96%;
+    max-width: 96vw;
+    padding: 0 0.25rem;
+  }
+
+  .sih-tour-card {
+    padding: 0.75rem 0.85rem;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .tour-flow-grid {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.3rem;
+  }
+
+  .tour-flow-node {
+    min-width: 70px;
+    padding: 0.25rem 0.4rem;
+  }
+}
+
+/* Small SmartPhones (<= 480px) */
+@media (max-width: 480px) {
+  .brand-name {
+    font-size: 1rem;
+  }
+
+  .brand-flame-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .header-actions button {
+    font-size: 0.65rem;
+    padding: 0 0.4rem;
+    height: 26px;
+  }
+
+  .btn-tour-nav, .btn-tour-next {
+    font-size: 0.68rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .kpi-value {
+    font-size: 1.15rem;
+  }
+}
