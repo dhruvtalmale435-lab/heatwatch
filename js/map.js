@@ -176,11 +176,17 @@ export class HeatWatchMap {
       this.map.flyTo(facility.coordinates, 14, { duration: 1.2 });
       const matchedObj = THERMAL_OBJECTS.find(o => 
         o.id === facility.id || 
+        o.regionId === facility.id ||
         (o.matchedFacility && o.matchedFacility.name.toLowerCase().includes(facility.name.toLowerCase().split('(')[0].trim())) ||
         (Math.abs(o.centroid[0] - facility.coordinates[0]) < 0.05 && Math.abs(o.centroid[1] - facility.coordinates[1]) < 0.05)
       );
       if (matchedObj) {
         this.selectObject(matchedObj.id);
+      } else {
+        const dynObj = this.synthesizeObjectFromFacility(facility);
+        if (this.onSelectObject) {
+          this.onSelectObject(dynObj);
+        }
       }
     }
   }
@@ -364,17 +370,17 @@ export class HeatWatchMap {
     });
   }
 
-  renderOsmFacilities() {
+  renderOsmFacilities(categoryFilter = 'all') {
     this.layers.osmFacilities.clearLayers();
 
+    // 1. Render Detailed OSM Polygons for Core Complexes
     OSM_FACILITIES.forEach(fac => {
-      // 1. Facility Perimeter Polygon
       const polygon = L.polygon(fac.polygon, {
         color: '#00f0ff',
         weight: 1.5,
         dashArray: '3, 4',
         fillColor: '#00f0ff',
-        fillOpacity: 0.10
+        fillOpacity: 0.12
       });
 
       polygon.bindTooltip(`
@@ -387,22 +393,92 @@ export class HeatWatchMap {
         </div>
       `, { sticky: true });
 
-      polygon.on('click', () => {
-        this.map.flyTo(fac.coordinates, 13, { duration: 0.8 });
-      });
+      const handleClick = () => {
+        this.map.flyTo(fac.coordinates, 14, { duration: 0.8 });
+        let matchedObj = THERMAL_OBJECTS.find(o => o.id === fac.id || o.regionId === fac.id);
+        if (!matchedObj) {
+          matchedObj = this.synthesizeObjectFromFacility({
+            id: fac.id,
+            name: fac.name,
+            state: fac.attributes.state,
+            city: fac.attributes.city,
+            type: fac.type,
+            coordinates: fac.coordinates,
+            capacity: fac.attributes.capacity,
+            operator: fac.attributes.operator
+          });
+        }
+        if (this.onSelectObject) this.onSelectObject(matchedObj);
+      };
 
+      polygon.on('click', handleClick);
       this.layers.osmFacilities.addLayer(polygon);
+    });
 
-      // 2. Center Marker with Icon
+    // 2. Filter All-India Facilities by active category
+    let facilitiesToRender = ALL_INDIA_FACILITIES;
+    if (categoryFilter !== 'all') {
+      facilitiesToRender = ALL_INDIA_FACILITIES.filter(fac => {
+        if (categoryFilter === 'industrial_fire') {
+          return fac.id === 'REF-01' || fac.id === 'REF-09' || fac.status === 'high_priority' || fac.type.includes('Petrochemical');
+        } else if (categoryFilter === 'routine_flare') {
+          return fac.type.includes('Refinery') || fac.type.includes('Petrochemical') || fac.type.includes('LNG') || fac.type.includes('Chemical');
+        } else if (categoryFilter === 'mining_fire') {
+          return fac.type.includes('Coal') || fac.type.includes('Thermal') || fac.type.includes('Steel') || fac.type.includes('Aluminum') || fac.type.includes('Mine');
+        } else if (categoryFilter === 'forest_fire') {
+          return fac.type.includes('Forest') || fac.type.includes('Biosphere');
+        } else if (categoryFilter === 'agriculture_fire') {
+          return fac.type.includes('Agrarian') || fac.type.includes('Crop') || fac.type.includes('Stubble');
+        } else if (categoryFilter === 'glint_filtered') {
+          return fac.type.includes('Solar');
+        }
+        return true;
+      });
+    }
+
+    // Render filtered facilities
+    facilitiesToRender.forEach(fac => {
+      let pinColor = '#00f0ff';
+      let iconSymbol = '🏭';
+      if (fac.type.includes('Thermal')) { pinColor = '#f59e0b'; iconSymbol = '⚡'; }
+      else if (fac.type.includes('Steel')) { pinColor = '#ec4899'; iconSymbol = '🏭'; }
+      else if (fac.type.includes('Coal')) { pinColor = '#a855f7'; iconSymbol = '⛏️'; }
+      else if (fac.type.includes('LNG')) { pinColor = '#06b6d4'; iconSymbol = '⛽'; }
+      else if (fac.type.includes('Forest') || fac.type.includes('Biosphere')) { pinColor = '#10b981'; iconSymbol = '🌲'; }
+      else if (fac.type.includes('Agrarian') || fac.type.includes('Crop')) { pinColor = '#eab308'; iconSymbol = '🌾'; }
+      else if (fac.type.includes('Solar')) { pinColor = '#64748b'; iconSymbol = '☀️'; }
+
       const centerMarker = L.circleMarker(fac.coordinates, {
-        radius: 4,
-        color: '#00f0ff',
+        radius: 6,
+        color: pinColor,
         fillColor: '#ffffff',
-        fillOpacity: 0.9,
-        weight: 1
+        fillOpacity: 0.95,
+        weight: 2
       });
 
-      centerMarker.bindTooltip(`<strong>${fac.name}</strong>`, { direction: 'top' });
+      const matchedObj = this.findMatchingThermalObject(fac);
+      const hasActiveHotspot = !!matchedObj || (fac.hasActiveDetection === true && fac.currentFRP);
+      const statusText = hasActiveHotspot 
+        ? `Satellite FRP: <strong style="color:#ff4747;">${matchedObj?.thermal?.currentFRP || fac.currentFRP} MW</strong> <span style="color:#ff8888; font-size:0.7rem;">(Active Hotspot)</span>`
+        : `Satellite Status: <strong style="color:#10b981;">Nominal (No Satellite Thermal Anomaly)</strong>`;
+
+      centerMarker.bindTooltip(`
+        <div style="font-family: 'Inter', sans-serif; font-size: 0.76rem;">
+          <strong style="color:${pinColor};">${iconSymbol} ${fac.name}</strong><br/>
+          <span style="color:#9ca3af;">${fac.city}, ${fac.state}</span><br/>
+          Type: <strong>${fac.type}</strong><br/>
+          Capacity: <span style="color:#cbd5e1; font-weight:600;">${fac.capacity || 'Commercial Plant'}</span><br/>
+          ${statusText}
+        </div>
+      `, { sticky: true });
+
+      centerMarker.on('click', () => {
+        this.map.flyTo(fac.coordinates, 14, { duration: 0.8 });
+        const matchedObj = this.findMatchingThermalObject(fac);
+        const objToSelect = matchedObj || this.synthesizeObjectFromFacility(fac);
+        this.selectObject(objToSelect.id, false);
+      });
+
       this.layers.osmFacilities.addLayer(centerMarker);
     });
   }
@@ -480,9 +556,16 @@ export class HeatWatchMap {
 
   selectObject(objectId, triggerFlyTo = true) {
     this.selectedObjectId = objectId;
-    const obj = THERMAL_OBJECTS.find(o => o.id === objectId);
+    let obj = THERMAL_OBJECTS.find(o => o.id === objectId || o.regionId === objectId);
+    if (!obj) {
+      const cleanId = String(objectId).replace(/^OBJ-/, '').replace(/^FAC-/, '');
+      const fac = ALL_INDIA_FACILITIES.find(f => f.id === cleanId || f.id === objectId || `FAC-${f.id}` === objectId || `OBJ-${f.id}` === objectId);
+      if (fac) {
+        obj = this.synthesizeObjectFromFacility(fac);
+      }
+    }
     if (obj) {
-      if (triggerFlyTo) {
+      if (triggerFlyTo && obj.coordinates) {
         this.map.flyTo(obj.coordinates, 14, { duration: 0.8 });
       }
       if (this.onSelectObject) {
@@ -631,15 +714,149 @@ export class HeatWatchMap {
     return dynamicObj;
   }
 
+  findMatchingThermalObject(fac) {
+    if (!fac) return null;
+    return THERMAL_OBJECTS.find(o => {
+      if (o.id === fac.id || o.regionId === fac.id || `FAC-${fac.id}` === o.id || `OBJ-${fac.id}` === o.id) return true;
+      if (fac.id === 'PWR-02' && o.id === 'OBJ-2019') return true;
+      if (fac.id === 'FOR-01' && o.id === 'OBJ-3041') return true;
+      if (fac.id === 'SOLAR-01' && o.id === 'OBJ-8021') return true;
+      if (fac.id === 'COAL-01' && o.id === 'OBJ-7011') return true;
+      if (fac.id === 'AGRI-01' && o.id === 'OBJ-4012') return true;
+      if (fac.id === 'REF-04' && o.id === 'OBJ-1082') return true;
+      if (fac.id === 'REF-01' && o.id === 'OBJ-1045') return true;
+      if (o.coordinates && fac.coordinates) {
+        const dLat = Math.abs(o.coordinates[0] - fac.coordinates[0]);
+        const dLon = Math.abs(o.coordinates[1] - fac.coordinates[1]);
+        if (dLat < 0.05 && dLon < 0.05) return true;
+      }
+      return false;
+    });
+  }
+
   synthesizeObjectFromFacility(fac) {
-    const det = {
-      lat: fac.coordinates[0],
-      lon: fac.coordinates[1],
-      frp: fac.type.includes('Refinery') ? 48.0 : (fac.type.includes('Thermal') ? 35.0 : (fac.type.includes('Steel') ? 32.0 : 22.0)),
-      tempK: 358.0,
-      satellite: 'VIIRS'
+    const lat = fac.coordinates[0];
+    const lon = fac.coordinates[1];
+    const objId = `FAC-${fac.id}`;
+
+    // Check if this facility maps to an actual active thermal hotspot detection
+    const matchedBenchmark = this.findMatchingThermalObject(fac);
+    if (matchedBenchmark) {
+      return matchedBenchmark;
+    }
+
+    const hasActiveDetection = fac.hasActiveDetection === true || (fac.currentFRP !== undefined && fac.currentFRP > 0);
+    const frp = hasActiveDetection ? fac.currentFRP : 0.0;
+    const baseMean = fac.baselineFRP || 0.0;
+    const isSurge = hasActiveDetection && frp && baseMean && (frp / Math.max(baseMean, 1)) > 1.8;
+    const status = hasActiveDetection ? (isSurge ? "high_priority" : "normal") : "normal";
+    const statusLabel = hasActiveDetection ? (isSurge ? "HIGH-PRIORITY ANOMALY" : "NORMAL OPERATIONAL BASELINE") : "NOMINAL BASELINE (No Flare)";
+
+    const dynObj = {
+      id: objId,
+      name: `${fac.name}`,
+      regionId: fac.id,
+      centroid: [lat, lon],
+      coordinates: [lat, lon],
+      hasActiveDetection: hasActiveDetection,
+      categoryGroup: hasActiveDetection ? "industrial_fire" : "routine_flare",
+      primaryCategory: "industrial",
+      categoryLabel: hasActiveDetection ? `${fac.type} Thermal Emitter` : `${fac.type} (Nominal Baseline)`,
+      subtype: fac.type,
+      status: status,
+      statusLabel: statusLabel,
+      evidenceScore: hasActiveDetection ? 0.91 : 0.85,
+      confidence: hasActiveDetection ? "High (91%)" : "Nominal",
+      matchedFacility: {
+        name: fac.name,
+        type: fac.type,
+        distanceMeters: 0,
+        osmId: `facility/${fac.id}`,
+        tags: {
+          operator: fac.operator || "National Industrial Grid",
+          capacity: fac.capacity || "Commercial Facility",
+          units: fac.units || "Active Refining & Industrial Units"
+        }
+      },
+      thermal: {
+        currentFRP: frp,
+        historicalMeanFRP: baseMean,
+        frpDeviationRatio: hasActiveDetection && frp && baseMean ? (Math.round((frp / Math.max(baseMean, 1)) * 100) / 100) : 1.0,
+        currentBrightnessTempK: hasActiveDetection && frp > 0 ? Math.round(320 + (frp * 0.5)) : 301.2,
+        historicalMeanTempK: 298.0,
+        sensor: "VIIRS SNPP 375m & MODIS",
+        detectionTime: hasActiveDetection ? "2026-08-28 02:18 UTC" : "Current Orbital Pass",
+        activeDays: hasActiveDetection ? 88 : 0,
+        totalDetections: hasActiveDetection ? 134 : 0,
+        persistenceRate: hasActiveDetection ? "94.2% (Persistent Flare)" : "Nominal Baseline",
+        footprintAreaHa: hasActiveDetection && frp ? Math.round((frp / 7.0) * 10) / 10 : 0.0
+      },
+      spatialDynamics: {
+        centroidStabilityPct: 99.6,
+        spreadVelocityKmH: 0.0,
+        motionType: "STATIONARY STACK",
+        isStationary: true,
+        driftVectorMeters: 0,
+        plumeDispersion: "Calm / Nominal"
+      },
+      landCover: fac.landCover || {
+        industrialBuiltUp: 78.0,
+        bareSoilPaved: 14.0,
+        waterBody: 4.0,
+        vegetationTree: 4.0,
+        cropland: 0.0
+      },
+      nighttimeLight: {
+        radianceScore: 82.4,
+        classification: "Industrial Electrification Grid"
+      },
+      glintFilter: {
+        statusLabel: "✓ PASSED: Verified Facility Perimeter",
+        albedoReflectance: 0.06,
+        solarElevationDeg: 54.0
+      },
+      hazardProximity: {
+        threatLevel: isSurge ? "CRITICAL INTERNAL SURGE" : "NOMINAL BACKGROUND",
+        summary: `Facility Perimeter: ${fac.name} (${fac.city}, ${fac.state})`
+      },
+      nearestSettlement: {
+        name: `${fac.city} Settlement Fringe`,
+        distanceKm: 2.2,
+        populationEstimate: "~18,000 residents"
+      },
+      recommendedAction: hasActiveDetection ? "Review facility flare release telemetry & alert plant safety unit." : "Routine background operational monitoring active.",
+      evidencePoints: [
+        { text: `Registered Facility: Direct match at ${fac.name} (${fac.state}) in OSM catalog`, verified: true, type: "neutral" },
+        { text: hasActiveDetection ? `Radiometry: Current FRP ${frp} MW (Baseline: ${baseMean} MW)` : `Satellite Radiometry: 0.0 MW (No active thermal pixels detected in current orbital pass)`, verified: hasActiveDetection, type: hasActiveDetection ? "pro-industrial" : "no-data" },
+        { text: `ESA WorldCover: ${(fac.landCover?.industrialBuiltUp || 78)}% heavy industrial built-up footprint`, verified: true, type: "neutral" },
+        { text: `Status: Operating within nominal baseline parameters`, verified: true, type: "neutral" }
+      ],
+      anomalyFormula: {
+        totalAnomalyScore: isSurge ? 0.88 : 0.0
+      }
     };
-    return this.synthesizeObjectFromDetection(det);
+
+    // Ensure 90-day time series exists in HISTORICAL_FRP_DATA
+    if (!HISTORICAL_FRP_DATA[objId]) {
+      const history = [];
+      const startDate = new Date("2026-06-01T00:00:00Z");
+      for (let i = 0; i < 90; i++) {
+        const curDate = new Date(startDate.getTime() + i * 86400000);
+        history.push({
+          dayIndex: i + 1,
+          day: `Day ${i + 1}`,
+          date: curDate.toISOString().substring(0, 10),
+          frp: hasActiveDetection && i === 89 ? frp : 0,
+          baseline: baseMean || 0,
+          threshold: baseMean ? Math.round(baseMean * 2 * 10) / 10 : 0,
+          tempK: 298,
+          status: "inactive"
+        });
+      }
+      HISTORICAL_FRP_DATA[objId] = history;
+    }
+
+    return dynObj;
   }
 
   flyToFacility(facilityId) {

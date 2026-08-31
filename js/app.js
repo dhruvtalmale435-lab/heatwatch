@@ -70,11 +70,13 @@ class HeatWatchApp {
     this.setupLiveFetchButton();
     this.setupPyrometryAndModelSimulator();
     this.setupTimelineScrubber();
+    this.setupGuidedTour();
 
     // 7. Initial render of selected object (#OBJ-1045)
     this.updateInspectorHUD(this.selectedObject);
     this.renderAlertsTable();
     this.renderNasaComparisonMatrix();
+    this.updateCategoryChipCounts();
 
     // Start Live Clock
     this.startClock();
@@ -171,24 +173,131 @@ class HeatWatchApp {
       });
     }
 
-    // Guided Story Mode Button in Header
-    const guidedDemoBtn = document.getElementById('btn-guided-demo');
-    if (guidedDemoBtn) {
-      guidedDemoBtn.addEventListener('click', () => {
-        this.switchView('command-map');
-        const demoBar = document.getElementById('demo-story-bar');
-        if (demoBar) {
-          demoBar.classList.add('active');
-          this.demoEngine.startDemo();
-        }
-      });
-    }
-
     // Export GeoJSON in Header
     const exportBtn = document.getElementById('btn-export-geojson');
     if (exportBtn) {
       exportBtn.addEventListener('click', () => {
         this.apiPlayground.exportGeoJson();
+      });
+    }
+
+    // Setup Human Verification Actions
+    this.setupHumanVerificationControls();
+  }
+
+  showToast(message) {
+    let toast = document.getElementById('app-notification-toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'app-notification-toast';
+      toast.style.cssText = `
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(10, 16, 30, 0.95);
+        backdrop-filter: blur(14px);
+        border: 1px solid var(--accent-cyan);
+        color: #fff;
+        font-family: var(--font-sans);
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 16px rgba(0, 240, 255, 0.3);
+        z-index: 9999;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+      `;
+      document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateX(-50%) translateY(-5px)';
+    clearTimeout(this._toastTimeout);
+    this._toastTimeout = setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+    }, 4000);
+  }
+
+  setupHumanVerificationControls() {
+    if (!this.verifiedTags) {
+      try {
+        this.verifiedTags = JSON.parse(localStorage.getItem('heatwatch_verified_tags') || '{}');
+      } catch (e) {
+        this.verifiedTags = {};
+      }
+    }
+
+    const saveAndTagVerification = (categoryKey, statusText, color) => {
+      const obj = this.selectedObject || THERMAL_OBJECTS[0];
+      if (!obj) return;
+      const objId = obj.id;
+      const facName = obj.name;
+      const record = {
+        object_id: objId,
+        facility_name: facName,
+        verified_category: categoryKey,
+        verified_by: "Operator_1 (SIH Active Learning)",
+        timestamp_utc: new Date().toISOString(),
+        status_text: statusText,
+        color: color
+      };
+
+      // 1. Save in memory & localStorage
+      this.verifiedTags[objId] = record;
+      try {
+        localStorage.setItem('heatwatch_verified_tags', JSON.stringify(this.verifiedTags));
+      } catch (e) {}
+
+      // 2. Post to backend active learning ledger
+      fetch('/api/verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(record)
+      }).catch(() => console.log('Ledger sync offline, saved to localStorage'));
+
+      // 3. Update Step 4 verification status in right panel
+      const el = document.getElementById('hud-verification-status');
+      if (el) {
+        el.innerHTML = `<span>${statusText}</span><div style="font-size:0.62rem; color:#9ca3af; margin-top:2px;">Logged to Ground-Truth DB &amp; Retraining Queue</div>`;
+        el.style.color = color;
+      }
+
+      // 4. Show live toast confirmation
+      this.showToast(`✓ Tagged & Saved: ${facName} (#${objId}) verified as ${categoryKey}. Synced to Active Learning pipeline.`);
+
+      // 5. Refresh Alerts table if visible
+      this.renderAlertsTable();
+    };
+
+    const btnInd = document.getElementById('btn-confirm-industrial');
+    if (btnInd) {
+      btnInd.addEventListener('click', () => {
+        saveAndTagVerification('industrial', '✓ Tagged: Confirmed Industrial Emitter', '#10b981');
+      });
+    }
+
+    const btnWild = document.getElementById('btn-confirm-wildfire');
+    if (btnWild) {
+      btnWild.addEventListener('click', () => {
+        saveAndTagVerification('wildfire', '🌲 Tagged: Confirmed Canopy Wildfire', '#f97316');
+      });
+    }
+
+    const btnAgri = document.getElementById('btn-confirm-agri');
+    if (btnAgri) {
+      btnAgri.addEventListener('click', () => {
+        saveAndTagVerification('agriculture', '🌾 Tagged: Confirmed Stubble Burning', '#eab308');
+      });
+    }
+
+    const btnDrone = document.getElementById('btn-dispatch-drone');
+    if (btnDrone) {
+      btnDrone.addEventListener('click', () => {
+        saveAndTagVerification('drone_dispatched', '🚁 Tagged: Drone Dispatched (Mission HW-902)', '#ff4747');
       });
     }
   }
@@ -255,11 +364,28 @@ class HeatWatchApp {
     // Populate all 50+ facilities into Focus dropdown
     this.populateFocusDropdown();
 
-    // Region Dropdown
+    // Region / Focus Facility Dropdown
     const regionSelect = document.getElementById('select-study-region');
     if (regionSelect) {
       regionSelect.addEventListener('change', (e) => {
-        this.mapInstance.setRegion(e.target.value);
+        const val = e.target.value;
+        this.mapInstance.setRegion(val);
+
+        // Find or synthesize object and update evidence inspector immediately!
+        let targetObj = THERMAL_OBJECTS.find(o => o.regionId === val || o.id === val);
+        if (!targetObj) {
+          const fac = ALL_INDIA_FACILITIES.find(f => f.id === val);
+          if (fac && this.mapInstance) {
+            targetObj = this.mapInstance.synthesizeObjectFromFacility(fac);
+          }
+        }
+        if (targetObj) {
+          this.handleSelectObject(targetObj);
+        }
+
+        // Auto-expand inspector if collapsed
+        const inspectorSidebar = document.getElementById('map-sidebar-inspector');
+        if (inspectorSidebar) inspectorSidebar.classList.remove('collapsed');
       });
     }
 
@@ -289,67 +415,6 @@ class HeatWatchApp {
         });
       }
     });
-
-    // Time Scrubber Slider
-    const timeScrubber = document.getElementById('map-timeline-slider');
-    const scrubberLabel = document.getElementById('scrubber-time-display');
-    if (timeScrubber && scrubberLabel) {
-      timeScrubber.addEventListener('input', (e) => {
-        const val = parseInt(e.target.value);
-        if (val === 100) {
-          scrubberLabel.textContent = "LIVE: Today 03:45 UTC";
-        } else {
-          const daysAgo = Math.round((100 - val) * 0.9);
-          scrubberLabel.textContent = `HISTORICAL: Day -${daysAgo}`;
-        }
-      });
-    }
-
-    // Live vs Demo Data Mode Buttons
-    const liveBtn = document.getElementById('btn-mode-live');
-    const demoBtn = document.getElementById('btn-mode-demo');
-    if (liveBtn && demoBtn) {
-      liveBtn.addEventListener('click', () => {
-        this.activeDataMode = 'live';
-        liveBtn.classList.add('active');
-        demoBtn.classList.remove('active');
-        document.getElementById('ticker-data-source').textContent = "NASA LANCE NRT (Live Stream)";
-      });
-      demoBtn.addEventListener('click', () => {
-        this.activeDataMode = 'demo';
-        demoBtn.classList.add('active');
-        liveBtn.classList.remove('active');
-        document.getElementById('ticker-data-source').textContent = "Curated SIH Offline Scenario (Offline Backup)";
-      });
-    }
-
-    // Guided Story Bar Controls
-    const closeDemoBtn = document.getElementById('btn-close-demo');
-    const nextDemoBtn = document.getElementById('btn-next-step');
-    const prevDemoBtn = document.getElementById('btn-prev-step');
-    const autoPlayBtn = document.getElementById('btn-autoplay-demo');
-
-    if (closeDemoBtn) {
-      closeDemoBtn.addEventListener('click', () => {
-        document.getElementById('demo-story-bar').classList.remove('active');
-        this.demoEngine.stopAutoPlay();
-      });
-    }
-
-    if (nextDemoBtn) {
-      nextDemoBtn.addEventListener('click', () => this.demoEngine.nextStep());
-    }
-
-    if (prevDemoBtn) {
-      prevDemoBtn.addEventListener('click', () => this.demoEngine.prevStep());
-    }
-
-    if (autoPlayBtn) {
-      autoPlayBtn.addEventListener('click', () => {
-        const isPlaying = this.demoEngine.toggleAutoPlay();
-        autoPlayBtn.textContent = isPlaying ? "⏸ Pause Tour" : "▶ Auto Play Tour";
-      });
-    }
   }
 
   populateFocusDropdown() {
@@ -563,6 +628,135 @@ class HeatWatchApp {
     if (regionPanel) {
       makeDraggable(regionPanel, regionDragHandle || regionPanel);
     }
+
+    // 5. Right Sidebar Inspector HUD (Collapsible)
+    const inspectorSidebar = document.getElementById('map-sidebar-inspector');
+    const toggleInspectorBtn = document.getElementById('btn-toggle-inspector');
+    const toggleInspectorIcon = document.getElementById('icon-toggle-inspector');
+    if (inspectorSidebar && toggleInspectorBtn) {
+      toggleInspectorBtn.addEventListener('click', () => {
+        inspectorSidebar.classList.toggle('collapsed');
+        const isCollapsed = inspectorSidebar.classList.contains('collapsed');
+        if (toggleInspectorIcon) {
+          toggleInspectorIcon.setAttribute('data-lucide', isCollapsed ? 'chevron-left' : 'chevron-right');
+          if (window.lucide) lucide.createIcons();
+        }
+        if (this.mapInstance && this.mapInstance.map) {
+          setTimeout(() => this.mapInstance.map.invalidateSize(), 310);
+        }
+      });
+    }
+  }
+
+  setupFacilitySearch() {
+    const searchInput = document.getElementById('input-facility-search');
+    const resultsContainer = document.getElementById('facility-search-results');
+    if (!searchInput || !resultsContainer) return;
+
+    const renderResults = (query) => {
+      if (!query || query.trim().length === 0) {
+        resultsContainer.innerHTML = '';
+        resultsContainer.style.display = 'none';
+        return;
+      }
+
+      const q = query.toLowerCase().trim();
+      const matches = ALL_INDIA_FACILITIES.filter(f => 
+        f.name.toLowerCase().includes(q) ||
+        f.city.toLowerCase().includes(q) ||
+        f.state.toLowerCase().includes(q) ||
+        f.type.toLowerCase().includes(q) ||
+        (f.operator && f.operator.toLowerCase().includes(q))
+      );
+
+      if (matches.length === 0) {
+        resultsContainer.innerHTML = `
+          <div style="padding: 0.6rem 0.8rem; font-size: 0.75rem; color: var(--text-muted); text-align: center;">
+            No industrial facilities matching "${query}"
+          </div>
+        `;
+        resultsContainer.style.display = 'block';
+        return;
+      }
+
+      resultsContainer.innerHTML = matches.slice(0, 10).map(f => {
+        let icon = "🏭";
+        if (f.type.includes('Thermal')) icon = "⚡";
+        else if (f.type.includes('Steel')) icon = "🏭";
+        else if (f.type.includes('Coal')) icon = "⛏️";
+        else if (f.type.includes('LNG')) icon = "⛽";
+        else if (f.type.includes('Solar')) icon = "☀️";
+        else if (f.type.includes('Forest') || f.type.includes('Biosphere')) icon = "🌲";
+
+        return `
+          <div class="search-result-item" data-facility-id="${f.id}">
+            <div class="search-result-icon">${icon}</div>
+            <div class="search-result-info">
+              <div class="search-result-name">${f.name}</div>
+              <div class="search-result-meta">${f.type} • ${f.city}, ${f.state}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      resultsContainer.style.display = 'block';
+
+      // Attach click events
+      resultsContainer.querySelectorAll('.search-result-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const facId = item.getAttribute('data-facility-id');
+          const fac = ALL_INDIA_FACILITIES.find(f => f.id === facId);
+          if (fac) {
+            searchInput.value = fac.name;
+            resultsContainer.style.display = 'none';
+
+            // Sync Focus dropdown
+            const focusSelect = document.getElementById('select-study-region');
+            if (focusSelect) focusSelect.value = fac.id;
+
+            // Fly map to coordinates
+            if (this.mapInstance) {
+              this.mapInstance.setRegion(fac.id);
+            }
+
+            // Synthesize and load the Evidence Inspector HUD directly for this searched facility!
+            let targetObj = THERMAL_OBJECTS.find(o => o.regionId === fac.id || o.id === fac.id);
+            if (!targetObj && this.mapInstance) {
+              targetObj = this.mapInstance.synthesizeObjectFromFacility(fac);
+            }
+            if (targetObj) {
+              this.handleSelectObject(targetObj);
+            }
+
+            // Ensure right sidebar inspector is expanded and visible
+            const inspectorSidebar = document.getElementById('map-sidebar-inspector');
+            if (inspectorSidebar) {
+              inspectorSidebar.classList.remove('collapsed');
+              const toggleIcon = document.getElementById('icon-toggle-inspector');
+              if (toggleIcon) {
+                toggleIcon.setAttribute('data-lucide', 'chevron-right');
+                if (window.lucide) lucide.createIcons();
+              }
+            }
+          }
+        });
+      });
+    };
+
+    searchInput.addEventListener('input', (e) => {
+      renderResults(e.target.value);
+    });
+
+    searchInput.addEventListener('focus', (e) => {
+      renderResults(e.target.value);
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
+        resultsContainer.style.display = 'none';
+      }
+    });
   }
 
   setCategoryFilter(categoryKey) {
@@ -578,17 +772,18 @@ class HeatWatchApp {
       tab.classList.toggle('active', tab.getAttribute('data-category') === categoryKey);
     });
 
-    // Update Map Clusters
+    // Update Map Clusters and OSM Facility pins to ONLY show matching category facilities
     const filtered = this.getFilteredThermalObjects();
     if (this.mapInstance) {
       this.mapInstance.renderThermalClusters(filtered);
+      this.mapInstance.renderOsmFacilities(categoryKey);
     }
 
     // Update Alerts Table
     this.renderAlertsTable();
 
-    // Pan camera to category exemplar
-    this.flyToCategoryExemplar(categoryKey);
+    // Auto-fit map camera so ALL facilities of this category are visible at once!
+    this.flyToCategoryExemplar(categoryKey, filtered);
   }
 
   setSortOrder(sortKey) {
@@ -600,18 +795,110 @@ class HeatWatchApp {
     this.renderAlertsTable();
   }
 
-  getFilteredThermalObjects() {
+  setupLiveFetchButton() {
+    const fetchBtn = document.getElementById('btn-fetch-live-firms');
+    if (!fetchBtn || !this.firmsFetcher) return;
+
+    const executeFetch = async (isAuto = false) => {
+      fetchBtn.disabled = true;
+      fetchBtn.innerHTML = `<i data-lucide="loader-2" style="animation: spin 1s linear infinite;"></i> Fetching NASA FIRMS...`;
+      if (window.lucide) lucide.createIcons();
+
+      try {
+        const result = await this.firmsFetcher.fetchLiveSatelliteData();
+        if (result && result.success) {
+          const count = result.points ? result.points.length : 0;
+          fetchBtn.innerHTML = `<i data-lucide="check-circle" style="color: #10b981;"></i> ${count} Live Hotspots Synced`;
+          setTimeout(() => {
+            fetchBtn.innerHTML = `<i data-lucide="satellite"></i> Query Live NASA FIRMS`;
+            fetchBtn.disabled = false;
+            if (window.lucide) lucide.createIcons();
+          }, 3500);
+        } else {
+          fetchBtn.innerHTML = `<i data-lucide="satellite"></i> Query Live NASA FIRMS`;
+          fetchBtn.disabled = false;
+          if (window.lucide) lucide.createIcons();
+        }
+      } catch (err) {
+        console.warn("[HeatWatch] Live NASA fetch note:", err);
+        fetchBtn.innerHTML = `<i data-lucide="satellite"></i> Query Live NASA FIRMS`;
+        fetchBtn.disabled = false;
+        if (window.lucide) lucide.createIcons();
+      }
+    };
+
+    fetchBtn.addEventListener('click', () => executeFetch(false));
+
+    // Automatically load real NASA FIRMS data on startup without requiring manual button click!
+    setTimeout(() => {
+      executeFetch(true);
+    }, 100);
+
+    // Auto-refresh background satellite feed continuously every 60 seconds
+    setInterval(() => {
+      executeFetch(true);
+    }, 60000);
+  }
+
+  getAllCategorizedObjects() {
     let list = [...THERMAL_OBJECTS];
+
+    if (this.mapInstance) {
+      ALL_INDIA_FACILITIES.forEach(fac => {
+        if (!list.some(o => o.id === fac.id || o.regionId === fac.id || o.id === `FAC-${fac.id}`)) {
+          const synth = this.mapInstance.synthesizeObjectFromFacility(fac);
+          if (fac.type.includes('Refinery') || fac.type.includes('Chemical') || fac.type.includes('Petro')) {
+            synth.categoryGroup = synth.status === 'high_priority' ? 'industrial_fire' : 'routine_flare';
+          } else if (fac.type.includes('Thermal') || fac.type.includes('Coal') || fac.type.includes('Steel') || fac.type.includes('Aluminum') || fac.type.includes('Mine')) {
+            synth.categoryGroup = 'mining_fire';
+          } else if (fac.type.includes('Forest') || fac.type.includes('Biosphere')) {
+            synth.categoryGroup = 'forest_fire';
+          } else if (fac.type.includes('Agrarian') || fac.type.includes('Crop')) {
+            synth.categoryGroup = 'agriculture_fire';
+          } else if (fac.type.includes('Solar')) {
+            synth.categoryGroup = 'glint_filtered';
+          }
+          list.push(synth);
+        }
+      });
+    }
+    return list;
+  }
+
+  updateCategoryChipCounts() {
+    const allObjects = this.getAllCategorizedObjects();
+    const setChip = (id, count) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = count;
+    };
+    const indCount = allObjects.filter(o => o.categoryGroup === 'industrial_fire' || o.status === 'high_priority').length;
+    const flareCount = allObjects.filter(o => o.categoryGroup === 'routine_flare').length;
+    const miningCount = allObjects.filter(o => o.categoryGroup === 'mining_fire').length;
+    const forestCount = allObjects.filter(o => o.categoryGroup === 'forest_fire').length;
+    const agriCount = allObjects.filter(o => o.categoryGroup === 'agriculture_fire').length;
+    const glintCount = allObjects.filter(o => o.categoryGroup === 'glint_filtered').length;
+
+    setChip('chip-count-all', allObjects.length);
+    setChip('chip-count-ind', indCount);
+    setChip('chip-count-flare', flareCount);
+    setChip('chip-count-mining', miningCount);
+    setChip('chip-count-forest', forestCount);
+    setChip('chip-count-agri', agriCount);
+    setChip('chip-count-glint', glintCount);
+  }
+
+  getFilteredThermalObjects() {
+    let list = this.getAllCategorizedObjects();
 
     if (this.currentCategoryFilter !== 'all') {
       list = list.filter(obj => {
         if (obj.categoryGroup === this.currentCategoryFilter) return true;
         if (this.currentCategoryFilter === 'industrial_fire' && (obj.categoryGroup === 'industrial_fire' || (obj.primaryCategory === 'industrial' && obj.status === 'high_priority'))) return true;
-        if (this.currentCategoryFilter === 'routine_flare' && obj.categoryGroup === 'routine_flare') return true;
-        if (this.currentCategoryFilter === 'mining_fire' && obj.categoryGroup === 'mining_fire') return true;
-        if (this.currentCategoryFilter === 'forest_fire' && (obj.categoryGroup === 'forest_fire' || obj.primaryCategory === 'wildfire')) return true;
-        if (this.currentCategoryFilter === 'agriculture_fire' && (obj.categoryGroup === 'agriculture_fire' || obj.primaryCategory === 'agriculture')) return true;
-        if (this.currentCategoryFilter === 'glint_filtered' && obj.categoryGroup === 'glint_filtered') return true;
+        if (this.currentCategoryFilter === 'routine_flare' && (obj.categoryGroup === 'routine_flare' || obj.subtype?.includes('Refinery') || obj.subtype?.includes('Petro'))) return true;
+        if (this.currentCategoryFilter === 'mining_fire' && (obj.categoryGroup === 'mining_fire' || obj.subtype?.includes('Coal') || obj.subtype?.includes('Thermal') || obj.subtype?.includes('Steel') || obj.subtype?.includes('Mine'))) return true;
+        if (this.currentCategoryFilter === 'forest_fire' && (obj.categoryGroup === 'forest_fire' || obj.primaryCategory === 'wildfire' || obj.subtype?.includes('Forest') || obj.subtype?.includes('Biosphere'))) return true;
+        if (this.currentCategoryFilter === 'agriculture_fire' && (obj.categoryGroup === 'agriculture_fire' || obj.primaryCategory === 'agriculture' || obj.subtype?.includes('Stubble') || obj.subtype?.includes('Agrarian') || obj.subtype?.includes('Crop'))) return true;
+        if (this.currentCategoryFilter === 'glint_filtered' && (obj.categoryGroup === 'glint_filtered' || obj.subtype?.includes('Solar'))) return true;
         return false;
       });
     }
@@ -644,66 +931,95 @@ class HeatWatchApp {
     return list;
   }
 
-  flyToCategoryExemplar(categoryKey) {
-    if (!this.mapInstance) return;
+  flyToCategoryExemplar(categoryKey, filteredObjects) {
+    if (!this.mapInstance || !this.mapInstance.map) return;
 
+    if (categoryKey === 'all') {
+      this.mapInstance.map.flyTo([22.5937, 78.9629], 5, { duration: 1.0 });
+      return;
+    }
+
+    let targetObj = null;
     switch (categoryKey) {
-      case 'forest_fire': {
-        const obj = THERMAL_OBJECTS.find(o => o.id === 'OBJ-3041');
-        if (obj) {
-          this.mapInstance.selectObject(obj.id);
-          this.handleSelectObject(obj);
-        }
+      case 'forest_fire':
+        targetObj = THERMAL_OBJECTS.find(o => o.id === 'OBJ-3041');
         break;
-      }
-      case 'agriculture_fire': {
-        const obj = THERMAL_OBJECTS.find(o => o.id === 'OBJ-4012');
-        if (obj) {
-          this.mapInstance.selectObject(obj.id);
-          this.handleSelectObject(obj);
-        }
+      case 'agriculture_fire':
+        targetObj = THERMAL_OBJECTS.find(o => o.id === 'OBJ-4012');
         break;
-      }
-      case 'mining_fire': {
-        const obj = THERMAL_OBJECTS.find(o => o.id === 'OBJ-7011');
-        if (obj) {
-          this.mapInstance.selectObject(obj.id);
-          this.handleSelectObject(obj);
-        }
+      case 'mining_fire':
+        targetObj = THERMAL_OBJECTS.find(o => o.id === 'OBJ-7011');
         break;
-      }
-      case 'industrial_fire': {
-        const obj = THERMAL_OBJECTS.find(o => o.id === 'OBJ-1045');
-        if (obj) {
-          this.mapInstance.selectObject(obj.id);
-          this.handleSelectObject(obj);
-        }
+      case 'industrial_fire':
+        targetObj = THERMAL_OBJECTS.find(o => o.id === 'OBJ-1045');
         break;
-      }
-      case 'routine_flare': {
-        const obj = THERMAL_OBJECTS.find(o => o.id === 'OBJ-1082');
-        if (obj) {
-          this.mapInstance.selectObject(obj.id);
-          this.handleSelectObject(obj);
-        }
+      case 'routine_flare':
+        targetObj = THERMAL_OBJECTS.find(o => o.id === 'OBJ-1082');
         break;
-      }
-      case 'glint_filtered': {
-        const obj = THERMAL_OBJECTS.find(o => o.id === 'OBJ-8021');
-        if (obj) {
-          this.mapInstance.selectObject(obj.id);
-          this.handleSelectObject(obj);
-        }
-        break;
-      }
-      default:
-        this.mapInstance.map.flyTo([22.5, 78.5], 5, { duration: 1.2 });
+      case 'glint_filtered':
+        targetObj = THERMAL_OBJECTS.find(o => o.id === 'OBJ-8021');
         break;
     }
+
+    if (!targetObj && filteredObjects && filteredObjects.length > 0) {
+      targetObj = filteredObjects[0];
+    }
+
+    // Auto-fit map bounds so that ALL matching places across India are framed and visible!
+    if (filteredObjects && filteredObjects.length > 1) {
+      const coords = filteredObjects.map(o => o.coordinates).filter(c => c && c.length === 2);
+      if (coords.length > 1) {
+        const bounds = L.latLngBounds(coords);
+        this.mapInstance.map.fitBounds(bounds, { padding: [70, 70], maxZoom: 10, duration: 1.0 });
+      }
+    } else if (targetObj) {
+      this.mapInstance.map.flyTo(targetObj.coordinates, 12, { duration: 1.0 });
+    }
+
+    if (targetObj) {
+      this.mapInstance.selectObject(targetObj.id, false);
+      this.handleSelectObject(targetObj);
+
+      // Sync the Focus Dropdown and Search Bar
+      const searchInput = document.getElementById('input-facility-search');
+      if (searchInput) searchInput.value = targetObj.name;
+
+      const focusSelect = document.getElementById('select-study-region');
+      if (focusSelect) {
+        focusSelect.value = targetObj.regionId || 'all_india';
+      }
+
+      // Auto-expand Right Sidebar Inspector HUD
+      const inspectorSidebar = document.getElementById('map-sidebar-inspector');
+      if (inspectorSidebar) inspectorSidebar.classList.remove('collapsed');
+    }
+  }
+
+  handleSelectObject(obj) {
+    if (!obj) return;
+    this.selectedObject = obj;
+
+    // 1. Sync Search Input and Focus Dropdown with selected object!
+    const searchInput = document.getElementById('input-facility-search');
+    if (searchInput) {
+      searchInput.value = obj.name;
+    }
+    const focusSelect = document.getElementById('select-study-region');
+    if (focusSelect) {
+      focusSelect.value = obj.regionId || obj.id || 'all_india';
+    }
+
+    // 2. Update Inspector HUD
+    this.updateInspectorHUD(obj);
+
+    // 3. Make sure inspector sidebar is open
+    const inspectorSidebar = document.getElementById('map-sidebar-inspector');
+    if (inspectorSidebar) inspectorSidebar.classList.remove('collapsed');
   }
 
   updateInspectorHUD(obj) {
     if (!obj) return;
+    this.selectedObject = obj;
 
     const setTxt = (id, val) => {
       const el = document.getElementById(id);
@@ -721,30 +1037,111 @@ class HeatWatchApp {
       severityBadge.textContent = obj.statusLabel;
     }
 
-    // Telemetry Stats
-    if (obj.thermal) {
-      setTxt('hud-stat-frp', `${obj.thermal.currentFRP} MW`);
-      setTxt('hud-stat-frp-dev', `${obj.thermal.frpDeviationRatio}× Baseline`);
-      setTxt('hud-stat-temp', `${obj.thermal.currentBrightnessTempK} K`);
-      setTxt('hud-stat-persistence', obj.thermal.persistenceRate);
-      setTxt('hud-stat-active-days', `${obj.thermal.activeDays} Days (${obj.thermal.totalDetections} Detections)`);
-    }
-    if (obj.matchedFacility) {
-      setTxt('hud-stat-facility-dist', `${obj.matchedFacility.distanceMeters} m`);
-      setTxt('hud-stat-facility-name', obj.matchedFacility.name);
+    const hasData = obj.hasActiveDetection !== false && obj.thermal && obj.thermal.currentFRP !== null && obj.status !== 'inactive';
+
+    // 1. Satellite Detection (NASA FIRMS / VIIRS)
+    setTxt('hud-sat-sensor', obj.thermal?.sensor || 'VIIRS NOAA-21 (375m I-Band)');
+    setTxt('hud-sat-time', obj.thermal?.detectionTime || '31 Aug 2026 • 14:26 UTC');
+    
+    const frpEl = document.getElementById('hud-stat-frp');
+    const frpSubEl = document.getElementById('hud-stat-frp-sub');
+    if (frpEl) {
+      if (hasData && obj.thermal.currentFRP > 0) {
+        frpEl.textContent = `${obj.thermal.currentFRP} MW`;
+        frpEl.className = 'stat-box-val highlight-surge';
+        frpEl.style.color = '';
+        if (frpSubEl) frpSubEl.textContent = 'Direct Radiometry';
+      } else {
+        frpEl.textContent = '0.0 MW (Nominal)';
+        frpEl.className = 'stat-box-val';
+        frpEl.style.color = '#10b981';
+        if (frpSubEl) frpSubEl.textContent = 'Ambient / No Flare';
+      }
     }
 
-    // Recommendation 2: Spatial Dynamics & Centroid Stability Tracking
+    setTxt('hud-stat-confidence', hasData && obj.thermal.currentFRP > 0 ? (obj.confidence || 'High (91%)') : 'Nominal (Ambient)');
+    
+    if (obj.coordinates && obj.coordinates.length === 2) {
+      setTxt('hud-stat-coords', `${obj.coordinates[0].toFixed(4)}, ${obj.coordinates[1].toFixed(4)}`);
+    } else {
+      setTxt('hud-stat-coords', '22.3615, 69.8640');
+    }
+    setTxt('hud-stat-temp', hasData && obj.thermal.currentBrightnessTempK ? `${obj.thermal.currentBrightnessTempK} K` : '301.2 K (Ambient)');
+
+    // 2. Geospatial Context Engine
+    if (obj.matchedFacility) {
+      setTxt('hud-context-facility-name', obj.matchedFacility.name);
+      setTxt('hud-context-facility-dist', `${obj.matchedFacility.distanceMeters} m (${obj.matchedFacility.distanceMeters < 500 ? 'Inside Perimeter' : 'Adjacent Area'})`);
+    } else {
+      setTxt('hud-context-facility-name', obj.name);
+      setTxt('hud-context-facility-dist', '0 m (Registered Footprint)');
+    }
+
+    const lc = obj.landCover || {};
+    const lcSummary = `ESA WorldCover: ${lc.industrialBuiltUp || 0}% Built-up | ${lc.vegetationTree || 0}% Forest | ${lc.cropland || 0}% Cropland`;
+    setTxt('hud-context-landcover', lcSummary);
+
+    // 3. Anomaly & Baseline Model
+    setTxt('hud-stat-frp-dev', hasData && obj.thermal.currentFRP > 0 ? `${obj.thermal.frpDeviationRatio}× Baseline` : '1.0× Baseline');
+    setTxt('hud-stat-baseline-val', hasData && obj.thermal.historicalMeanFRP ? `${obj.thermal.historicalMeanFRP} MW 30d Baseline` : 'Nominal Baseline');
+    
+    const riskEl = document.getElementById('hud-stat-risk-level');
+    const riskSubEl = document.getElementById('hud-stat-risk-sub');
+    if (riskEl) {
+      if (!hasData || obj.status === 'normal' || obj.status === 'inactive' || (obj.thermal && obj.thermal.currentFRP === 0)) {
+        riskEl.textContent = 'NOMINAL';
+        riskEl.style.color = '#10b981';
+        if (riskSubEl) riskSubEl.textContent = 'Normal Baseline';
+      } else if (obj.status === 'high_priority') {
+        riskEl.textContent = 'HIGH RISK';
+        riskEl.style.color = '#ff4747';
+        if (riskSubEl) riskSubEl.textContent = 'Critical Anomaly Surge';
+      } else if (obj.status === 'elevated') {
+        riskEl.textContent = 'ELEVATED';
+        riskEl.style.color = '#f59e0b';
+        if (riskSubEl) riskSubEl.textContent = 'Elevated Thermal Flux';
+      } else {
+        riskEl.textContent = 'LOW RISK';
+        riskEl.style.color = '#10b981';
+        if (riskSubEl) riskSubEl.textContent = 'Nominal State';
+      }
+    }
+    setTxt('hud-stat-classification', obj.categoryLabel || 'Registered Industrial Hotspot');
+
+    // 4. Human Verification Status (check persisted tag)
+    const verifEl = document.getElementById('hud-verification-status');
+    if (verifEl) {
+      if (this.verifiedTags && this.verifiedTags[obj.id]) {
+        const tag = this.verifiedTags[obj.id];
+        verifEl.innerHTML = `<span>${tag.status_text}</span><div style="font-size:0.62rem; color:#9ca3af; margin-top:2px;">Logged on ${new Date(tag.timestamp_utc).toLocaleTimeString()} (Active Learning DB)</div>`;
+        verifEl.style.color = tag.color || '#10b981';
+      } else {
+        verifEl.textContent = '⚠️ Awaiting Operator Verification';
+        verifEl.style.color = '#f59e0b';
+      }
+    }
+
+    // 5. Action Recommendation
+    setTxt('hud-action-text', obj.recommendedAction || 'Monitor sector satellite telemetry in standard operational cycle.');
+    if (obj.nearestSettlement) {
+      setTxt('hud-exposure-text', `Nearest: ${obj.nearestSettlement.name} (${obj.nearestSettlement.distanceKm} km, ~${obj.nearestSettlement.population?.toLocaleString() || '12,000'} residents)`);
+    }
+
+    // Spatial Dynamics & Centroid Stability Tracking
     if (obj.spatialDynamics) {
-      setTxt('hud-stat-stability', `${obj.spatialDynamics.centroidStabilityPct}%`);
-      setTxt('hud-stat-velocity', `${obj.spatialDynamics.spreadVelocityKmH} km/h`);
+      setTxt('hud-stat-stability', hasData ? `${obj.spatialDynamics.centroidStabilityPct}%` : '—');
+      setTxt('hud-stat-velocity', hasData ? `${obj.spatialDynamics.spreadVelocityKmH} km/h` : '0.0 km/h');
       setTxt('hud-stat-motion-type', obj.spatialDynamics.motionType);
-      setTxt('hud-stat-drift', `${obj.spatialDynamics.driftVectorMeters} m`);
-      setTxt('hud-stat-plume-dir', obj.spatialDynamics.plumeDispersion || 'Calm');
+      setTxt('hud-stat-drift', hasData ? `${obj.spatialDynamics.driftVectorMeters} m` : '0 m');
+      setTxt('hud-stat-plume-dir', hasData ? (obj.spatialDynamics.plumeDispersion || 'Calm') : 'No Active Plume');
 
       const motionBadge = document.getElementById('hud-motion-badge');
       if (motionBadge) {
-        if (obj.spatialDynamics.isStationary) {
+        if (!hasData) {
+          motionBadge.textContent = "NO THERMAL FLUX";
+          motionBadge.style.background = "rgba(100, 116, 139, 0.2)";
+          motionBadge.style.color = "var(--text-muted)";
+        } else if (obj.spatialDynamics.isStationary) {
           motionBadge.textContent = "STATIONARY STACK";
           motionBadge.style.background = "rgba(0, 240, 255, 0.15)";
           motionBadge.style.color = "var(--accent-cyan)";
@@ -759,7 +1156,9 @@ class HeatWatchApp {
     // Recommendation 1: False Positive & Solar Glint Rejection Filter
     if (obj.glintFilter) {
       setTxt('hud-glint-badge', obj.glintFilter.statusLabel);
-      setTxt('hud-glint-desc', `Albedo (${obj.glintFilter.albedoReflectance}) & solar elevation (${obj.glintFilter.solarElevationDeg}°) confirm active combustion. Solar rooftop/desert glint ruled out.`);
+      setTxt('hud-glint-desc', hasData 
+        ? `Albedo (${obj.glintFilter.albedoReflectance}) & solar elevation (${obj.glintFilter.solarElevationDeg}°) confirm active combustion. Solar rooftop/desert glint ruled out.`
+        : `Verified registered industrial infrastructure footprint from official geographic catalog. No glint or false fire triggered.`);
     }
 
     // Recommendation 3: Critical Infrastructure Hazard Proximity
@@ -782,29 +1181,24 @@ class HeatWatchApp {
       }
     }
 
-    // Sub-Pixel Radiometric Calculation (Collapsible Secondary)
-    // Human Verification Status
-    const hudVerifStatus = document.getElementById('hud-verification-status');
-    if (hudVerifStatus) {
-      if (obj.humanVerification && obj.humanVerification.isVerified) {
-        hudVerifStatus.textContent = `✓ Verified: ${obj.humanVerification.verifiedCategory.toUpperCase()} (${obj.humanVerification.verifiedBy})`;
-        hudVerifStatus.style.color = "#10b981";
-      } else {
-        hudVerifStatus.textContent = "⏳ Pending Operator Review";
-        hudVerifStatus.style.color = "#ffaa00";
-      }
+    // Evidence Score Progress
+    const scoreBar = document.getElementById('hud-score-bar');
+    if (hasData && obj.evidenceScore) {
+      setTxt('hud-score-pct', `${(obj.evidenceScore * 100).toFixed(0)}%`);
+      if (scoreBar) scoreBar.style.width = `${obj.evidenceScore * 100}%`;
+    } else {
+      setTxt('hud-score-pct', '— (No Hotspot)');
+      if (scoreBar) scoreBar.style.width = '0%';
     }
 
-    // Evidence Score Progress
-    setTxt('hud-score-pct', `${(obj.evidenceScore * 100).toFixed(0)}%`);
-    const scoreBar = document.getElementById('hud-score-bar');
-    if (scoreBar) scoreBar.style.width = `${obj.evidenceScore * 100}%`;
-
     // Anomaly Score Progress
-    if (obj.anomalyFormula) {
+    const anomBar = document.getElementById('hud-anomaly-bar');
+    if (hasData && obj.anomalyFormula) {
       setTxt('hud-anomaly-pct', `${(obj.anomalyFormula.totalAnomalyScore * 100).toFixed(0)}%`);
-      const anomBar = document.getElementById('hud-anomaly-bar');
       if (anomBar) anomBar.style.width = `${obj.anomalyFormula.totalAnomalyScore * 100}%`;
+    } else {
+      setTxt('hud-anomaly-pct', '0% (Nominal)');
+      if (anomBar) anomBar.style.width = '0%';
     }
 
     // Evidence Checklist
@@ -812,10 +1206,10 @@ class HeatWatchApp {
     if (evContainer && obj.evidencePoints) {
       evContainer.innerHTML = obj.evidencePoints.map(ev => `
         <div class="evidence-row">
-          <span class="ev-icon ${ev.type === 'anomaly-trigger' ? 'alert' : 'check'}">
-            ${ev.type === 'anomaly-trigger' ? '■' : '✓'}
+          <span class="ev-icon ${ev.type === 'anomaly-trigger' ? 'alert' : (ev.type === 'no-data' ? 'neutral' : 'check')}">
+            ${ev.type === 'anomaly-trigger' ? '■' : (ev.type === 'no-data' ? '—' : '✓')}
           </span>
-          <span style="color: ${ev.type === 'anomaly-trigger' ? '#ff8888' : '#e5e7eb'};">${ev.text}</span>
+          <span style="color: ${ev.type === 'anomaly-trigger' ? '#ff8888' : (ev.type === 'no-data' ? 'var(--text-muted)' : '#e5e7eb')};">${ev.text}</span>
         </div>
       `).join('');
     }
@@ -826,6 +1220,11 @@ class HeatWatchApp {
       setTxt('hud-heatwatch-label', obj.nasaComparison.heatwatchLabel);
       setTxt('hud-compare-status', obj.nasaComparison.agreementStatus);
       setTxt('hud-compare-desc', obj.nasaComparison.explanation);
+    } else {
+      setTxt('hud-nasa-label', 'No Satellite Detection');
+      setTxt('hud-heatwatch-label', 'No Active Anomaly (Nominal Baseline)');
+      setTxt('hud-compare-status', '✓ Inactive Agreement');
+      setTxt('hud-compare-desc', 'Neither NASA FIRMS nor HeatWatch detects an active high-temperature combustion pixel on the current orbital pass.');
     }
 
     // Action Box
@@ -842,24 +1241,28 @@ class HeatWatchApp {
     }
 
     // Run Live ML Model Inference for this selected hotspot
-    const features = {
-      frp: obj.thermal ? obj.thermal.currentFRP : 25.0,
-      tempK: obj.thermal ? obj.thermal.currentBrightnessTempK : 345.0,
-      distRefineryM: obj.matchedFacility ? obj.matchedFacility.distanceMeters : 5000.0,
-      builtupPct: obj.landCover ? obj.landCover.industrialBuiltUp : 10.0,
-      forestPct: obj.landCover ? obj.landCover.vegetationTree : 10.0,
-      croplandPct: obj.landCover ? obj.landCover.cropland : 10.0,
-      nightlight: obj.nighttimeLight ? obj.nighttimeLight.radianceScore : 10.0
-    };
+    if (hasData) {
+      const features = {
+        frp: obj.thermal ? obj.thermal.currentFRP : 25.0,
+        tempK: obj.thermal ? obj.thermal.currentBrightnessTempK : 345.0,
+        distRefineryM: obj.matchedFacility ? obj.matchedFacility.distanceMeters : 5000.0,
+        builtupPct: obj.landCover ? obj.landCover.industrialBuiltUp : 10.0,
+        forestPct: obj.landCover ? obj.landCover.vegetationTree : 10.0,
+        croplandPct: obj.landCover ? obj.landCover.cropland : 10.0,
+        nightlight: obj.nighttimeLight ? obj.nighttimeLight.radianceScore : 10.0
+      };
 
-    this.modelExplainer.inferProbabilitiesLive(features).then(mlRes => {
-      if (mlRes && mlRes.topClass) {
-        setTxt('hud-obj-category', `${mlRes.topClass.name} • ${obj.subtype || 'Thermal Source'}`);
-        setTxt('hud-score-pct', `${(mlRes.topClass.prob * 100).toFixed(1)}%`);
-        const scoreBar = document.getElementById('hud-score-bar');
-        if (scoreBar) scoreBar.style.width = `${mlRes.topClass.prob * 100}%`;
-      }
-    });
+      this.modelExplainer.inferProbabilitiesLive(features).then(mlRes => {
+        if (mlRes && mlRes.topClass) {
+          setTxt('hud-obj-category', `${mlRes.topClass.name} • ${obj.subtype || 'Thermal Source'}`);
+          setTxt('hud-score-pct', `${(mlRes.topClass.prob * 100).toFixed(1)}%`);
+          const scoreBar = document.getElementById('hud-score-bar');
+          if (scoreBar) scoreBar.style.width = `${mlRes.topClass.prob * 100}%`;
+        }
+      });
+    } else {
+      setTxt('hud-obj-category', `Registered Facility (No Active Fire/Flare)`);
+    }
 
     // Make sure inspector sidebar is visible
     const inspectorEl = document.getElementById('map-sidebar-inspector');
@@ -1215,6 +1618,228 @@ class HeatWatchApp {
         this.openSpectralModal(this.selectedObject.id);
       });
     }
+
+    if (closeSpectralBtn && spectralModal) {
+      closeSpectralBtn.addEventListener('click', () => {
+        spectralModal.classList.remove('active');
+      });
+    }
+
+    // Incident Dossier Modal Handlers
+    const dossierModal = document.getElementById('modal-incident-dossier');
+    const openHeaderDossierBtn = document.getElementById('btn-header-dossier');
+    const closeDossierBtn = document.getElementById('btn-close-dossier-modal');
+    const printDossierBtn = document.getElementById('btn-print-dossier');
+
+    if (openHeaderDossierBtn) {
+      openHeaderDossierBtn.addEventListener('click', () => {
+        this.openIncidentDossierModal(this.selectedObject.id);
+      });
+    }
+
+    if (closeDossierBtn && dossierModal) {
+      closeDossierBtn.addEventListener('click', () => {
+        dossierModal.classList.remove('active');
+      });
+    }
+
+    if (printDossierBtn) {
+      printDossierBtn.addEventListener('click', () => {
+        window.print();
+      });
+    }
+  }
+
+  closeModal(modalId) {
+    const m = document.getElementById(modalId);
+    if (m) m.classList.remove('active');
+  }
+
+  openIncidentDossierModal(objectId) {
+    const obj = (objectId && THERMAL_OBJECTS.find(o => o.id === objectId)) || this.selectedObject;
+    const modal = document.getElementById('modal-incident-dossier');
+    if (!modal) return;
+
+    const setTxt = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val;
+    };
+
+    setTxt('dos-ref-code', `REF: HW-${obj.id}-2026`);
+    setTxt('dos-status-tag', obj.statusLabel || 'HIGH-PRIORITY ESCALATION');
+    setTxt('dos-object-name', obj.name);
+    setTxt('dos-id', obj.id);
+    setTxt('dos-coords', `${obj.centroid[0].toFixed(4)}° N, ${obj.centroid[1].toFixed(4)}° E`);
+    setTxt('dos-category', obj.categoryLabel);
+    setTxt('dos-conf', `${((obj.evidenceScore || 0.91) * 100).toFixed(0)}% (Multi-Modal AI Attribution)`);
+
+    if (obj.thermal) {
+      setTxt('dos-frp-hero', `${obj.thermal.currentFRP} MW`);
+      setTxt('dos-surge-hero', `${obj.thermal.frpDeviationRatio}× 90-Day Baseline`);
+    }
+    if (obj.matchedFacility) {
+      setTxt('dos-facility', `${obj.matchedFacility.name} (${obj.matchedFacility.distanceMeters}m from stack)`);
+    }
+    if (obj.landCover) {
+      setTxt('dos-landcover', `${obj.landCover.industrialBuiltUp}% Built-up • ${obj.landCover.bareSoilPaved}% Paved`);
+    }
+
+    modal.classList.add('active');
+    if (window.lucide) lucide.createIcons();
+  }
+
+  setupGuidedTour() {
+    const tourBtn = document.getElementById('btn-guided-demo');
+    const tourOverlay = document.getElementById('sih-tour-overlay');
+    const tourCloseBtn = document.getElementById('btn-tour-close');
+    const tourPrevBtn = document.getElementById('btn-tour-prev');
+    const tourNextBtn = document.getElementById('btn-tour-next');
+    const tourPlayBtn = document.getElementById('btn-tour-play-pause');
+    const ribbon = document.getElementById('map-category-ribbon');
+    const timeScrubber = document.getElementById('map-time-scrubber');
+
+    if (tourBtn && this.demoEngine) {
+      tourBtn.addEventListener('click', () => {
+        this.switchView('command-map');
+        if (tourOverlay) tourOverlay.style.display = 'flex';
+        if (ribbon) ribbon.style.display = 'none';
+        if (timeScrubber) timeScrubber.style.display = 'none';
+        this.demoEngine.startDemo();
+      });
+    }
+
+    const closeTour = () => {
+      if (tourOverlay) tourOverlay.style.display = 'none';
+      if (ribbon) ribbon.style.display = 'flex';
+      if (timeScrubber) timeScrubber.style.display = 'flex';
+      if (this.demoEngine) this.demoEngine.stopAutoPlay();
+    };
+
+    if (tourCloseBtn) {
+      tourCloseBtn.addEventListener('click', closeTour);
+    }
+
+    if (tourPrevBtn && this.demoEngine) {
+      tourPrevBtn.addEventListener('click', () => this.demoEngine.prevStep());
+    }
+
+    if (tourNextBtn && this.demoEngine) {
+      tourNextBtn.addEventListener('click', () => this.demoEngine.nextStep());
+    }
+
+    if (tourPlayBtn && this.demoEngine) {
+      tourPlayBtn.addEventListener('click', () => {
+        const isPlaying = this.demoEngine.toggleAutoPlay();
+        tourPlayBtn.classList.toggle('playing', isPlaying);
+        const textPlay = document.getElementById('text-tour-play');
+        const iconPlay = document.getElementById('icon-tour-play');
+        if (textPlay) textPlay.textContent = isPlaying ? 'Pause' : 'Auto Play';
+        if (iconPlay) {
+          iconPlay.setAttribute('data-lucide', isPlaying ? 'pause' : 'play');
+          if (window.lucide) lucide.createIcons();
+        }
+      });
+    }
+
+    // Keyboard navigation during tour
+    window.addEventListener('keydown', (e) => {
+      if (!tourOverlay || tourOverlay.style.display === 'none') return;
+      if (e.key === 'ArrowRight') {
+        this.demoEngine.nextStep();
+      } else if (e.key === 'ArrowLeft') {
+        this.demoEngine.prevStep();
+      } else if (e.key === ' ' || e.code === 'Space') {
+        if (tourPlayBtn) tourPlayBtn.click();
+        e.preventDefault();
+      } else if (e.key === 'Escape') {
+        closeTour();
+      }
+    });
+  }
+
+  renderDemoStepUI(stepData, index) {
+    if (!stepData) return;
+
+    const tourOverlay = document.getElementById('sih-tour-overlay');
+    if (tourOverlay && tourOverlay.style.display === 'none') {
+      tourOverlay.style.display = 'flex';
+    }
+
+    const totalSteps = 8;
+    const badgeEl = document.getElementById('tour-step-badge');
+    const barEl = document.getElementById('tour-progress-bar');
+    const titleEl = document.getElementById('tour-title');
+    const descEl = document.getElementById('tour-desc');
+    const actionEl = document.getElementById('tour-action-text');
+
+    if (badgeEl) badgeEl.textContent = `STEP ${index + 1} OF ${totalSteps}`;
+    if (barEl) barEl.style.width = `${((index + 1) / totalSteps) * 100}%`;
+    if (titleEl) titleEl.textContent = stepData.title;
+    if (descEl) descEl.textContent = stepData.description;
+    if (actionEl) actionEl.textContent = stepData.actionHighlight;
+
+    const inspectorSidebar = document.getElementById('map-sidebar-inspector');
+
+    // Dynamic Visual Actions per step:
+    if (index === 0) {
+      // Step 1: Raw Ingestion
+      if (this.mapInstance) {
+        this.mapInstance.setBaseMap('satellite');
+      }
+      this.closeModal('modal-incident-dossier');
+    } else if (index === 1) {
+      // Step 2: Multimodal GIS Overlays
+      this.closeModal('modal-incident-dossier');
+      if (this.mapInstance) {
+        this.mapInstance.toggleLayer('osmFacilities', true);
+        this.mapInstance.toggleLayer('worldCoverBuffers', true);
+      }
+    } else if (index === 2) {
+      // Step 3: ST-DBSCAN Clustering
+      this.closeModal('modal-incident-dossier');
+      if (inspectorSidebar) inspectorSidebar.classList.remove('collapsed');
+      this.handleSelectObject(THERMAL_OBJECTS[0]);
+    } else if (index === 3) {
+      // Step 4: AI Source Segregation
+      this.closeModal('modal-incident-dossier');
+      if (inspectorSidebar) {
+        inspectorSidebar.classList.remove('collapsed');
+        const evCard = document.getElementById('hud-evidence-list');
+        if (evCard) evCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    } else if (index === 4) {
+      // Step 5: 90-Day Baseline
+      this.closeModal('modal-incident-dossier');
+      if (inspectorSidebar) {
+        inspectorSidebar.classList.remove('collapsed');
+        const chartEl = document.getElementById('sidebar-frp-chart');
+        if (chartEl) chartEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    } else if (index === 5) {
+      // Step 6: Acute Anomaly Surge
+      this.closeModal('modal-incident-dossier');
+      if (inspectorSidebar) {
+        inspectorSidebar.classList.remove('collapsed');
+        const sevBadge = document.getElementById('hud-obj-severity');
+        if (sevBadge) {
+          sevBadge.classList.add('pulse-anomaly');
+          setTimeout(() => sevBadge.classList.remove('pulse-anomaly'), 2500);
+        }
+      }
+    } else if (index === 6) {
+      // Step 7: NASA Static Mask Comparison
+      this.closeModal('modal-incident-dossier');
+      if (inspectorSidebar) {
+        inspectorSidebar.classList.remove('collapsed');
+        const compCard = document.querySelector('.nasa-comparison-card');
+        if (compCard) compCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    } else if (index === 7) {
+      // Step 8: Actionable Emergency Triage Dossier
+      this.openIncidentDossierModal();
+    }
+
+    if (window.lucide) lucide.createIcons();
   }
 
   openSpectralModal(objectId) {
@@ -1339,36 +1964,74 @@ class HeatWatchApp {
     tbody.innerHTML = displayedAlerts.map(o => {
       const frp = o.thermal?.currentFRP || 0;
       const dev = o.thermal?.frpDeviationRatio || 1.0;
+      const baseFrp = o.thermal?.historicalMeanFRP ? `${o.thermal.historicalMeanFRP} MW` : 'Baseline';
       const facName = o.matchedFacility?.name || o.name || 'Mapped Site';
-      const dist = o.matchedFacility?.distanceMeters !== undefined ? `${o.matchedFacility.distanceMeters}m away` : 'Regional Perimeter';
+      const dist = o.matchedFacility?.distanceMeters !== undefined ? `${o.matchedFacility.distanceMeters}m (${o.matchedFacility.distanceMeters < 500 ? 'Inside Facility' : 'Adjacent Area'})` : 'Regional Perimeter';
+      const sensor = o.thermal?.sensor || 'VIIRS NOAA-21 (375m)';
+      const time = o.thermal?.detectionTime || '31 Aug • 14:26 UTC';
+      const coords = o.coordinates ? `${o.coordinates[0].toFixed(3)}, ${o.coordinates[1].toFixed(3)}` : '22.36, 69.86';
       const statusClass = o.status === 'high_priority' ? 'high-priority' : (o.status === 'elevated' ? 'elevated' : 'normal');
+      const statusText = o.status === 'high_priority' ? 'HIGH RISK' : (o.status === 'elevated' ? 'ELEVATED' : 'NOMINAL');
 
       return `
         <tr style="border-bottom:1px solid rgba(255,255,255,0.05); transition:background 0.2s ease;">
-          <td style="font-family:var(--font-mono); font-weight:700; color:var(--accent-cyan);">${o.id}</td>
+          <!-- 1. Satellite Detection -->
           <td>
-            <div style="font-weight:600; color:#fff;">${o.name}</div>
-            <div style="font-size:0.72rem; color:var(--text-muted);">${facName} (${dist})</div>
+            <div style="font-family:var(--font-mono); font-weight:700; color:var(--accent-cyan); font-size:0.82rem;">${o.id}</div>
+            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:1px;">${sensor}</div>
+            <div style="font-size:0.75rem; margin-top:2px;">
+              <strong style="color:${frp > 40 ? '#ff4747' : '#00f0ff'};">${frp} MW</strong> &bull; <span style="font-family:var(--font-mono); color:#9ca3af; font-size:0.7rem;">${coords}</span>
+            </div>
+            <div style="font-size:0.68rem; color:var(--text-dim);">${time}</div>
           </td>
+
+          <!-- 2. Geospatial Context -->
           <td>
-            <span class="severity-tag ${statusClass}">
-              ${o.statusLabel || o.status.toUpperCase()}
-            </span>
+            <div style="font-weight:600; color:#fff; font-size:0.82rem;">${o.name}</div>
+            <div style="font-size:0.72rem; color:var(--text-muted); margin-top:1px;">${facName}</div>
+            <div style="font-size:0.7rem; color:var(--accent-cyan); margin-top:2px;">Distance: ${dist}</div>
           </td>
+
+          <!-- 3. Baseline & Risk Model -->
           <td>
-            <strong style="color:${dev >= 2.0 ? '#ff4747' : '#00f0ff'};">${frp} MW</strong>
-            <span style="font-size:0.72rem; color:#9ca3af;"> (${dev}× Baseline)</span>
+            <div style="margin-bottom:3px;">
+              <span class="severity-tag ${statusClass}">
+                ${statusText}
+              </span>
+            </div>
+            <div style="font-size:0.75rem; color:#d1d5db;">
+              <strong style="color:${dev >= 2.0 ? '#ff8888' : '#00f0ff'};">${dev}×</strong> vs ${baseFrp}
+            </div>
           </td>
-          <td style="font-size:0.75rem; color:#d1d5db; max-width:280px; line-height:1.4;">
-            ${o.recommendedAction || o.categoryLabel}
+
+          <!-- 4. AI Classification & Advisory -->
+          <td style="max-width:240px;">
+            <div style="font-size:0.76rem; font-weight:600; color:var(--accent-cyan);">${o.categoryLabel || 'Industrial Emitter'}</div>
+            <div style="font-size:0.7rem; color:#9ca3af; margin-top:2px; line-height:1.35;">${o.recommendedAction || 'Continuous orbital monitoring.'}</div>
           </td>
+
+          <!-- 5. Human Verification & Triage Actions -->
           <td>
-            <div style="display:flex; gap:0.4rem; align-items:center;">
-              <button class="btn-secondary" style="padding:0.25rem 0.6rem; font-size:0.72rem;" onclick="window.heatwatchApp.selectAndInspect('${o.id}')" title="Inspect on GIS Map">
-                <i data-lucide="map-pin" style="width:11px; height:11px;"></i> Inspect
-              </button>
-              <button class="btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.72rem;" onclick="window.heatwatchApp.openIncidentDossierById('${o.id}')" title="Open 1-Page Incident Dossier">
-                <i data-lucide="file-text" style="width:11px; height:11px;"></i>
+            ${this.verifiedTags && this.verifiedTags[o.id] ? `
+              <div style="font-size:0.68rem; font-weight:700; color:${this.verifiedTags[o.id].color || '#10b981'}; margin-bottom:4px; padding:2px 6px; background:rgba(16,185,129,0.1); border-radius:4px; border:1px solid rgba(16,185,129,0.25);">
+                ${this.verifiedTags[o.id].status_text}
+              </div>
+            ` : `
+              <div style="font-size:0.65rem; color:#f59e0b; margin-bottom:4px;">
+                ⚠️ Awaiting Review
+              </div>
+            `}
+            <div style="display:flex; flex-direction:column; gap:0.35rem;">
+              <div style="display:flex; gap:0.35rem;">
+                <button class="btn-secondary" style="padding:0.22rem 0.55rem; font-size:0.7rem; flex:1;" onclick="window.heatwatchApp.selectAndInspect('${o.id}')" title="Inspect on GIS Command Map">
+                  <i data-lucide="map-pin" style="width:11px; height:11px;"></i> Inspect
+                </button>
+                <button class="btn-secondary" style="padding:0.22rem 0.45rem; font-size:0.7rem;" onclick="window.heatwatchApp.openIncidentDossierById('${o.id}')" title="Open 1-Page Incident Dossier">
+                  <i data-lucide="file-text" style="width:11px; height:11px;"></i>
+                </button>
+              </div>
+              <button class="btn-secondary" style="padding:0.22rem 0.55rem; font-size:0.68rem; color:#ff8888; border-color:rgba(255,71,71,0.3);" onclick="window.heatwatchApp.showToast('🚁 Automated drone dispatched to ${o.name} (#${o.id})')" title="Dispatch Automated Drone">
+                <i data-lucide="send" style="width:10px; height:10px;"></i> Dispatch Drone
               </button>
             </div>
           </td>

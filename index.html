@@ -94,11 +94,6 @@
 
     <!-- Header Action Controls -->
     <div class="header-actions">
-      <div class="mode-toggle-group">
-        <button class="mode-btn active" id="btn-mode-live" title="Connect to simulated near-real-time satellite stream">LIVE STREAM</button>
-        <button class="mode-btn" id="btn-mode-demo" title="Load offline curated historical scenario dataset">OFFLINE DEMO</button>
-      </div>
-
       <button class="btn-primary" id="btn-fetch-live-firms" title="Query live NASA FIRMS API for India">
         <i data-lucide="satellite"></i> Query Live FIRMS
       </button>
@@ -126,7 +121,7 @@
       <span>INGESTION STATUS: <strong class="ticker-metric" id="ticker-data-source">NASA LANCE NRT (Live Stream)</strong></span>
     </div>
     <div class="ticker-status-item">
-      <span>SATELLITES: <strong class="ticker-metric">VIIRS SNPP (375m) &bull; NOAA-20 &bull; MODIS Terra &bull; Sentinel-2 MSI</strong></span>
+      <span>SATELLITES: <strong class="ticker-metric">VIIRS SNPP (375m) &bull; NOAA-20 &bull; NOAA-21 &bull; MODIS Terra (Active Thermal Radiometry)</strong></span>
     </div>
     <div class="ticker-status-item">
       <span>ANOMALY ENGINE: <span class="status-dot anomaly"></span> <strong class="ticker-metric" style="color:#ff4747;">2 HIGH PRIORITY ALERTS</strong></span>
@@ -265,7 +260,7 @@
         </div>
 
         <!-- Floating Multimodal Layer Control (Draggable & Collapsible) -->
-        <div class="map-floating-panel map-layers-panel draggable-panel collapsed" id="map-layers-panel">
+        <div class="map-floating-panel map-layers-panel draggable-panel" id="map-layers-panel">
           <div class="panel-heading-row" id="btn-toggle-layers" style="cursor:pointer; margin-bottom:0;" title="Click to collapse / expand layers">
             <div style="display:flex; align-items:center; gap:0.35rem;">
               <div class="ribbon-drag-handle" id="layers-drag-handle" title="Touch / Drag to move anywhere on map" style="padding:0 2px;">
@@ -358,8 +353,56 @@
           <span class="timeline-box-day" id="scrubber-day-badge">Day 90</span>
         </div>
 
-        <!-- Right Sidebar: Thermal Object & Telemetry Inspector -->
+        <!-- Interactive SIH Guided Tour Floating Controller Card -->
+        <div class="sih-tour-overlay" id="sih-tour-overlay" style="display:none;">
+          <div class="sih-tour-card">
+            <div class="tour-header">
+              <div class="tour-badge-title">
+                <span class="tour-live-dot"></span>
+                <span class="tour-step-count" id="tour-step-badge">STEP 1 OF 8</span>
+              </div>
+              <button class="tour-close-btn" id="btn-tour-close" title="Exit Guided Tour">&times;</button>
+            </div>
+
+            <div class="tour-progress-bar-wrap">
+              <div class="tour-progress-bar" id="tour-progress-bar" style="width: 12.5%;"></div>
+            </div>
+
+            <div class="tour-body">
+              <h3 class="tour-step-title" id="tour-title">1. Ingest Raw NASA FIRMS Detections</h3>
+              <p class="tour-step-desc" id="tour-desc">
+                Satellite detects high-temperature infrared pixels over the Jamnagar industrial belt. Raw FIRMS only tells you WHERE heat is detected, leaving its nature ambiguous.
+              </p>
+              <div class="tour-action-callout" id="tour-action">
+                <i data-lucide="sparkles" style="width:14px; height:14px; color:var(--accent-cyan);"></i>
+                <span id="tour-action-text">Show raw FIRMS points on high-resolution satellite imagery without any facility or land-use context.</span>
+              </div>
+            </div>
+
+            <div class="tour-footer">
+              <div class="tour-nav-controls">
+                <button class="btn-tour-nav" id="btn-tour-prev" title="Previous Step">
+                  <i data-lucide="chevron-left"></i> Prev
+                </button>
+                <button class="btn-tour-play" id="btn-tour-play-pause" title="Play / Pause Auto Tour">
+                  <i data-lucide="play" id="icon-tour-play"></i> <span id="text-tour-play">Auto Play</span>
+                </button>
+                <button class="btn-tour-nav" id="btn-tour-next" title="Next Step">
+                  Next <i data-lucide="chevron-right"></i>
+                </button>
+              </div>
+              <span class="tour-hint-text">Keys: <strong>&larr;</strong> / <strong>&rarr;</strong> / <strong>Space</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Sidebar: Thermal Object & Telemetry Inspector (Collapsible) -->
         <aside class="map-sidebar-inspector" id="map-sidebar-inspector">
+          <!-- Sidebar Floating Collapse / Expand Toggle Button -->
+          <button class="sidebar-toggle-tab" id="btn-toggle-inspector" title="Toggle Evidence Inspector HUD (Click to Collapse/Expand)">
+            <i data-lucide="chevron-right" id="icon-toggle-inspector"></i>
+          </button>
+
           <div class="sidebar-header">
             <div class="object-badge-row">
               <span class="object-id-code" id="hud-obj-id">OBJ-1045</span>
@@ -370,38 +413,109 @@
           </div>
 
           <div class="sidebar-content">
-            <!-- Telemetry Metrics Grid -->
-            <div class="hud-section-card">
-              <div class="section-card-title">
-                <span>Satellite Physical Telemetry</span>
-                <i data-lucide="gauge" style="width:14px; height:14px;"></i>
+            <!-- PIPELINE STEP 1: SATELLITE DETECTION (NASA FIRMS / VIIRS) -->
+            <div class="hud-section-card pipeline-card">
+              <div class="pipeline-step-badge">STEP 1 &bull; SATELLITE DETECTION</div>
+              <div class="pipeline-header-row" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <strong id="hud-sat-sensor" style="color:var(--accent-cyan); font-size:0.8rem;">VIIRS NOAA-21 (375m)</strong>
+                <span id="hud-sat-time" style="font-size:0.7rem; color:var(--text-muted);">31 Aug 2026 &bull; 14:26 UTC</span>
               </div>
               <div class="telemetry-stats-grid">
                 <div class="stat-box">
-                  <div class="stat-box-label">Current FRP</div>
+                  <div class="stat-box-label">Observed FRP</div>
                   <div class="stat-box-val highlight-surge" id="hud-stat-frp">68.4 MW</div>
-                  <div class="stat-box-sub" id="hud-stat-frp-dev" style="color:#ff8888;">3.76× Baseline</div>
+                  <div class="stat-box-sub" id="hud-stat-frp-sub">Direct Radiometry</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-box-label">Raw Confidence</div>
+                  <div class="stat-box-val" id="hud-stat-confidence" style="color:#10b981;">High (91%)</div>
+                  <div class="stat-box-sub">VIIRS I4 Band</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-box-label">Coordinates</div>
+                  <div class="stat-box-val" id="hud-stat-coords" style="font-size:0.78rem; font-family:var(--font-mono); color:#cbd5e1;">22.3615, 69.8640</div>
+                  <div class="stat-box-sub">WGS84 Lat/Lon</div>
                 </div>
                 <div class="stat-box">
                   <div class="stat-box-label">Brightness Temp</div>
                   <div class="stat-box-val" id="hud-stat-temp">368.5 K</div>
-                  <div class="stat-box-sub">VIIRS 375m Band I4</div>
-                </div>
-                <div class="stat-box">
-                  <div class="stat-box-label">Temporal Persistence</div>
-                  <div class="stat-box-val" id="hud-stat-persistence" style="font-size:0.95rem;">92.4%</div>
-                  <div class="stat-box-sub" id="hud-stat-active-days">94 Days (142 Detections)</div>
-                </div>
-                <div class="stat-box">
-                  <div class="stat-box-label">Nearest Facility</div>
-                  <div class="stat-box-val" id="hud-stat-facility-dist" style="font-size:0.95rem;">210 m</div>
-                  <div class="stat-box-sub" id="hud-stat-facility-name" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">RIL Mega-Refinery</div>
+                  <div class="stat-box-sub">3.74µm Infrared</div>
                 </div>
               </div>
             </div>
 
+            <!-- PIPELINE STEP 2: GEOSPATIAL CONTEXT ENGINE -->
+            <div class="hud-section-card pipeline-card">
+              <div class="pipeline-step-badge">STEP 2 &bull; GEOSPATIAL CONTEXT</div>
+              <div class="context-detail-box" style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); padding:0.5rem 0.65rem; border-radius:6px; margin-top:0.35rem;">
+                <div style="font-size:0.72rem; color:var(--text-muted); margin-bottom:2px;">Nearest Known Infrastructure / Land:</div>
+                <div style="font-size:0.82rem; font-weight:700; color:#fff;" id="hud-context-facility-name">Jamnagar Mega-Refinery & Petrochemical Complex</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.35rem; font-size:0.72rem;">
+                  <span>Distance to Boundary: <strong id="hud-context-facility-dist" style="color:var(--accent-cyan);">210 m (Inside Perimeter)</strong></span>
+                </div>
+                <div style="font-size:0.7rem; color:var(--text-muted); margin-top:0.35rem;" id="hud-context-landcover">
+                  ESA WorldCover: <strong style="color:#e5e7eb;">76.4% Industrial Built-up | 15.2% Bare Soil</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- PIPELINE STEP 3: HEATWATCH ANOMALY & BASELINE MODEL -->
+            <div class="hud-section-card pipeline-card">
+              <div class="pipeline-step-badge">STEP 3 &bull; ANOMALY &amp; BASELINE MODEL</div>
+              <div class="telemetry-stats-grid" style="margin-top:0.45rem;">
+                <div class="stat-box">
+                  <div class="stat-box-label">FRP Anomaly</div>
+                  <div class="stat-box-val" id="hud-stat-frp-dev" style="color:#ff8888;">3.76× Baseline</div>
+                  <div class="stat-box-sub" id="hud-stat-baseline-val">18.2 MW 30d Baseline</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-box-label">Risk Level</div>
+                  <div class="stat-box-val" id="hud-stat-risk-level" style="color:#ff4747; font-weight:800;">HIGH RISK</div>
+                  <div class="stat-box-sub" id="hud-stat-risk-sub">Critical Anomaly Surge</div>
+                </div>
+              </div>
+              <div style="margin-top:0.45rem; padding:0.4rem 0.6rem; background:rgba(0, 240, 255, 0.06); border-radius:6px; border:1px solid rgba(0, 240, 255, 0.2);">
+                <div style="font-size:0.68rem; color:var(--text-muted);">AI Multi-Modal Classification:</div>
+                <div style="font-size:0.78rem; font-weight:700; color:var(--accent-cyan);" id="hud-stat-classification">Probable Industrial Flare Escalation (91% Confidence)</div>
+              </div>
+            </div>
+
+            <!-- PIPELINE STEP 4: HUMAN-IN-THE-LOOP VERIFICATION -->
+            <div class="hud-section-card pipeline-card" style="background:rgba(245, 158, 11, 0.05); border:1px solid rgba(245, 158, 11, 0.25);">
+              <div class="pipeline-step-badge" style="background:rgba(245,158,11,0.2); color:#f59e0b;">STEP 4 &bull; HUMAN VERIFICATION</div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.35rem;">
+                <span style="font-size:0.72rem; color:var(--text-muted);">Audit Status:</span>
+                <span id="hud-verification-status" style="font-size:0.75rem; font-weight:700; color:#f59e0b;">⚠️ Awaiting Operator Verification</span>
+              </div>
+              <div class="human-action-btn-group" style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem; margin-top:0.5rem;">
+                <button class="btn-human-action" id="btn-confirm-industrial" style="font-size:0.68rem; padding:0.38rem 0.4rem; border-radius:4px; background:rgba(0,240,255,0.12); border:1px solid var(--accent-cyan); color:#fff; cursor:pointer; font-weight:600;">
+                  🏭 Confirm Industrial
+                </button>
+                <button class="btn-human-action" id="btn-confirm-wildfire" style="font-size:0.68rem; padding:0.38rem 0.4rem; border-radius:4px; background:rgba(249,115,22,0.12); border:1px solid #f97316; color:#fff; cursor:pointer; font-weight:600;">
+                  🌲 Confirm Wildfire
+                </button>
+                <button class="btn-human-action" id="btn-confirm-agri" style="font-size:0.68rem; padding:0.38rem 0.4rem; border-radius:4px; background:rgba(234,179,8,0.12); border:1px solid #eab308; color:#fff; cursor:pointer; font-weight:600;">
+                  🌾 Confirm Stubble
+                </button>
+                <button class="btn-human-action" id="btn-dispatch-drone" style="font-size:0.68rem; padding:0.38rem 0.4rem; border-radius:4px; background:rgba(255,71,71,0.15); border:1px solid #ff4747; color:#ff8888; cursor:pointer; font-weight:700;">
+                  🚁 Dispatch Drone
+                </button>
+              </div>
+            </div>
+
+            <!-- PIPELINE STEP 5: ACTION RECOMMENDATION -->
+            <div class="action-box" style="margin-top:0.5rem;">
+              <div style="font-size:0.68rem; font-weight:700; color:#ff8888; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:3px;">
+                STEP 5 &bull; ACTION RECOMMENDATION
+              </div>
+              <p id="hud-action-text" style="font-size:0.75rem; color:#fff; line-height:1.35;">Urgent field verification required. Cross-check refinery valve pressure.</p>
+              <p style="font-size:0.7rem; color:#fca5a5; margin-top:4px;" id="hud-exposure-text">
+                Nearest: Moti Khavdi Settlement (1.8 km, ~14,500 residents)
+              </p>
+            </div>
+
             <!-- Recommendation 2: Spatial Dynamics & Centroid Stability Tracking -->
-            <div class="hud-section-card">
+            <div class="hud-section-card" style="margin-top:0.6rem;">
               <div class="section-card-title">
                 <span>Spatial Dynamics & Spread Velocity</span>
                 <span class="dynamics-pill" id="hud-motion-badge" style="font-size:0.65rem; padding:2px 7px; border-radius:4px; background:rgba(0,240,255,0.15); color:var(--accent-cyan); font-family:var(--font-mono); font-weight:700;">STATIONARY STACK</span>
@@ -410,22 +524,22 @@
                 <div class="stat-box">
                   <div class="stat-box-label">Centroid Stability</div>
                   <div class="stat-box-val" id="hud-stat-stability" style="color:var(--accent-cyan);">99.4%</div>
-                  <div class="stat-box-sub" id="hud-stat-drift-sub">Stack Fixed (&lt;15m)</div>
+                  <div class="stat-box-sub" id="hud-stat-drift-sub">HeatWatch Spatial Cluster Track</div>
                 </div>
                 <div class="stat-box">
                   <div class="stat-box-label">Spread Velocity</div>
                   <div class="stat-box-val" id="hud-stat-velocity" style="color:#fff;">0.0 km/h</div>
-                  <div class="stat-box-sub" id="hud-stat-motion-type">Zero Lateral Spread</div>
+                  <div class="stat-box-sub" id="hud-stat-motion-type">Centroid Multi-Pass Shift</div>
                 </div>
                 <div class="stat-box">
                   <div class="stat-box-label">Centroid Drift</div>
                   <div class="stat-box-val" id="hud-stat-drift" style="font-size:0.95rem;">12 m</div>
-                  <div class="stat-box-sub">Multi-Satellite Mean</div>
+                  <div class="stat-box-sub">Multi-Satellite Mean (<15m)</div>
                 </div>
                 <div class="stat-box">
                   <div class="stat-box-label">Plume Dispersion</div>
                   <div class="stat-box-val" id="hud-stat-plume-dir" style="font-size:0.85rem; color:#f59e0b;">SW (18 km/h)</div>
-                  <div class="stat-box-sub">Atmospheric Vector</div>
+                  <div class="stat-box-sub">ERA5 / NOAA GFS Wind Grid</div>
                 </div>
               </div>
             </div>
@@ -455,40 +569,11 @@
               </p>
             </div>
 
-            <!-- Brain 1: Multi-Modal Evidence & XGBoost Attribution -->
-            <div class="hud-section-card">
-              <div class="section-card-title">
-                <span>Brain 1: Multi-Modal Source Attribution</span>
-                <span style="font-family:var(--font-mono); color:var(--accent-cyan);" id="hud-score-pct">91%</span>
-              </div>
-              <div class="score-progress-wrap">
-                <div class="score-progress-header">
-                  <span style="color:var(--text-muted);">Attribution Evidence Confidence</span>
-                  <span style="color:#fff; font-weight:600;">High Confidence</span>
-                </div>
-                <div class="score-bar-bg">
-                  <div class="score-bar-fill" id="hud-score-bar" style="width:91%;"></div>
-                </div>
-              </div>
-              <p style="font-size:0.7rem; color:var(--text-dim); margin-top:6px;">
-                Calculated from Facility Match (35%) + Built-up Context (25%) + Nightlights (20%) + Persistence (20%).
-              </p>
-            </div>
-
             <!-- Brain 2: Behavioural Anomaly Gauge & Radar -->
             <div class="hud-section-card">
               <div class="section-card-title">
-                <span>Brain 2: Behavioural Anomaly Engine</span>
+                <span>Multi-Modal Feature Attribution Radar</span>
                 <span style="font-family:var(--font-mono); color:var(--accent-thermal);" id="hud-anomaly-pct">88%</span>
-              </div>
-              <div class="score-progress-wrap">
-                <div class="score-progress-header">
-                  <span style="color:var(--text-muted);">Baseline Deviation Severity</span>
-                  <span style="color:#ff4747; font-weight:700;">Critical Anomaly</span>
-                </div>
-                <div class="score-bar-bg">
-                  <div class="score-bar-fill anomaly-fill" id="hud-anomaly-bar" style="width:88%;"></div>
-                </div>
               </div>
               <div class="chart-canvas-wrap" style="height:140px; margin-top:8px;">
                 <canvas id="sidebar-radar-chart"></canvas>
@@ -549,17 +634,6 @@
               </div>
             </details>
 
-            <!-- Explainable Evidence Checklist -->
-            <div class="hud-section-card">
-              <div class="section-card-title">
-                <span>Explainable AI Evidence Trail</span>
-                <i data-lucide="check-circle-2" style="width:14px; height:14px;"></i>
-              </div>
-              <div class="evidence-list" id="hud-evidence-list">
-                <!-- Dynamically populated -->
-              </div>
-            </div>
-
             <!-- NASA Static Mask Comparison Box -->
             <div class="hud-section-card nasa-compare-card">
               <div class="section-card-title" style="color:#60a5fa;">
@@ -580,30 +654,6 @@
               </div>
               <p style="font-size:0.72rem; color:#93c5fd; margin-top:6px; line-height:1.35;" id="hud-compare-desc">
                 NASA classifies as routine static background. HeatWatch exposes a sudden 4.4x surge and uncontained spatial flare-up.
-              </p>
-            </div>
-
-            <!-- Human Verification Status (Active Learning Loop) -->
-            <div class="hud-section-card" style="background:rgba(0, 240, 255, 0.05); border:1px solid rgba(0, 240, 255, 0.2);">
-              <div class="section-card-title" style="color:var(--accent-cyan);">
-                <span>Human Verification & Retraining</span>
-                <i data-lucide="shield-check" style="width:14px; height:14px;"></i>
-              </div>
-              <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; margin-bottom:0.4rem;">
-                <span style="color:var(--text-muted);">Audit Status:</span>
-                <strong id="hud-verification-status" style="color:#10b981;">✓ Verified: Industrial Plant</strong>
-              </div>
-              <p style="font-size:0.68rem; color:var(--text-dim);">
-                Operator verified ground truth. Queued into active learning dataset for XGBoost continuous retraining.
-              </p>
-            </div>
-
-            <!-- Action Recommendation & Buttons -->
-            <div class="action-box">
-              <strong style="color:#ff8888; display:block; margin-bottom:4px;">RECOMMENDED ACTION:</strong>
-              <p id="hud-action-text">Urgent field verification required. Cross-check refinery valve pressure.</p>
-              <p style="font-size:0.7rem; color:#fca5a5; margin-top:4px;" id="hud-exposure-text">
-                Nearest: Moti Khavdi Settlement (1.8 km, ~14,500 residents)
               </p>
             </div>
 
@@ -882,12 +932,11 @@
           <table class="table-custom">
             <thead>
               <tr>
-                <th>Object ID</th>
-                <th>Thermal Entity & Location</th>
-                <th>Priority Status</th>
-                <th>Current FRP (Deviation)</th>
-                <th>Actionable Intelligence Summary</th>
-                <th>Triage Actions</th>
+                <th>1. Satellite Detection (NASA FIRMS)</th>
+                <th>2. Geospatial Context</th>
+                <th>3. Baseline &amp; Risk Model</th>
+                <th>4. AI Classification</th>
+                <th>5. Human Verification &amp; Triage</th>
               </tr>
             </thead>
             <tbody id="alerts-table-body">

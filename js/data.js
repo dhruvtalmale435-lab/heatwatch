@@ -1121,9 +1121,9 @@ export const DEMO_STORY_STEPS = [
   },
   {
     step: 5,
-    title: "5. Establish 90-Day Baseline (Mean FRP = 18.2 MW)",
-    description: "A petrochemical flare is normal operational flaring every day. HeatWatch calculates a normal historical baseline (Mean FRP = 18.2 MW, designated flare stack footprint).",
-    actionHighlight: "View 90-day time-series telemetry chart comparing historical mean against current surge.",
+    title: "5. Metric Scientific Provenance: Satellite vs. AI Derivations",
+    description: "Every metric has transparent provenance: Observed FRP (68.4 MW) & Brightness Temp (368.5 K) come directly from NASA FIRMS VIIRS I4 radiometry; Temporal Persistence (92.4%), Centroid Stability (99.4%), and Zero Spread Velocity (0.0 km/h) are derived by HeatWatch's 90-day orbital clustering engine; and Plume Vector (SW 18 km/h) is synced from ERA5/GFS atmospheric wind data.",
+    actionHighlight: "Demonstrates clear scientific provenance for every metric displayed on the dashboard.",
     targetObjectId: "OBJ-1045",
     mapLayers: { rawFirms: false, thermalClusters: true, osmFacilities: true, worldCoverBuffers: false, nasaStaticMask: false, riskBuffers: true },
     zoomCoordinates: [22.3615, 69.8640],

@@ -25,8 +25,24 @@ export class HeatWatchAnalytics {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
 
-    const dataPoints = HISTORICAL_FRP_DATA[objectId] || HISTORICAL_FRP_DATA["OBJ-1045"] || [];
-    if (!dataPoints.length) return;
+    let dataPoints = HISTORICAL_FRP_DATA[objectId];
+    if (!dataPoints || !dataPoints.length) {
+      dataPoints = [];
+      const startDate = new Date("2026-06-01T00:00:00Z");
+      for (let i = 0; i < 90; i++) {
+        const curDate = new Date(startDate.getTime() + i * 86400000);
+        dataPoints.push({
+          dayIndex: i + 1,
+          day: `Day ${i + 1}`,
+          date: curDate.toISOString().substring(0, 10),
+          frp: 0,
+          baseline: 0,
+          threshold: 0,
+          tempK: 298,
+          status: "inactive"
+        });
+      }
+    }
 
     const labels = dataPoints.map(d => d.day);
     const frpValues = dataPoints.map(d => d.frp);
