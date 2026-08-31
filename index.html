@@ -98,7 +98,7 @@
         <i data-lucide="satellite"></i> Query Live FIRMS
       </button>
 
-      <button class="btn-secondary" id="btn-guided-demo" title="Start Interactive 8-Step Presentation Tour">
+      <button class="btn-secondary" id="btn-guided-demo" title="Start Interactive 10-Step Guided SIH Presentation Tour">
         <i data-lucide="play-circle"></i> SIH Tour
       </button>
 
@@ -136,6 +136,68 @@
        3. Main Application Views Container
        ========================================================================== -->
   <main class="app-main">
+
+    <!-- ======================================================================
+         SIH TOUR MODE: Presentation Layer Only
+         ====================================================================== -->
+    <div id="sih-tour-overlay" class="sih-tour-overlay" style="display: none;">
+      <div class="sih-tour-card" id="sih-tour-card">
+        <!-- Tour Header -->
+        <div class="tour-header">
+          <div class="tour-badge-title">
+            <span class="tour-live-dot"></span>
+            <span class="tour-step-count" id="tour-step-badge">STEP 1 / 10</span>
+            <span class="tour-mode-tag">SIH JURY PRESENTATION</span>
+          </div>
+          <button class="tour-close-btn" id="btn-close-sih-tour" title="Exit Tour (Esc)">&times;</button>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="tour-progress-bar-wrap">
+          <div class="tour-progress-bar" id="tour-progress-fill" style="width: 10%;"></div>
+        </div>
+
+        <!-- Tour Body Content -->
+        <div class="tour-body">
+          <h3 class="tour-step-title" id="tour-step-title">FROM THERMAL DETECTION TO ACTIONABLE INTELLIGENCE</h3>
+          <p class="tour-step-subtitle" id="tour-step-subtitle">NASA FIRMS tells us where thermal activity is detected. HeatWatch adds context, attribution and behavioural analysis.</p>
+          
+          <!-- Dynamic Visual Container (Diagram / Pipeline / Comparison) -->
+          <div class="tour-visual-container" id="tour-visual-container"></div>
+
+          <!-- Narration Text -->
+          <div class="tour-narration-box" id="tour-narration-box">
+            <i data-lucide="quote" style="width: 14px; height: 14px; flex-shrink: 0; color: #38bdf8;"></i>
+            <span id="tour-narration-text">"Satellite systems can detect thermal anomalies, but an individual hotspot does not tell us what caused it or whether it is normal for that location."</span>
+          </div>
+
+          <!-- Action / Spotlight Context Callout -->
+          <div class="tour-action-callout" id="tour-action-callout">
+            <i data-lucide="crosshair" style="width: 13px; height: 13px; flex-shrink: 0; color: #38bdf8;"></i>
+            <span id="tour-action-text">Viewing raw NASA FIRMS satellite detections over the industrial region without facility context.</span>
+          </div>
+        </div>
+
+        <!-- Tour Footer & Controls -->
+        <div class="tour-footer">
+          <button class="btn-tour-nav" id="btn-tour-prev" title="Previous Step (Left Arrow)">
+            <i data-lucide="chevron-left"></i> Previous
+          </button>
+
+          <!-- Interactive Clickable Step Dots -->
+          <div class="tour-step-dots" id="tour-step-dots"></div>
+
+          <div class="tour-footer-right">
+            <button class="btn-tour-restart" id="btn-tour-restart" title="Restart Presentation from Step 1">
+              <i data-lucide="rotate-ccw"></i> Restart
+            </button>
+            <button class="btn-tour-next" id="btn-tour-next" title="Next Step (Right Arrow)">
+              Next <i data-lucide="chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- ------------------------------------------------------------------------
          VIEW 1: Command Map (GIS Command Center)
@@ -343,56 +405,6 @@
             <div class="legend-item"><div class="legend-chip chip-agri"></div><span>Agricultural Burning</span></div>
             <div class="legend-item"><div class="legend-chip chip-osm"></div><span>OSM Facility Boundary</span></div>
             <div class="legend-item"><div class="legend-chip chip-nasa"></div><span>NASA Static Anomaly Point</span></div>
-          </div>
-        </div>
-
-        <!-- Small Centered 90-Day Satellite Historical Slider -->
-        <div class="map-time-scrubber small-timeline-box" id="map-time-scrubber">
-          <span class="timeline-box-title">⏱️ 90d</span>
-          <input type="range" id="map-timeline-slider" class="time-scrubber-slider" min="1" max="90" value="90" step="1">
-          <span class="timeline-box-day" id="scrubber-day-badge">Day 90</span>
-        </div>
-
-        <!-- Interactive SIH Guided Tour Floating Controller Card -->
-        <div class="sih-tour-overlay" id="sih-tour-overlay" style="display:none;">
-          <div class="sih-tour-card">
-            <div class="tour-header">
-              <div class="tour-badge-title">
-                <span class="tour-live-dot"></span>
-                <span class="tour-step-count" id="tour-step-badge">STEP 1 OF 8</span>
-              </div>
-              <button class="tour-close-btn" id="btn-tour-close" title="Exit Guided Tour">&times;</button>
-            </div>
-
-            <div class="tour-progress-bar-wrap">
-              <div class="tour-progress-bar" id="tour-progress-bar" style="width: 12.5%;"></div>
-            </div>
-
-            <div class="tour-body">
-              <h3 class="tour-step-title" id="tour-title">1. Ingest Raw NASA FIRMS Detections</h3>
-              <p class="tour-step-desc" id="tour-desc">
-                Satellite detects high-temperature infrared pixels over the Jamnagar industrial belt. Raw FIRMS only tells you WHERE heat is detected, leaving its nature ambiguous.
-              </p>
-              <div class="tour-action-callout" id="tour-action">
-                <i data-lucide="sparkles" style="width:14px; height:14px; color:var(--accent-cyan);"></i>
-                <span id="tour-action-text">Show raw FIRMS points on high-resolution satellite imagery without any facility or land-use context.</span>
-              </div>
-            </div>
-
-            <div class="tour-footer">
-              <div class="tour-nav-controls">
-                <button class="btn-tour-nav" id="btn-tour-prev" title="Previous Step">
-                  <i data-lucide="chevron-left"></i> Prev
-                </button>
-                <button class="btn-tour-play" id="btn-tour-play-pause" title="Play / Pause Auto Tour">
-                  <i data-lucide="play" id="icon-tour-play"></i> <span id="text-tour-play">Auto Play</span>
-                </button>
-                <button class="btn-tour-nav" id="btn-tour-next" title="Next Step">
-                  Next <i data-lucide="chevron-right"></i>
-                </button>
-              </div>
-              <span class="tour-hint-text">Keys: <strong>&larr;</strong> / <strong>&rarr;</strong> / <strong>Space</strong></span>
-            </div>
           </div>
         </div>
 
@@ -678,34 +690,58 @@
     <section class="view-section" id="view-analytics-tab">
       <div class="analytics-view-container">
         
-        <div class="analytics-header-row">
+        <div class="analytics-header-row" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
           <div>
             <h2 style="font-family:var(--font-heading); font-size:1.5rem; font-weight:700;">Regional Thermal Telemetry & Baselines</h2>
-            <p style="font-size:0.85rem; color:var(--text-muted);">Historical time-series analysis, multi-year persistence profiles, and anomaly deviation distributions</p>
+            <p style="font-size:0.85rem; color:var(--text-muted);">Historical 90-day time-series analysis, persistence profiles, and anomaly deviation distributions</p>
+          </div>
+          <div style="display:flex; align-items:center; gap:0.75rem;">
+            <label style="font-size:0.8rem; font-weight:600; color:#38bdf8;">Select Location / Facility:</label>
+            <select id="select-analytics-facility" class="filter-select" style="padding:0.45rem 0.85rem; min-width:260px; background:#0e1726; color:#fff; border:1px solid rgba(56,189,248,0.4); border-radius:6px;">
+            </select>
+          </div>
+        </div>
+
+        <!-- Dynamic Selected Facility Banner -->
+        <div id="analytics-facility-banner" style="background:rgba(14, 23, 38, 0.95); border:1px solid rgba(56, 189, 248, 0.3); border-radius:8px; padding:0.85rem 1.25rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+          <div>
+            <div style="font-size:0.72rem; font-family:var(--font-mono); color:#94a3b8;" id="analytics-facility-id">FAC-REF-01 • PETROCHEMICAL REFINERY</div>
+            <div style="font-size:1.15rem; font-weight:700; color:#fff;" id="analytics-facility-name">Jamnagar Petrochemical Complex (RIL)</div>
+            <div style="font-size:0.78rem; color:#38bdf8;" id="analytics-facility-loc">Jamnagar, Gujarat • Lat: 22.4707, Lon: 69.8358</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:1rem;">
+            <div style="text-align:right;">
+              <div style="font-size:0.7rem; color:#94a3b8;">CURRENT STATUS</div>
+              <div style="font-size:0.85rem; font-weight:700; color:#ff4747;" id="analytics-facility-status">🔴 HIGH-PRIORITY SURGE</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:0.7rem; color:#94a3b8;">DEVIATION RATIO</div>
+              <div style="font-size:0.95rem; font-family:var(--font-mono); font-weight:700; color:#38bdf8;" id="analytics-facility-ratio">3.76× Baseline</div>
+            </div>
           </div>
         </div>
 
         <!-- 4 KPI Cards -->
         <div class="analytics-grid-4col">
           <div class="kpi-card">
-            <span class="kpi-title">Monitored Thermal Objects</span>
-            <span class="kpi-value">6 Facilities</span>
-            <span class="kpi-sub">Across 6 Industrial Study Corridors</span>
+            <span class="kpi-title">Current Observed FRP</span>
+            <span class="kpi-value" id="kpi-analytics-frp" style="color:var(--accent-cyan);">68.4 MW</span>
+            <span class="kpi-sub" id="kpi-analytics-sensor">VIIRS SNPP 375m Radiometer</span>
           </div>
           <div class="kpi-card">
-            <span class="kpi-title">Critical Anomalies</span>
-            <span class="kpi-value" style="color:var(--accent-thermal);">2 Active</span>
-            <span class="kpi-sub">>2.0× Historical Baseline Threshold</span>
+            <span class="kpi-title">90-Day Baseline Mean</span>
+            <span class="kpi-value" id="kpi-analytics-baseline" style="color:#94a3b8;">18.2 MW</span>
+            <span class="kpi-sub">Multi-Pass Operational Median</span>
           </div>
           <div class="kpi-card">
-            <span class="kpi-title">Peak Fire Radiative Power</span>
-            <span class="kpi-value" style="color:var(--accent-cyan);">340.8 MW</span>
-            <span class="kpi-sub">Simlipal Wildfire Outbreak</span>
+            <span class="kpi-title">Peak Radiative Temp</span>
+            <span class="kpi-value" id="kpi-analytics-temp" style="color:#f59e0b;">368.5 K</span>
+            <span class="kpi-sub" id="kpi-analytics-temp-c">95.35 °C (Pixel Average)</span>
           </div>
           <div class="kpi-card">
-            <span class="kpi-title">Attribution Accuracy (F1)</span>
-            <span class="kpi-value" style="color:var(--accent-forest);">94.2%</span>
-            <span class="kpi-sub">Benchmarked on Ground-Verified Corridors</span>
+            <span class="kpi-title">Attribution Confidence</span>
+            <span class="kpi-value" id="kpi-analytics-conf" style="color:#10b981;">94.2%</span>
+            <span class="kpi-sub" id="kpi-analytics-category">Industrial Thermal Flare</span>
           </div>
         </div>
 
@@ -723,8 +759,8 @@
 
           <div class="chart-card">
             <div class="chart-card-header">
-              <span class="chart-card-title">Selected Facility 90-Day Time Series</span>
-              <span style="font-size:0.75rem; color:var(--accent-cyan); font-family:var(--font-mono);">OBJ-1045 Surge</span>
+              <span class="chart-card-title" id="title-analytics-timeseries">Selected Facility 90-Day Time Series</span>
+              <span style="font-size:0.75rem; color:var(--accent-cyan); font-family:var(--font-mono);" id="badge-analytics-timeseries">Live Telemetry</span>
             </div>
             <div class="chart-canvas-wrap" style="height:300px;">
               <canvas id="canvas-analytics-timeseries"></canvas>

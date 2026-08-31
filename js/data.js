@@ -1063,10 +1063,10 @@ export const OSM_FACILITIES = ALL_INDIA_FACILITIES.map((fac, idx) => ({
   type: fac.type,
   coordinates: fac.coordinates,
   polygon: [
-    [fac.coordinates[0] + 0.007, fac.coordinates[1] - 0.008],
-    [fac.coordinates[0] + 0.008, fac.coordinates[1] + 0.010],
-    [fac.coordinates[0] - 0.007, fac.coordinates[1] + 0.011],
-    [fac.coordinates[0] - 0.008, fac.coordinates[1] - 0.007]
+    [fac.coordinates[0] + 0.0035, fac.coordinates[1] - 0.0040],
+    [fac.coordinates[0] + 0.0040, fac.coordinates[1] + 0.0045],
+    [fac.coordinates[0] - 0.0035, fac.coordinates[1] + 0.0045],
+    [fac.coordinates[0] - 0.0040, fac.coordinates[1] - 0.0035]
   ],
   attributes: {
     state: fac.state,
@@ -1081,83 +1081,209 @@ export const OSM_FACILITIES = ALL_INDIA_FACILITIES.map((fac, idx) => ({
 export const DEMO_STORY_STEPS = [
   {
     step: 1,
-    title: "1. Ingest Raw NASA FIRMS Detections (Deliverable 2)",
-    description: "Satellite detects high-temperature infrared pixels over the Jamnagar industrial belt. Raw FIRMS only tells you WHERE heat is detected, leaving its nature ambiguous.",
-    actionHighlight: "Show raw FIRMS points on high-resolution satellite imagery without any facility or land-use context.",
+    id: "step-problem",
+    title: "FROM THERMAL DETECTION TO ACTIONABLE INTELLIGENCE",
+    subtitle: "NASA FIRMS tells us where thermal activity is detected. HeatWatch adds context, attribution and behavioural analysis.",
+    narration: "Satellite systems can detect thermal anomalies, but an individual hotspot does not tell us what caused it or whether it is normal for that location.",
+    visualFlow: [
+      { label: "SATELLITE", sub: "VIIRS / MODIS" },
+      { label: "THERMAL DETECTION", sub: "Raw 375m Pixel" },
+      { label: "HEATWATCH", sub: "Geospatial Engine" },
+      { label: "SOURCE + BEHAVIOUR + PRIORITY", sub: "Actionable Intel" }
+    ],
+    viewTab: "view-command-map",
     targetObjectId: "OBJ-1045",
     mapLayers: { rawFirms: true, thermalClusters: false, osmFacilities: false, worldCoverBuffers: false, nasaStaticMask: false, riskBuffers: false },
     zoomCoordinates: [22.3615, 69.8640],
-    zoomLevel: 13
+    zoomLevel: 13,
+    spotlightTarget: "#gis-map-canvas",
+    actionHighlight: "Viewing raw NASA FIRMS satellite detections over the industrial region without facility context."
   },
   {
     step: 2,
-    title: "2. Activate Multimodal Geospatial Context Layers",
-    description: "Overlay OpenStreetMap industrial plant polygons and ESA WorldCover 10m land classifications to anchor the thermal anomalies in real-world infrastructure.",
-    actionHighlight: "Turn on OSM facilities layer (refinery polygons) and ESA WorldCover raster buffers.",
+    id: "step-command-map",
+    title: "COMMAND MAP: GEOSPATIAL & INDUSTRIAL CONTEXT",
+    subtitle: "Combining satellite thermal detections with geographic and industrial context.",
+    narration: "This is our Command Map. We combine satellite thermal detections with geographic and industrial context.",
+    visualFlow: [
+      { label: "RAW DETECTIONS", sub: "FIRMS VIIRS" },
+      { label: "THERMAL OBJECTS", sub: "Clustered Entities" },
+      { label: "OSM FACILITIES", sub: "Industrial Footprints" },
+      { label: "LAND COVER", sub: "ESA WorldCover 10m" }
+    ],
+    viewTab: "view-command-map",
     targetObjectId: "OBJ-1045",
-    mapLayers: { rawFirms: true, thermalClusters: false, osmFacilities: true, worldCoverBuffers: true, nasaStaticMask: false, riskBuffers: true },
+    mapLayers: { rawFirms: true, thermalClusters: true, osmFacilities: true, worldCoverBuffers: true, nasaStaticMask: false, riskBuffers: true },
     zoomCoordinates: [22.3615, 69.8640],
-    zoomLevel: 14
+    zoomLevel: 14,
+    spotlightTarget: ".map-layers-panel",
+    actionHighlight: "Overlaid OpenStreetMap industrial plant boundaries, land cover rasters, and asset hazard buffers."
   },
   {
     step: 3,
-    title: "3. Cluster Points into Persistent Thermal Object #1045",
-    description: "ST-DBSCAN spatiotemporal clustering aggregates multiple individual satellite detections across 90 days into a single persistent facility-level entity.",
-    actionHighlight: "Observe creation of Thermal Object #OBJ-1045 with 92.4% historical persistence.",
-    targetObjectId: "OBJ-1045",
-    mapLayers: { rawFirms: true, thermalClusters: true, osmFacilities: true, worldCoverBuffers: true, nasaStaticMask: false, riskBuffers: true },
-    zoomCoordinates: [22.3615, 69.8640],
-    zoomLevel: 14
-  },
-  {
-    step: 4,
-    title: "4. Deliverable 1: Source Segregation & AI Attribution",
-    description: "The AI Engine evaluates 5 dimensions (Facility Distance, Temporal Persistence, Land Cover, Night Radiance, and Centroid Stability), proving 91% Confidence for Petrochemical Flare vs Forest/Crop Fires.",
-    actionHighlight: "Open Evidence Score breakdown showing why it is segregated as an Industrial Flare.",
-    targetObjectId: "OBJ-1045",
-    mapLayers: { rawFirms: false, thermalClusters: true, osmFacilities: true, worldCoverBuffers: true, nasaStaticMask: false, riskBuffers: true },
-    zoomCoordinates: [22.3615, 69.8640],
-    zoomLevel: 14
-  },
-  {
-    step: 5,
-    title: "5. Metric Scientific Provenance: Satellite vs. AI Derivations",
-    description: "Every metric has transparent provenance: Observed FRP (68.4 MW) & Brightness Temp (368.5 K) come directly from NASA FIRMS VIIRS I4 radiometry; Temporal Persistence (92.4%), Centroid Stability (99.4%), and Zero Spread Velocity (0.0 km/h) are derived by HeatWatch's 90-day orbital clustering engine; and Plume Vector (SW 18 km/h) is synced from ERA5/GFS atmospheric wind data.",
-    actionHighlight: "Demonstrates clear scientific provenance for every metric displayed on the dashboard.",
+    id: "step-thermal-object",
+    title: "STEP 1: TURNING HOTSPOTS INTO THERMAL OBJECTS",
+    subtitle: "Aggregating satellite pixels into persistent facility-level entities.",
+    narration: "We don't treat every satellite pixel as an independent event. Related detections are grouped into thermal objects so we can study their spatial and temporal behaviour.",
+    realMetrics: {
+      frp: "68.4 MW",
+      tempK: "368.5 K",
+      persistence: "92.4%",
+      stability: "99.4%",
+      velocity: "0.0 km/h (Stationary Stack)",
+      facility: "Jamnagar Polypropylene Cracker #4 (210m)"
+    },
+    viewTab: "view-command-map",
     targetObjectId: "OBJ-1045",
     mapLayers: { rawFirms: false, thermalClusters: true, osmFacilities: true, worldCoverBuffers: false, nasaStaticMask: false, riskBuffers: true },
     zoomCoordinates: [22.3615, 69.8640],
-    zoomLevel: 14
+    zoomLevel: 14,
+    spotlightTarget: "#map-sidebar-inspector",
+    actionHighlight: "Thermal Object #OBJ-1045 isolated with multi-year persistence and fixed centroid coordinates."
+  },
+  {
+    step: 4,
+    id: "step-attribution-engine",
+    title: "ENGINE 1 — SOURCE ATTRIBUTION",
+    subtitle: "Answering: WHAT IS THIS THERMAL SOURCE?",
+    narration: "The first engine answers one question: WHAT IS THIS THERMAL SOURCE?",
+    pipelineStages: [
+      { step: "NASA FIRMS", note: "Raw Infrared Radiometry" },
+      { step: "THERMAL OBJECT", note: "ST-DBSCAN Clustering" },
+      { step: "CONTEXT ENRICHMENT", note: "OSM + Land Cover + Radiometry + History" },
+      { step: "SOURCE ATTRIBUTION", note: "Physics-Grounded Classifier" },
+      { step: "CATEGORY + CONFIDENCE", note: "Petrochemical Flare (91.0%)" }
+    ],
+    realVerdict: {
+      category: "Petrochemical / Industrial Flare",
+      confidence: "91.0% Attribution Confidence",
+      glintFilter: "PASSED (0.02 Glint Risk)"
+    },
+    viewTab: "view-command-map",
+    targetObjectId: "OBJ-1045",
+    mapLayers: { rawFirms: false, thermalClusters: true, osmFacilities: true, worldCoverBuffers: true, nasaStaticMask: false, riskBuffers: true },
+    zoomCoordinates: [22.3615, 69.8640],
+    zoomLevel: 14,
+    spotlightTarget: "#hud-evidence-list",
+    actionHighlight: "Source attribution engine confirms petrochemical flare via multi-modal geographic and radiometry features."
+  },
+  {
+    step: 5,
+    id: "step-classification-limit",
+    title: "CLASSIFICATION IS ONLY THE FIRST STEP",
+    subtitle: "Why source attribution alone cannot distinguish routine operations from emergencies.",
+    narration: "A refinery flare may be completely normal. The important question is whether today's behaviour is normal for this particular location.",
+    callout: "INDUSTRIAL SOURCE ≠ NORMAL OPERATION",
+    viewTab: "view-command-map",
+    targetObjectId: "OBJ-1045",
+    mapLayers: { rawFirms: true, thermalClusters: true, osmFacilities: true, worldCoverBuffers: false, nasaStaticMask: false, riskBuffers: true },
+    zoomCoordinates: [22.3615, 69.8640],
+    zoomLevel: 14,
+    spotlightTarget: "#hud-obj-severity",
+    actionHighlight: "Even with 91% industrial confidence, an operational baseline is required to determine whether it is safe."
   },
   {
     step: 6,
-    title: "6. Acute Anomaly Detection: 3.76× Surge (68.4 MW)",
-    description: "Today's satellite pass records 68.4 MW (3.76× baseline) with +281% spatial footprint expansion spreading into chemical storage tanks. Status flips from NORMAL to HIGH-PRIORITY ANOMALY.",
-    actionHighlight: "Thermal status badge escalates to HIGH-PRIORITY ANOMALY (Anomaly Score 0.883).",
+    id: "step-historical-baseline",
+    title: "ENGINE 2 — HISTORICAL BASELINE",
+    subtitle: "Comparing current thermal behaviour against established historical norms.",
+    narration: "Each thermal object can be compared with its historical behaviour.",
+    visualFlow: [
+      { label: "CURRENT OBSERVATION", sub: "68.4 MW Today" },
+      { label: "+", sub: "Compare" },
+      { label: "HISTORICAL BASELINE", sub: "18.2 MW 30-Day Mean" },
+      { label: "➔", sub: "Evaluate" },
+      { label: "DEVIATION", sub: "+3.76× Escalation" }
+    ],
+    viewTab: "view-analytics-tab",
     targetObjectId: "OBJ-1045",
-    mapLayers: { rawFirms: true, thermalClusters: true, osmFacilities: true, worldCoverBuffers: true, nasaStaticMask: false, riskBuffers: true },
-    zoomCoordinates: [22.3615, 69.8640],
-    zoomLevel: 15
+    mapLayers: {},
+    spotlightTarget: "#canvas-analytics-timeseries",
+    actionHighlight: "Switching to Analytics: 90-day time-series telemetry reveals persistent baseline mean of 18.2 MW."
   },
   {
     step: 7,
-    title: "7. NASA Static Mask Side-by-Side Comparison",
-    description: "NASA FIRMS's 2025 static anomaly layer still flags this as a routine 'Static Industrial Source'. HeatWatch differentiates by exposing the abnormal flare escalation.",
-    actionHighlight: "Compare NASA label (Routine Static Mask) vs HeatWatch label (Critical Incident Outbreak).",
+    id: "step-anomaly-detection",
+    title: "IS THIS NORMAL FOR THIS LOCATION?",
+    subtitle: "Acute anomaly detection via statistical baseline deviation.",
+    narration: "The second engine compares the current observation with the established historical baseline and identifies abnormal behaviour.",
+    realMetrics: {
+      currentFRP: "68.4 MW",
+      baselineMean: "18.2 MW",
+      deviation: "+3.76× (+275% Surge)",
+      temperatureDelta: "+42.1 K above normal",
+      footprintArea: "8.4 Hectares (+281% Expansion)",
+      anomalyScore: "0.883 / 1.0",
+      status: "🔴 HIGH PRIORITY ANOMALY"
+    },
+    scale: ["NORMAL", "ELEVATED", "HIGH PRIORITY"],
+    viewTab: "view-analytics-tab",
     targetObjectId: "OBJ-1045",
-    mapLayers: { rawFirms: true, thermalClusters: true, osmFacilities: true, worldCoverBuffers: false, nasaStaticMask: true, riskBuffers: true },
-    zoomCoordinates: [22.3615, 69.8640],
-    zoomLevel: 14
+    mapLayers: {},
+    spotlightTarget: ".analytics-grid-4col",
+    actionHighlight: "FRP surges beyond 3.0× baseline threshold, triggering automated escalation to High Priority."
   },
   {
     step: 8,
-    title: "8. Actionable Human Verification & Emergency Dispatch",
-    description: "Rather than claiming automatic certainty, HeatWatch generates a prioritized action dossier with Sentinel-2 spectral verification for District Disaster Management Authorities.",
-    actionHighlight: "Inspect Field Verification Action Plan, nearest community exposure (Moti Khavdi, 1.8km), and export GeoJSON report.",
+    id: "step-key-difference",
+    title: "WHAT MAKES HEATWATCH DIFFERENT?",
+    subtitle: "Comparing standard satellite products with HeatWatch's multi-tier intelligence pipeline.",
+    narration: "Traditional systems stop at pointing out where heat exists. HeatWatch adds the critical intelligence layer: identifying what it is, whether it is normal, and what action is required.",
+    comparison: {
+      left: {
+        title: "TRADITIONAL THERMAL VIEW",
+        steps: ["Satellite Pass", "Hotspot Detection", "Pin on Map"]
+      },
+      right: {
+        title: "HEATWATCH INTELLIGENCE",
+        steps: ["Satellite Radiometry", "Thermal Object Clustering", "Facility + Land Context", "Source Attribution", "Historical Baseline", "Anomaly Analysis", "Operational Priority"]
+      },
+      footer: "WE DON'T REPLACE SATELLITE DETECTION. WE ADD THE INTELLIGENCE LAYER AFTER DETECTION."
+    },
+    viewTab: "view-command-map",
+    targetObjectId: "OBJ-1045",
+    mapLayers: { rawFirms: true, thermalClusters: true, osmFacilities: true, worldCoverBuffers: false, nasaStaticMask: true, riskBuffers: true },
+    zoomCoordinates: [22.3615, 69.8640],
+    zoomLevel: 14,
+    spotlightTarget: "#sih-tour-overlay",
+    actionHighlight: "Side-by-side comparison: NASA Static Mask flags routine flare, while HeatWatch identifies acute escalation."
+  },
+  {
+    step: 9,
+    id: "step-final-assessment",
+    title: "FROM DETECTION TO DECISION",
+    subtitle: "Closing the loop from orbital detection to prioritized disaster triage.",
+    narration: "HeatWatch enables disaster authorities and plant operators to prioritize actionable incidents and deploy ground resources with verified confidence.",
+    pipeline: ["DETECT", "ATTRIBUTE", "ESTABLISH BASELINE", "IDENTIFY DEVIATION", "PRIORITIZE RESPONSE"],
+    finalStatus: {
+      level: "HIGH PRIORITY",
+      action: "Despatch onsite inspection team & notify Reliance Jamnagar Safety Division",
+      settlement: "Moti Khavdi Village (1.8 km, ~8,400 pop)",
+      threat: "Storage Tank Farm Sector B (210m)"
+    },
+    viewTab: "view-command-map",
     targetObjectId: "OBJ-1045",
     mapLayers: { rawFirms: true, thermalClusters: true, osmFacilities: true, worldCoverBuffers: true, nasaStaticMask: true, riskBuffers: true },
     zoomCoordinates: [22.3615, 69.8640],
-    zoomLevel: 14
+    zoomLevel: 14,
+    spotlightTarget: "#hud-action-card",
+    actionHighlight: "Actionable triage dossier generated with population exposure estimates and field verification checklist."
+  },
+  {
+    step: 10,
+    id: "step-closing",
+    title: "HEATWATCH",
+    subtitle: "Satellite-derived thermal intelligence for industrial and environmental monitoring.",
+    narration: "HeatWatch transforms satellite thermal observations into actionable geospatial intelligence. Thank you. We are ready for questions from the jury.",
+    flow: ["DETECT", "ATTRIBUTE", "BASELINE", "ANOMALY", "ALERT"],
+    statement: "HeatWatch transforms satellite thermal observations into actionable geospatial intelligence.",
+    viewTab: "view-command-map",
+    targetObjectId: "OBJ-1045",
+    mapLayers: { rawFirms: true, thermalClusters: true, osmFacilities: true, worldCoverBuffers: false, nasaStaticMask: false, riskBuffers: true },
+    zoomCoordinates: [22.5, 78.5],
+    zoomLevel: 5,
+    spotlightTarget: null,
+    actionHighlight: "Full India operational view. Ready for judge Q&A and live scenario testing."
   }
 ];
 
@@ -1168,74 +1294,113 @@ export const DEMO_STORY_STEPS = [
  */
 export const HISTORICAL_FRP_DATA = {};
 
-function generate90DayHistoricalData() {
+export function getHistoricalFrpForObject(objOrId) {
+  const isObject = typeof objOrId === 'object' && objOrId !== null;
+  const objId = isObject ? (objOrId.id || 'FAC-UNKNOWN') : String(objOrId || '');
+  if (!objId) return [];
+
+  const cleanId = objId.replace(/^(FAC-|OBJ-)/, '');
+  const fac = ALL_INDIA_FACILITIES.find(f => f.id === cleanId || f.id === objId || `FAC-${f.id}` === objId || `OBJ-${f.id}` === objId);
+  const benchmarkObj = THERMAL_OBJECTS.find(o => o.id === objId || o.id === cleanId);
+  const targetObj = isObject ? objOrId : benchmarkObj;
+
+  const defaultCategoryBaseline = 
+    cleanId.startsWith('REF') || fac?.type?.includes('Refinery') ? 36.0 :
+    cleanId.startsWith('PWR') || cleanId.startsWith('STP') || fac?.type?.includes('Power') ? 55.0 :
+    cleanId.startsWith('STL') || fac?.type?.includes('Steel') ? 44.0 :
+    cleanId.startsWith('MINE') || cleanId.startsWith('COAL') || fac?.type?.includes('Mine') ? 48.0 :
+    cleanId.startsWith('CHEM') || cleanId.startsWith('FERT') || fac?.type?.includes('Chemical') ? 28.0 :
+    cleanId.startsWith('LNG') || fac?.type?.includes('LNG') ? 25.0 :
+    cleanId.startsWith('FOR') || cleanId.startsWith('BIO') || fac?.type?.includes('Forest') ? 12.0 :
+    cleanId.startsWith('AGR') || fac?.type?.includes('Crop') || fac?.type?.includes('Agri') ? 18.0 :
+    cleanId.startsWith('SOL') || fac?.type?.includes('Solar') ? 0.0 : 32.5;
+
+  const baseMean = (targetObj?.thermal?.historicalMeanFRP !== undefined)
+    ? Number(targetObj.thermal.historicalMeanFRP)
+    : (fac?.baselineFRP !== undefined ? Number(fac.baselineFRP) : defaultCategoryBaseline);
+
+  const currentFRP = (targetObj?.thermal?.currentFRP !== undefined)
+    ? Number(targetObj.thermal.currentFRP)
+    : (fac?.currentFRP !== undefined ? Number(fac.currentFRP) : (fac?.status === 'high_priority' ? baseMean * 2.8 : (baseMean > 0 ? baseMean * 1.04 : 0)));
+
+  const isSurge = targetObj?.status === 'high_priority' || fac?.status === 'high_priority' || (currentFRP > baseMean * 1.8 && baseMean > 0);
+  const isWildfire = fac?.id?.startsWith('FOR') || targetObj?.primaryCategory === 'wildfire' || targetObj?.categoryGroup === 'forest_fire';
+  const isAgri = fac?.id?.startsWith('AGR') || targetObj?.primaryCategory === 'agriculture' || targetObj?.categoryGroup === 'agriculture_fire';
+
+  const list = [];
   const startDate = new Date("2026-06-01T00:00:00Z");
-  
-  THERMAL_OBJECTS.forEach(obj => {
-    const list = [];
-    const baseMean = obj.thermal.historicalMeanFRP || 18.0;
-    const currentFRP = obj.thermal.currentFRP || 25.0;
-    const isSurge = obj.status === "high_priority";
-    const isWildfire = obj.primaryCategory === "wildfire";
-    const isAgri = obj.primaryCategory === "agricultural";
 
-    for (let dayIdx = 0; dayIdx < 90; dayIdx++) {
-      const curDate = new Date(startDate.getTime() + dayIdx * 86400000);
-      const dateStr = curDate.toISOString().substring(0, 10);
-      const dayLabel = `Day ${dayIdx + 1} (${curDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`;
+  for (let dayIdx = 0; dayIdx < 90; dayIdx++) {
+    const curDate = new Date(startDate.getTime() + dayIdx * 86400000);
+    const dateStr = curDate.toISOString().substring(0, 10);
+    const dayLabel = `Day ${dayIdx + 1} (${curDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`;
 
-      let frpVal;
-      let status = "normal";
+    let frpVal;
+    let status = "normal";
 
-      if (isSurge) {
-        // Acute surge in last 5 days
-        if (dayIdx >= 85) {
-          const progress = (dayIdx - 85) / 4.0;
-          frpVal = baseMean + (currentFRP - baseMean) * progress + (Math.sin(dayIdx * 3) * 2.0);
-          status = dayIdx >= 87 ? "anomaly" : "elevated";
-        } else {
-          frpVal = baseMean + (Math.sin(dayIdx * 0.7) * 2.2) + ((Math.random() - 0.5) * 1.5);
-        }
-      } else if (isWildfire) {
-        // Zero in dry season, flare-up in late summer
-        if (dayIdx < 78) {
-          frpVal = Math.max(0, (Math.random() - 0.7) * 2.0);
-        } else {
-          const wildfireProgress = (dayIdx - 78) / 11.0;
-          frpVal = 10.0 + (currentFRP - 10.0) * wildfireProgress + (Math.sin(dayIdx) * 5.0);
-          status = "wildfire_active";
-        }
-      } else if (isAgri) {
-        // Seasonal harvest burning
-        if (dayIdx < 70) {
-          frpVal = Math.max(0, (Math.random() - 0.8) * 1.0);
-        } else {
-          const harvestProgress = (dayIdx - 70) / 19.0;
-          frpVal = 8.0 + (currentFRP - 8.0) * harvestProgress + (Math.cos(dayIdx) * 4.0);
-          status = "seasonal_burn";
-        }
+    if (baseMean === 0 && !isWildfire && !isAgri) {
+      frpVal = 0;
+      status = "nominal";
+    } else if (isSurge) {
+      if (dayIdx >= 85) {
+        const progress = (dayIdx - 85) / 4.0;
+        frpVal = baseMean + (currentFRP - baseMean) * progress + (Math.sin(dayIdx * 3) * 1.8);
+        status = dayIdx >= 87 ? "anomaly" : "elevated";
       } else {
-        // Stable industrial baseline
-        frpVal = baseMean + (Math.sin(dayIdx * 0.5) * (baseMean * 0.12)) + ((Math.random() - 0.5) * 2.0);
+        frpVal = baseMean + (Math.sin(dayIdx * 0.7) * (baseMean * 0.08)) + ((Math.cos(dayIdx * 1.5)) * 1.2);
       }
-
-      frpVal = Math.max(0, Math.round(frpVal * 10) / 10);
-      const threshold = Math.round(baseMean * 2.0 * 10) / 10;
-
-      list.push({
-        dayIndex: dayIdx + 1,
-        day: dayLabel,
-        date: dateStr,
-        frp: frpVal,
-        baseline: baseMean,
-        threshold: threshold,
-        tempK: Math.round(300 + (frpVal * 1.05)),
-        status: status
-      });
+    } else if (isWildfire) {
+      if (dayIdx < 78) {
+        frpVal = Math.max(0, (Math.sin(dayIdx) * 1.5));
+      } else {
+        const wildfireProgress = (dayIdx - 78) / 11.0;
+        frpVal = 8.0 + (currentFRP - 8.0) * wildfireProgress + (Math.sin(dayIdx) * 4.0);
+        status = "wildfire_active";
+      }
+    } else if (isAgri) {
+      if (dayIdx < 70) {
+        frpVal = Math.max(0, (Math.cos(dayIdx) * 1.0));
+      } else {
+        const harvestProgress = (dayIdx - 70) / 19.0;
+        frpVal = 6.0 + (currentFRP - 6.0) * harvestProgress + (Math.cos(dayIdx) * 3.5);
+        status = "seasonal_burn";
+      }
+    } else {
+      frpVal = baseMean + (Math.sin(dayIdx * 0.5) * (baseMean * 0.10)) + ((Math.sin(dayIdx * 2.1)) * 1.4);
     }
 
-    HISTORICAL_FRP_DATA[obj.id] = list;
+    frpVal = Math.max(0, Math.round(frpVal * 10) / 10);
+    const threshold = Math.round(baseMean * 2.0 * 10) / 10;
+
+    list.push({
+      dayIndex: dayIdx + 1,
+      day: dayLabel,
+      date: dateStr,
+      frp: frpVal,
+      baseline: baseMean,
+      threshold: threshold,
+      tempK: Math.round(300 + (frpVal * 1.05)),
+      status: status
+    });
+  }
+
+  HISTORICAL_FRP_DATA[objId] = list;
+  return list;
+}
+
+function generate90DayHistoricalData() {
+  // Pre-generate for all Thermal Objects
+  THERMAL_OBJECTS.forEach(obj => {
+    getHistoricalFrpForObject(obj.id);
+  });
+
+  // Pre-generate for all 50+ Indian Facilities
+  ALL_INDIA_FACILITIES.forEach(fac => {
+    getHistoricalFrpForObject(fac.id);
+    getHistoricalFrpForObject(`FAC-${fac.id}`);
+    getHistoricalFrpForObject(`OBJ-${fac.id}`);
   });
 }
 
 generate90DayHistoricalData();
+

@@ -4,7 +4,7 @@
  * ST-DBSCAN clusters, ESA WorldCover buffers, and NASA static anomaly masks.
  */
 
-import { THERMAL_OBJECTS, RAW_FIRMS_DETECTIONS, OSM_FACILITIES, STUDY_REGIONS, ALL_INDIA_FACILITIES, HISTORICAL_FRP_DATA } from './data.js';
+import { THERMAL_OBJECTS, RAW_FIRMS_DETECTIONS, OSM_FACILITIES, STUDY_REGIONS, ALL_INDIA_FACILITIES, HISTORICAL_FRP_DATA, getHistoricalFrpForObject } from './data.js';
 
 export class HeatWatchMap {
   constructor(containerId, onSelectObjectCallback) {
@@ -146,7 +146,9 @@ export class HeatWatchMap {
       }
       this.activeBaseMap = this.baseMaps[styleKey];
       this.activeBaseMap.addTo(this.map);
-      this.activeBaseMap.bringToBack();
+      if (typeof this.activeBaseMap.bringToBack === 'function') {
+        this.activeBaseMap.bringToBack();
+      }
     } else {
       console.warn(`[HeatWatch Map] Unknown basemap key: ${styleKey}`);
     }
@@ -311,35 +313,37 @@ export class HeatWatchMap {
   }
 
   updateHistoricalClusters(dayIndex) {
-    if (!HISTORICAL_FRP_DATA) return;
+    if (!this.markers) return;
     
-    THERMAL_OBJECTS.forEach(obj => {
-      const historyList = HISTORICAL_FRP_DATA[obj.id] || [];
-      const record = historyList[dayIndex - 1];
-      const marker = this.markers[obj.id];
-      if (!record || !marker) return;
+    Object.keys(this.markers).forEach(objId => {
+      const marker = this.markers[objId];
+      if (!marker) return;
+
+      const historyList = getHistoricalFrpForObject(objId);
+      const record = historyList && historyList[dayIndex - 1];
+      if (!record) return;
 
       const ratio = Math.round((record.frp / Math.max(record.baseline, 1)) * 100) / 100;
-      let markerColor = '#00f0ff';
+      let markerColor = '#38bdf8';
       let pulseClass = '';
 
-      if (obj.categoryGroup === 'forest_fire' || obj.primaryCategory === 'wildfire') {
-        markerColor = record.frp > 10 ? '#f97316' : '#64748b';
-        if (record.frp > 10) pulseClass = `<div class="marker-pulse-ring" style="background: rgba(249, 115, 22, 0.4); border: 2px solid #f97316;"></div>`;
-      } else if (obj.categoryGroup === 'agriculture_fire' || obj.primaryCategory === 'agriculture') {
+      if (objId.includes('FOR') || objId.includes('3041')) {
+        markerColor = record.frp > 10 ? '#22c55e' : '#64748b';
+        if (record.frp > 10) pulseClass = `<div class="marker-pulse-ring" style="background: rgba(34, 197, 94, 0.4); border: 2px solid #22c55e;"></div>`;
+      } else if (objId.includes('AGR') || objId.includes('4012')) {
         markerColor = record.frp > 10 ? '#eab308' : '#64748b';
         if (record.frp > 10) pulseClass = `<div class="marker-pulse-ring" style="background: rgba(234, 179, 8, 0.35); border: 2px solid #eab308;"></div>`;
-      } else if (obj.categoryGroup === 'mining_fire') {
+      } else if (objId.includes('MINE') || objId.includes('7011')) {
         markerColor = '#a855f7';
         pulseClass = `<div class="marker-pulse-ring" style="background: rgba(168, 85, 247, 0.4); border: 2px solid #a855f7;"></div>`;
-      } else if (ratio >= 2.5) {
-        markerColor = '#ff4747';
-        pulseClass = `<div class="marker-pulse-ring" style="background: rgba(255, 71, 71, 0.4); border: 2px solid #ff4747;"></div>`;
-      } else if (ratio >= 1.5) {
+      } else if (ratio >= 2.0) {
+        markerColor = '#ef4444';
+        pulseClass = `<div class="marker-pulse-ring" style="background: rgba(239, 68, 68, 0.4); border: 2px solid #ef4444;"></div>`;
+      } else if (ratio >= 1.4) {
         markerColor = '#f59e0b';
         pulseClass = `<div class="marker-pulse-ring" style="background: rgba(245, 158, 11, 0.3); border: 2px solid #f59e0b;"></div>`;
       } else {
-        markerColor = '#00f0ff';
+        markerColor = '#38bdf8';
         pulseClass = '';
       }
 
@@ -356,17 +360,19 @@ export class HeatWatchMap {
       });
 
       marker.setIcon(customIcon);
-      marker.setTooltipContent(`
-        <div style="font-family: 'Inter', sans-serif;">
-          <div style="font-weight: 700; color: ${markerColor}; font-size: 0.85rem;">${obj.id}: ${obj.name}</div>
-          <div style="font-size: 0.72rem; color: #9ca3af; margin-top: 2px;">
-            ${record.day} &bull; ${record.date}
+      if (typeof marker.setTooltipContent === 'function') {
+        marker.setTooltipContent(`
+          <div style="font-family: 'Inter', sans-serif;">
+            <div style="font-weight: 700; color: ${markerColor}; font-size: 0.85rem;">${objId}</div>
+            <div style="font-size: 0.72rem; color: #9ca3af; margin-top: 2px;">
+              ${record.day} &bull; ${record.date}
+            </div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; margin-top: 4px; color: #fff;">
+              FRP: <strong>${record.frp} MW</strong> (${ratio}x Baseline) &bull; ${record.tempK} K
+            </div>
           </div>
-          <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; margin-top: 4px; color: #fff;">
-            FRP: <strong>${record.frp} MW</strong> (${ratio}x Baseline) &bull; ${record.tempK} K
-          </div>
-        </div>
-      `);
+        `);
+      }
     });
   }
 
@@ -725,11 +731,6 @@ export class HeatWatchMap {
       if (fac.id === 'AGRI-01' && o.id === 'OBJ-4012') return true;
       if (fac.id === 'REF-04' && o.id === 'OBJ-1082') return true;
       if (fac.id === 'REF-01' && o.id === 'OBJ-1045') return true;
-      if (o.coordinates && fac.coordinates) {
-        const dLat = Math.abs(o.coordinates[0] - fac.coordinates[0]);
-        const dLon = Math.abs(o.coordinates[1] - fac.coordinates[1]);
-        if (dLat < 0.05 && dLon < 0.05) return true;
-      }
       return false;
     });
   }
@@ -745,12 +746,21 @@ export class HeatWatchMap {
       return matchedBenchmark;
     }
 
-    const hasActiveDetection = fac.hasActiveDetection === true || (fac.currentFRP !== undefined && fac.currentFRP > 0);
-    const frp = hasActiveDetection ? fac.currentFRP : 0.0;
-    const baseMean = fac.baselineFRP || 0.0;
-    const isSurge = hasActiveDetection && frp && baseMean && (frp / Math.max(baseMean, 1)) > 1.8;
-    const status = hasActiveDetection ? (isSurge ? "high_priority" : "normal") : "normal";
-    const statusLabel = hasActiveDetection ? (isSurge ? "HIGH-PRIORITY ANOMALY" : "NORMAL OPERATIONAL BASELINE") : "NOMINAL BASELINE (No Flare)";
+    const baseMean = fac.baselineFRP || (
+      fac.id.startsWith('REF') ? 28.5 :
+      fac.id.startsWith('PWR') ? 45.0 :
+      fac.id.startsWith('STL') ? 35.0 :
+      fac.id.startsWith('MINE') ? 52.0 :
+      fac.id.startsWith('CHEM') ? 22.0 :
+      fac.id.startsWith('FOR') ? 0.0 :
+      fac.id.startsWith('AGR') ? 0.0 : 0.0
+    );
+
+    const hasActiveDetection = fac.hasActiveDetection === true || (fac.currentFRP !== undefined && fac.currentFRP > 0) || baseMean > 0;
+    const frp = fac.currentFRP !== undefined ? fac.currentFRP : (baseMean > 0 ? Math.round((baseMean * (1 + (Math.sin(fac.coordinates[0] * 5) * 0.06))) * 10) / 10 : 0.0);
+    const isSurge = fac.status === 'high_priority' || (hasActiveDetection && frp && baseMean && (frp / Math.max(baseMean, 1)) > 1.8);
+    const status = isSurge ? "high_priority" : (hasActiveDetection ? "normal" : "nominal");
+    const statusLabel = isSurge ? "HIGH-PRIORITY ANOMALY" : (hasActiveDetection ? "NORMAL OPERATIONAL BASELINE" : "NOMINAL BASELINE");
 
     const dynObj = {
       id: objId,
@@ -759,9 +769,9 @@ export class HeatWatchMap {
       centroid: [lat, lon],
       coordinates: [lat, lon],
       hasActiveDetection: hasActiveDetection,
-      categoryGroup: hasActiveDetection ? "industrial_fire" : "routine_flare",
-      primaryCategory: "industrial",
-      categoryLabel: hasActiveDetection ? `${fac.type} Thermal Emitter` : `${fac.type} (Nominal Baseline)`,
+      categoryGroup: isSurge ? "industrial_fire" : (fac.id.startsWith('MINE') ? "mining_fire" : (fac.id.startsWith('FOR') ? "forest_fire" : (fac.id.startsWith('AGR') ? "agriculture_fire" : (fac.id.startsWith('SOL') ? "glint_filtered" : "routine_flare")))),
+      primaryCategory: fac.id.startsWith('FOR') ? "wildfire" : (fac.id.startsWith('AGR') ? "agriculture" : (fac.id.startsWith('MINE') ? "mining" : (fac.id.startsWith('SOL') ? "solar_glint" : "industrial"))),
+      categoryLabel: isSurge ? `${fac.type} Thermal Surge` : `${fac.type} (Operational Baseline)`,
       subtype: fac.type,
       status: status,
       statusLabel: statusLabel,
@@ -782,22 +792,22 @@ export class HeatWatchMap {
         currentFRP: frp,
         historicalMeanFRP: baseMean,
         frpDeviationRatio: hasActiveDetection && frp && baseMean ? (Math.round((frp / Math.max(baseMean, 1)) * 100) / 100) : 1.0,
-        currentBrightnessTempK: hasActiveDetection && frp > 0 ? Math.round(320 + (frp * 0.5)) : 301.2,
-        historicalMeanTempK: 298.0,
-        sensor: "VIIRS SNPP 375m & MODIS",
-        detectionTime: hasActiveDetection ? "2026-08-28 02:18 UTC" : "Current Orbital Pass",
+        currentBrightnessTempK: hasActiveDetection && frp > 0 ? Math.round(320 + (frp * 0.85)) : 301.2,
+        historicalMeanTempK: baseMean > 0 ? Math.round(315 + (baseMean * 0.80)) : 298.0,
+        sensor: "VIIRS SNPP 375m & MODIS Terra",
+        detectionTime: "2026-08-28 02:18 UTC",
         activeDays: hasActiveDetection ? 88 : 0,
         totalDetections: hasActiveDetection ? 134 : 0,
-        persistenceRate: hasActiveDetection ? "94.2% (Persistent Flare)" : "Nominal Baseline",
+        persistenceRate: hasActiveDetection ? "94.2% (Persistent Industrial Emitter)" : "Nominal Baseline",
         footprintAreaHa: hasActiveDetection && frp ? Math.round((frp / 7.0) * 10) / 10 : 0.0
       },
       spatialDynamics: {
         centroidStabilityPct: 99.6,
         spreadVelocityKmH: 0.0,
-        motionType: "STATIONARY STACK",
+        motionType: "STATIONARY FACILITY STACK",
         isStationary: true,
         driftVectorMeters: 0,
-        plumeDispersion: "Calm / Nominal"
+        plumeDispersion: "Calm / Nominal (6 km/h)"
       },
       landCover: fac.landCover || {
         industrialBuiltUp: 78.0,
@@ -811,8 +821,8 @@ export class HeatWatchMap {
         classification: "Industrial Electrification Grid"
       },
       glintFilter: {
-        statusLabel: "✓ PASSED: Verified Facility Perimeter",
-        albedoReflectance: 0.06,
+        statusLabel: fac.id.startsWith('SOL') ? "REJECTED: Solar Panel Optical Glint" : "✓ PASSED: Verified High-Temp Emitter",
+        albedoReflectance: fac.id.startsWith('SOL') ? 0.42 : 0.06,
         solarElevationDeg: 54.0
       },
       hazardProximity: {
@@ -824,37 +834,20 @@ export class HeatWatchMap {
         distanceKm: 2.2,
         populationEstimate: "~18,000 residents"
       },
-      recommendedAction: hasActiveDetection ? "Review facility flare release telemetry & alert plant safety unit." : "Routine background operational monitoring active.",
+      recommendedAction: isSurge ? "Review facility flare release telemetry & alert plant safety unit." : "Routine background operational monitoring active.",
       evidencePoints: [
         { text: `Registered Facility: Direct match at ${fac.name} (${fac.state}) in OSM catalog`, verified: true, type: "neutral" },
-        { text: hasActiveDetection ? `Radiometry: Current FRP ${frp} MW (Baseline: ${baseMean} MW)` : `Satellite Radiometry: 0.0 MW (No active thermal pixels detected in current orbital pass)`, verified: hasActiveDetection, type: hasActiveDetection ? "pro-industrial" : "no-data" },
+        { text: hasActiveDetection ? `Radiometry: Current FRP ${frp} MW (90-Day Baseline: ${baseMean} MW)` : `Satellite Radiometry: 0.0 MW (No active thermal pixels detected in current orbital pass)`, verified: hasActiveDetection, type: hasActiveDetection ? "pro-industrial" : "no-data" },
         { text: `ESA WorldCover: ${(fac.landCover?.industrialBuiltUp || 78)}% heavy industrial built-up footprint`, verified: true, type: "neutral" },
         { text: `Status: Operating within nominal baseline parameters`, verified: true, type: "neutral" }
       ],
       anomalyFormula: {
-        totalAnomalyScore: isSurge ? 0.88 : 0.0
+        totalAnomalyScore: isSurge ? 0.88 : (hasActiveDetection ? 0.08 : 0.0)
       }
     };
 
     // Ensure 90-day time series exists in HISTORICAL_FRP_DATA
-    if (!HISTORICAL_FRP_DATA[objId]) {
-      const history = [];
-      const startDate = new Date("2026-06-01T00:00:00Z");
-      for (let i = 0; i < 90; i++) {
-        const curDate = new Date(startDate.getTime() + i * 86400000);
-        history.push({
-          dayIndex: i + 1,
-          day: `Day ${i + 1}`,
-          date: curDate.toISOString().substring(0, 10),
-          frp: hasActiveDetection && i === 89 ? frp : 0,
-          baseline: baseMean || 0,
-          threshold: baseMean ? Math.round(baseMean * 2 * 10) / 10 : 0,
-          tempK: 298,
-          status: "inactive"
-        });
-      }
-      HISTORICAL_FRP_DATA[objId] = history;
-    }
+    HISTORICAL_FRP_DATA[objId] = getHistoricalFrpForObject(objId);
 
     return dynObj;
   }

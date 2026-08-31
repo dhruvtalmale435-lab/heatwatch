@@ -552,7 +552,7 @@ export const ALL_INDIA_FACILITIES = [
     state: "Gujarat",
     city: "Surat / Hazira",
     type: "LNG & Heavy Chemical Port",
-    coordinates: [21.0945, 72.6682],
+    coordinates: [21.1180, 72.6510],
     capacity: "5 MMTPA LNG Regas + Cryogenic Storage",
     status: "inactive",
     operator: "Shell / TotalEnergies / L&T Heavy Eng",

@@ -1,13 +1,48 @@
 import os
 import sys
+import threading
+import time
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import json
 import pickle
 import numpy as np
-from datetime import datetime
+from datetime import datetime, timezone
+
+# Ensure UTF-8 output on Windows consoles
+if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
 
 PORT = 3000
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+
+# Import live satellite sync service
+sys.path.append(os.path.join(DIRECTORY, "backend"))
+try:
+    import live_service
+    print("[HeatWatch AI] Ingestion & Attribution Engine linked for automatic background syncing.")
+except Exception as e:
+    print(f"[HeatWatch AI] live_service import note: {e}")
+    live_service = None
+
+def run_periodic_live_sync():
+    """Background thread to keep live NASA satellite telemetry fresh continuously."""
+    time.sleep(3) # Initial brief delay
+    while True:
+        if live_service:
+            try:
+                print("[HeatWatch Auto-Sync] Checking and updating live NASA FIRMS telemetry...", flush=True)
+                live_service.run_sync()
+                print("[HeatWatch Auto-Sync] [OK] Successfully refreshed live satellite observations & ML attribution.", flush=True)
+            except Exception as e:
+                print(f"[HeatWatch Auto-Sync] Sync note: {e}", flush=True)
+        # Sleep for 15 minutes (900 seconds) between live orbital pass checks
+        time.sleep(900)
+
+sync_thread = threading.Thread(target=run_periodic_live_sync, daemon=True)
+sync_thread.start()
 
 # 1. Load Trained ML Model (Brain 1)
 MODEL_PATH = os.path.join(DIRECTORY, "ml_engine1", "models", "attribution_model.pkl")
@@ -62,7 +97,8 @@ class DevHandler(SimpleHTTPRequestHandler):
                 "status": "online",
                 "service": "HeatWatch Full-Stack Dev Server",
                 "ml_attribution_model_loaded": attribution_model is not None,
-                "ml_anomaly_engine_active": anomaly_engine is not None
+                "ml_anomaly_engine_active": anomaly_engine is not None,
+                "auto_sync_active": live_service is not None
             }
             body = json.dumps(status_obj).encode('utf-8')
             self.send_response(200)
@@ -79,6 +115,24 @@ class DevHandler(SimpleHTTPRequestHandler):
                 "ledger": VERIFIED_AUDIT_LEDGER
             }
             body = json.dumps(stats).encode('utf-8')
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', str(len(body)))
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(body)
+            self.wfile.flush()
+            return
+        elif self.path == '/api/firms/sync':
+            if live_service:
+                try:
+                    live_service.run_sync()
+                    res = {"status": "success", "message": "Live NASA FIRMS satellite data and ML attribution re-synced successfully."}
+                except Exception as e:
+                    res = {"status": "error", "message": str(e)}
+            else:
+                res = {"status": "error", "message": "Live sync service not loaded"}
+            body = json.dumps(res).encode('utf-8')
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.send_header('Content-Length', str(len(body)))

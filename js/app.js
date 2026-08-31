@@ -3,7 +3,7 @@
  * Coordinates GIS Map, Analytics, Inspector HUD, Alert Center, and Guided Demo
  */
 
-import { THERMAL_OBJECTS, STUDY_REGIONS, OSM_FACILITIES, ALL_INDIA_FACILITIES, HISTORICAL_FRP_DATA } from './data.js';
+import { THERMAL_OBJECTS, STUDY_REGIONS, OSM_FACILITIES, ALL_INDIA_FACILITIES, HISTORICAL_FRP_DATA, getHistoricalFrpForObject } from './data.js';
 import { HeatWatchMap } from './map.js';
 import { HeatWatchAnalytics } from './analytics.js';
 import { DemoStoryEngine } from './demo-story.js';
@@ -51,9 +51,15 @@ class HeatWatchApp {
     });
 
     // 4. Initialize Demo Story Engine
-    this.demoEngine = new DemoStoryEngine(this.mapInstance, (stepData, index) => {
-      this.renderDemoStepUI(stepData, index);
-    });
+    this.demoEngine = new DemoStoryEngine(
+      this.mapInstance,
+      (stepData, index) => {
+        this.renderDemoStepUI(stepData, index);
+      },
+      (prevTab) => {
+        this.handleTourEnd(prevTab);
+      }
+    );
 
     // 5. Initialize API Playground
     this.apiPlayground = new ApiPlayground();
@@ -69,17 +75,67 @@ class HeatWatchApp {
     this.setupFacilitySearch();
     this.setupLiveFetchButton();
     this.setupPyrometryAndModelSimulator();
-    this.setupTimelineScrubber();
     this.setupGuidedTour();
 
     // 7. Initial render of selected object (#OBJ-1045)
+    this.populateAnalyticsFacilityDropdown();
     this.updateInspectorHUD(this.selectedObject);
+    this.updateAnalyticsTabView(this.selectedObject);
     this.renderAlertsTable();
     this.renderNasaComparisonMatrix();
     this.updateCategoryChipCounts();
 
+    // 8. Auto-fetch Live NASA FIRMS data and ML attributed clusters immediately
+    if (this.firmsFetcher) {
+      this.firmsFetcher.fetchLiveSatelliteData();
+    }
+
     // Start Live Clock
     this.startClock();
+  }
+
+  switchView(viewId) {
+    this.currentView = viewId;
+    
+    // Normalize view tab ID
+    let sectionId = viewId;
+    if (viewId === 'command-map' || viewId === 'command-map-tab' || viewId === 'view-command-map') sectionId = 'view-command-map';
+    else if (viewId === 'analytics-tab' || viewId === 'analytics' || viewId === 'view-analytics-tab') sectionId = 'view-analytics-tab';
+    else if (viewId === 'alerts-tab' || viewId === 'alerts' || viewId === 'view-alerts-tab') sectionId = 'view-alerts-tab';
+    else if (viewId === 'pyrometry-tab' || viewId === 'pyrometry' || viewId === 'view-pyrometry-tab') sectionId = 'view-pyrometry-tab';
+    else if (viewId === 'comparison-tab' || viewId === 'comparison' || viewId === 'view-comparison-tab') sectionId = 'view-comparison-tab';
+    else if (viewId === 'api-tab' || viewId === 'api' || viewId === 'view-api-tab') sectionId = 'view-api-tab';
+
+    document.querySelectorAll('.view-section').forEach(sec => {
+      if (sec.id === sectionId) {
+        sec.classList.add('active');
+      } else {
+        sec.classList.remove('active');
+      }
+    });
+
+    document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+      const btnView = btn.getAttribute('data-view');
+      if (btnView === viewId || btnView === sectionId) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    // Invalidate map size if switching back to command map
+    if (sectionId === 'view-command-map' && this.mapInstance && this.mapInstance.map) {
+      setTimeout(() => {
+        this.mapInstance.map.invalidateSize();
+      }, 100);
+    }
+
+    // Refresh analytics tab with currently selected object if switching to analytics
+    if (sectionId === 'view-analytics-tab') {
+      setTimeout(() => {
+        this.updateAnalyticsTabView(this.selectedObject);
+      }, 50);
+    }
   }
 
   setupNavigation() {
@@ -329,7 +385,7 @@ class HeatWatchApp {
 
     // Refresh icons
     if (window.lucide) {
-      setTimeout(() => lucide.createIcons(), 50);
+      setTimeout(() => { if (window.lucide) window.lucide.createIcons(); }, 50);
     }
 
     // Trigger analytics charts if switching to analytics
@@ -452,8 +508,257 @@ class HeatWatchApp {
   handleSelectObject(obj) {
     this.selectedObject = obj;
     this.updateInspectorHUD(obj);
+    this.updateAnalyticsTabView(obj);
     const sidebar = document.getElementById('map-sidebar-inspector');
     if (sidebar) sidebar.scrollTop = 0;
+  }
+
+  populateAnalyticsFacilityDropdown() {
+    const selectEl = document.getElementById('select-analytics-facility');
+    if (!selectEl) return;
+
+    let html = '<option value="">-- Choose Any Facility / Hotspot Across India --</option>';
+    const categories = [
+      { key: "REF", label: "Petrochemical Refineries & Terminals" },
+      { key: "PWR", label: "Thermal Power Plants (Coal / Gas)" },
+      { key: "STL", label: "Integrated Steel Mills & Smelters" },
+      { key: "MINE", label: "Coal Basins & Mines" },
+      { key: "CHEM", label: "Chemical & Fertilizer Plants" },
+      { key: "FOR", label: "Forest Fire Hotspots" },
+      { key: "AGR", label: "Agricultural Fire Hotspots" }
+    ];
+
+    categories.forEach(cat => {
+      const facs = ALL_INDIA_FACILITIES.filter(f => f.id.startsWith(cat.key));
+      if (facs.length > 0) {
+        html += `<optgroup label="${cat.label}">`;
+        facs.forEach(f => {
+          html += `<option value="FAC-${f.id}">${f.name} (${f.state})</option>`;
+        });
+        html += `</optgroup>`;
+      }
+    });
+
+    selectEl.innerHTML = html;
+    selectEl.addEventListener('change', (e) => {
+      const val = e.target.value;
+      if (!val) return;
+      const cleanId = val.replace('FAC-', '');
+      const fac = ALL_INDIA_FACILITIES.find(f => f.id === cleanId);
+      if (fac && this.mapInstance) {
+        const synObj = this.mapInstance.synthesizeObjectFromFacility(fac);
+        this.handleSelectObject(synObj);
+      }
+    });
+  }
+
+  updateAnalyticsTabView(obj) {
+    if (!obj) return;
+
+    const idEl = document.getElementById('analytics-facility-id');
+    const nameEl = document.getElementById('analytics-facility-name');
+    const locEl = document.getElementById('analytics-facility-loc');
+    const statusEl = document.getElementById('analytics-facility-status');
+    const ratioEl = document.getElementById('analytics-facility-ratio');
+    const frpEl = document.getElementById('kpi-analytics-frp');
+    const baseEl = document.getElementById('kpi-analytics-baseline');
+    const tempEl = document.getElementById('kpi-analytics-temp');
+    const tempCEl = document.getElementById('kpi-analytics-temp-c');
+    const confEl = document.getElementById('kpi-analytics-conf');
+    const catEl = document.getElementById('kpi-analytics-category');
+    const titleEl = document.getElementById('title-analytics-timeseries');
+    const badgeEl = document.getElementById('badge-analytics-timeseries');
+    const selectEl = document.getElementById('select-analytics-facility');
+
+    const cleanId = String(obj.regionId || obj.id || '').replace(/^(FAC-|OBJ-)/, '');
+    const facRef = ALL_INDIA_FACILITIES.find(f => f.id === cleanId || f.id === obj.id || `FAC-${f.id}` === obj.id || `OBJ-${f.id}` === obj.id);
+
+    if (selectEl) {
+      const optionsList = selectEl.options ? Array.from(selectEl.options) : (selectEl.querySelectorAll ? Array.from(selectEl.querySelectorAll('option')) : []);
+      const optMatch = optionsList.find(opt => 
+        opt.value === `FAC-${cleanId}` || 
+        opt.value === cleanId || 
+        (obj.name && opt.text && opt.text.toLowerCase().includes(obj.name.toLowerCase().split('(')[0].trim()))
+      );
+      if (optMatch) {
+        selectEl.value = optMatch.value;
+      }
+    }
+
+    const facilityName = obj.name || facRef?.name || 'Selected Facility';
+    const categoryName = obj.categoryLabel || obj.subtype || facRef?.type || 'Industrial Thermal Emitter';
+
+    if (idEl) idEl.textContent = `${obj.id} • ${categoryName.toUpperCase()}`;
+    if (nameEl) nameEl.textContent = facilityName;
+    if (locEl) {
+      const city = facRef?.city || obj.matchedFacility?.city || facilityName.split('(')[0].trim();
+      const state = facRef?.state || obj.matchedFacility?.state || obj.state || 'India';
+      const coords = obj.coordinates || facRef?.coordinates || [22.4707, 69.8358];
+      const lat = coords[0] ? Number(coords[0]).toFixed(4) : '22.4707';
+      const lon = coords[1] ? Number(coords[1]).toFixed(4) : '69.8358';
+      locEl.textContent = `${city}, ${state} • Lat: ${lat}, Lon: ${lon}`;
+    }
+
+    const curFrp = obj.thermal?.currentFRP !== undefined ? Number(obj.thermal.currentFRP) : (facRef?.baselineFRP || 0);
+    const baseFrp = obj.thermal?.historicalMeanFRP !== undefined ? Number(obj.thermal.historicalMeanFRP) : (facRef?.baselineFRP || 0);
+    const ratio = baseFrp > 0 ? (Math.round((curFrp / baseFrp) * 100) / 100) : (obj.thermal?.frpDeviationRatio || 1.0);
+
+    if (ratioEl) ratioEl.textContent = `${ratio}× Baseline`;
+
+    if (statusEl) {
+      if (obj.status === 'high_priority' || ratio >= 2.0) {
+        statusEl.textContent = "🔴 HIGH-PRIORITY SURGE";
+        statusEl.style.color = "#ff4747";
+      } else if (obj.status === 'elevated' || ratio >= 1.4) {
+        statusEl.textContent = "🟡 ELEVATED FLUX";
+        statusEl.style.color = "#f59e0b";
+      } else {
+        statusEl.textContent = "🟢 NOMINAL BASELINE";
+        statusEl.style.color = "#10b981";
+      }
+    }
+
+    if (frpEl) frpEl.textContent = `${curFrp} MW`;
+    if (baseEl) baseEl.textContent = `${baseFrp} MW`;
+    
+    const tempK = obj.thermal?.currentBrightnessTempK || (curFrp > 0 ? Math.round(320 + curFrp * 0.85) : 301.2);
+    if (tempEl) tempEl.textContent = `${tempK} K`;
+    if (tempCEl) tempCEl.textContent = `${Math.round((tempK - 273.15) * 10) / 10} °C (Radiometric Temp)`;
+    if (confEl) confEl.textContent = obj.confidence || '94.2%';
+    if (catEl) catEl.textContent = categoryName;
+
+    if (titleEl) titleEl.textContent = `${facilityName} — 90-Day Baseline vs Observed FRP`;
+    if (badgeEl) badgeEl.textContent = `${obj.id} Telemetry`;
+
+    if (this.analyticsInstance) {
+      this.analyticsInstance.updateAllAnalytics(obj);
+    }
+  }
+
+  getAllCategorizedObjects() {
+    const list = [...THERMAL_OBJECTS];
+    if (this.liveClusters && this.liveClusters.length > 0) {
+      this.liveClusters.forEach(cl => {
+        if (!list.find(o => o.id === cl.id)) {
+          list.push(cl);
+        }
+      });
+    }
+    return list;
+  }
+
+  sortObjects(list, sortOrder) {
+    const sorted = [...list];
+    if (sortOrder === 'frp_desc') {
+      sorted.sort((a, b) => (b.thermal?.currentFRP || 0) - (a.thermal?.currentFRP || 0));
+    } else if (sortOrder === 'frp_asc') {
+      sorted.sort((a, b) => (a.thermal?.currentFRP || 0) - (b.thermal?.currentFRP || 0));
+    } else if (sortOrder === 'anomaly_desc') {
+      sorted.sort((a, b) => (b.historicalProfile?.anomalyScore || 0) - (a.historicalProfile?.anomalyScore || 0));
+    } else if (sortOrder === 'conf_desc') {
+      sorted.sort((a, b) => (b.evidenceScore || 0) - (a.evidenceScore || 0));
+    }
+    return sorted;
+  }
+
+  setCategoryFilter(categoryKey) {
+    this.currentCategoryFilter = categoryKey;
+
+    // 1. Update Map Ribbon Chips Active State
+    document.querySelectorAll('.category-chip').forEach(chip => {
+      if (chip.getAttribute('data-category') === categoryKey) {
+        chip.classList.add('active');
+      } else {
+        chip.classList.remove('active');
+      }
+    });
+
+    // 2. Update Alert Center Tabs Active State
+    document.querySelectorAll('.alert-tab-btn').forEach(tab => {
+      if (tab.getAttribute('data-category') === categoryKey) {
+        tab.classList.add('active');
+      } else {
+        tab.classList.remove('active');
+      }
+    });
+
+    // 3. Filter Map Layers (OSM facilities and thermal objects)
+    if (this.mapInstance) {
+      this.mapInstance.renderOsmFacilities(categoryKey);
+
+      const allObjects = this.getAllCategorizedObjects();
+      let filtered = allObjects;
+
+      if (categoryKey !== 'all') {
+        filtered = allObjects.filter(obj => {
+          const cat = obj.categoryGroup || obj.primaryCategory;
+          if (categoryKey === 'industrial_fire') return cat === 'industrial_fire' || (obj.primaryCategory === 'industrial' && obj.status === 'high_priority');
+          if (categoryKey === 'routine_flare') return cat === 'routine_flare' || (obj.primaryCategory === 'industrial' && obj.status !== 'high_priority');
+          if (categoryKey === 'mining_fire') return cat === 'mining_fire' || obj.primaryCategory === 'mining';
+          if (categoryKey === 'forest_fire') return cat === 'forest_fire' || obj.primaryCategory === 'wildfire';
+          if (categoryKey === 'agriculture_fire') return cat === 'agriculture_fire' || obj.primaryCategory === 'agriculture';
+          if (categoryKey === 'glint_filtered') return cat === 'glint_filtered';
+          return cat === categoryKey;
+        });
+      }
+
+      const sorted = this.sortObjects(filtered, this.currentSortOrder);
+      this.mapInstance.renderThermalClusters(sorted);
+    }
+
+    // 4. Update Alert Center table & counts
+    this.renderAlertsTable();
+    this.updateCategoryChipCounts();
+  }
+
+  setSortOrder(sortOrder) {
+    this.currentSortOrder = sortOrder;
+    this.renderAlertsTable();
+    if (this.mapInstance) {
+      const allObjects = this.getAllCategorizedObjects();
+      const sorted = this.sortObjects(allObjects, sortOrder);
+      this.mapInstance.renderThermalClusters(sorted);
+    }
+  }
+
+  updateCategoryChipCounts() {
+    const all = this.getAllCategorizedObjects();
+    const counts = {
+      all: all.length,
+      industrial_fire: 0,
+      routine_flare: 0,
+      mining_fire: 0,
+      forest_fire: 0,
+      agriculture_fire: 0,
+      glint_filtered: 0
+    };
+
+    all.forEach(o => {
+      const cat = o.categoryGroup || o.primaryCategory;
+      if (cat === 'industrial_fire' || (o.primaryCategory === 'industrial' && o.status === 'high_priority')) counts.industrial_fire++;
+      else if (cat === 'routine_flare' || o.primaryCategory === 'industrial') counts.routine_flare++;
+      else if (cat === 'mining_fire' || o.primaryCategory === 'mining') counts.mining_fire++;
+      else if (cat === 'forest_fire' || o.primaryCategory === 'wildfire') counts.forest_fire++;
+      else if (cat === 'agriculture_fire' || o.primaryCategory === 'agriculture') counts.agriculture_fire++;
+      else if (cat === 'glint_filtered') counts.glint_filtered++;
+      else counts.routine_flare++;
+    });
+
+    const setBadge = (sel, num) => {
+      const el = document.querySelector(sel);
+      if (el) {
+        const badge = el.querySelector('.chip-count');
+        if (badge) badge.textContent = num;
+      }
+    };
+
+    setBadge('.category-chip[data-category="all"]', counts.all);
+    setBadge('.category-chip[data-category="industrial_fire"]', counts.industrial_fire);
+    setBadge('.category-chip[data-category="routine_flare"]', counts.routine_flare);
+    setBadge('.category-chip[data-category="mining_fire"]', counts.mining_fire);
+    setBadge('.category-chip[data-category="forest_fire"]', counts.forest_fire);
+    setBadge('.category-chip[data-category="agriculture_fire"]', counts.agriculture_fire);
+    setBadge('.category-chip[data-category="glint_filtered"]', counts.glint_filtered);
   }
 
   setupCategoryFiltersAndSorting() {
@@ -968,11 +1273,11 @@ class HeatWatchApp {
     // Auto-fit map bounds so that ALL matching places across India are framed and visible!
     if (filteredObjects && filteredObjects.length > 1) {
       const coords = filteredObjects.map(o => o.coordinates).filter(c => c && c.length === 2);
-      if (coords.length > 1) {
+      if (coords.length > 1 && typeof L !== 'undefined' && typeof L.latLngBounds === 'function' && this.mapInstance?.map?.fitBounds) {
         const bounds = L.latLngBounds(coords);
         this.mapInstance.map.fitBounds(bounds, { padding: [70, 70], maxZoom: 10, duration: 1.0 });
       }
-    } else if (targetObj) {
+    } else if (targetObj && this.mapInstance?.map?.flyTo) {
       this.mapInstance.map.flyTo(targetObj.coordinates, 12, { duration: 1.0 });
     }
 
@@ -1308,7 +1613,7 @@ class HeatWatchApp {
 
     dossierModal.classList.add('active');
     if (window.lucide) {
-      setTimeout(() => lucide.createIcons(), 50);
+      setTimeout(() => { if (window.lucide) window.lucide.createIcons(); }, 50);
     }
   }
 
@@ -1688,160 +1993,6 @@ class HeatWatchApp {
     if (window.lucide) lucide.createIcons();
   }
 
-  setupGuidedTour() {
-    const tourBtn = document.getElementById('btn-guided-demo');
-    const tourOverlay = document.getElementById('sih-tour-overlay');
-    const tourCloseBtn = document.getElementById('btn-tour-close');
-    const tourPrevBtn = document.getElementById('btn-tour-prev');
-    const tourNextBtn = document.getElementById('btn-tour-next');
-    const tourPlayBtn = document.getElementById('btn-tour-play-pause');
-    const ribbon = document.getElementById('map-category-ribbon');
-    const timeScrubber = document.getElementById('map-time-scrubber');
-
-    if (tourBtn && this.demoEngine) {
-      tourBtn.addEventListener('click', () => {
-        this.switchView('command-map');
-        if (tourOverlay) tourOverlay.style.display = 'flex';
-        if (ribbon) ribbon.style.display = 'none';
-        if (timeScrubber) timeScrubber.style.display = 'none';
-        this.demoEngine.startDemo();
-      });
-    }
-
-    const closeTour = () => {
-      if (tourOverlay) tourOverlay.style.display = 'none';
-      if (ribbon) ribbon.style.display = 'flex';
-      if (timeScrubber) timeScrubber.style.display = 'flex';
-      if (this.demoEngine) this.demoEngine.stopAutoPlay();
-    };
-
-    if (tourCloseBtn) {
-      tourCloseBtn.addEventListener('click', closeTour);
-    }
-
-    if (tourPrevBtn && this.demoEngine) {
-      tourPrevBtn.addEventListener('click', () => this.demoEngine.prevStep());
-    }
-
-    if (tourNextBtn && this.demoEngine) {
-      tourNextBtn.addEventListener('click', () => this.demoEngine.nextStep());
-    }
-
-    if (tourPlayBtn && this.demoEngine) {
-      tourPlayBtn.addEventListener('click', () => {
-        const isPlaying = this.demoEngine.toggleAutoPlay();
-        tourPlayBtn.classList.toggle('playing', isPlaying);
-        const textPlay = document.getElementById('text-tour-play');
-        const iconPlay = document.getElementById('icon-tour-play');
-        if (textPlay) textPlay.textContent = isPlaying ? 'Pause' : 'Auto Play';
-        if (iconPlay) {
-          iconPlay.setAttribute('data-lucide', isPlaying ? 'pause' : 'play');
-          if (window.lucide) lucide.createIcons();
-        }
-      });
-    }
-
-    // Keyboard navigation during tour
-    window.addEventListener('keydown', (e) => {
-      if (!tourOverlay || tourOverlay.style.display === 'none') return;
-      if (e.key === 'ArrowRight') {
-        this.demoEngine.nextStep();
-      } else if (e.key === 'ArrowLeft') {
-        this.demoEngine.prevStep();
-      } else if (e.key === ' ' || e.code === 'Space') {
-        if (tourPlayBtn) tourPlayBtn.click();
-        e.preventDefault();
-      } else if (e.key === 'Escape') {
-        closeTour();
-      }
-    });
-  }
-
-  renderDemoStepUI(stepData, index) {
-    if (!stepData) return;
-
-    const tourOverlay = document.getElementById('sih-tour-overlay');
-    if (tourOverlay && tourOverlay.style.display === 'none') {
-      tourOverlay.style.display = 'flex';
-    }
-
-    const totalSteps = 8;
-    const badgeEl = document.getElementById('tour-step-badge');
-    const barEl = document.getElementById('tour-progress-bar');
-    const titleEl = document.getElementById('tour-title');
-    const descEl = document.getElementById('tour-desc');
-    const actionEl = document.getElementById('tour-action-text');
-
-    if (badgeEl) badgeEl.textContent = `STEP ${index + 1} OF ${totalSteps}`;
-    if (barEl) barEl.style.width = `${((index + 1) / totalSteps) * 100}%`;
-    if (titleEl) titleEl.textContent = stepData.title;
-    if (descEl) descEl.textContent = stepData.description;
-    if (actionEl) actionEl.textContent = stepData.actionHighlight;
-
-    const inspectorSidebar = document.getElementById('map-sidebar-inspector');
-
-    // Dynamic Visual Actions per step:
-    if (index === 0) {
-      // Step 1: Raw Ingestion
-      if (this.mapInstance) {
-        this.mapInstance.setBaseMap('satellite');
-      }
-      this.closeModal('modal-incident-dossier');
-    } else if (index === 1) {
-      // Step 2: Multimodal GIS Overlays
-      this.closeModal('modal-incident-dossier');
-      if (this.mapInstance) {
-        this.mapInstance.toggleLayer('osmFacilities', true);
-        this.mapInstance.toggleLayer('worldCoverBuffers', true);
-      }
-    } else if (index === 2) {
-      // Step 3: ST-DBSCAN Clustering
-      this.closeModal('modal-incident-dossier');
-      if (inspectorSidebar) inspectorSidebar.classList.remove('collapsed');
-      this.handleSelectObject(THERMAL_OBJECTS[0]);
-    } else if (index === 3) {
-      // Step 4: AI Source Segregation
-      this.closeModal('modal-incident-dossier');
-      if (inspectorSidebar) {
-        inspectorSidebar.classList.remove('collapsed');
-        const evCard = document.getElementById('hud-evidence-list');
-        if (evCard) evCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    } else if (index === 4) {
-      // Step 5: 90-Day Baseline
-      this.closeModal('modal-incident-dossier');
-      if (inspectorSidebar) {
-        inspectorSidebar.classList.remove('collapsed');
-        const chartEl = document.getElementById('sidebar-frp-chart');
-        if (chartEl) chartEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    } else if (index === 5) {
-      // Step 6: Acute Anomaly Surge
-      this.closeModal('modal-incident-dossier');
-      if (inspectorSidebar) {
-        inspectorSidebar.classList.remove('collapsed');
-        const sevBadge = document.getElementById('hud-obj-severity');
-        if (sevBadge) {
-          sevBadge.classList.add('pulse-anomaly');
-          setTimeout(() => sevBadge.classList.remove('pulse-anomaly'), 2500);
-        }
-      }
-    } else if (index === 6) {
-      // Step 7: NASA Static Mask Comparison
-      this.closeModal('modal-incident-dossier');
-      if (inspectorSidebar) {
-        inspectorSidebar.classList.remove('collapsed');
-        const compCard = document.querySelector('.nasa-comparison-card');
-        if (compCard) compCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    } else if (index === 7) {
-      // Step 8: Actionable Emergency Triage Dossier
-      this.openIncidentDossierModal();
-    }
-
-    if (window.lucide) lucide.createIcons();
-  }
-
   openSpectralModal(objectId) {
     const obj = THERMAL_OBJECTS.find(o => o.id === objectId) || this.selectedObject;
     const modal = document.getElementById('modal-spectral-inspector');
@@ -2040,7 +2191,9 @@ class HeatWatchApp {
     }).join('');
 
     if (window.lucide) {
-      setTimeout(() => lucide.createIcons(), 50);
+      setTimeout(() => {
+        if (window.lucide) window.lucide.createIcons();
+      }, 50);
     }
   }
 
@@ -2332,39 +2485,26 @@ class HeatWatchApp {
 
   setupTimelineScrubber() {
     const slider = document.getElementById('map-timeline-slider');
+    if (!slider) return;
     const playBtn = document.getElementById('btn-timeline-play');
     const playIcon = document.getElementById('icon-timeline-play');
-    const playLabel = document.getElementById('label-timeline-play');
-    const prevBtn = document.getElementById('btn-timeline-prev');
-    const nextBtn = document.getElementById('btn-timeline-next');
     const dateBadge = document.getElementById('scrubber-date-badge');
     const dayBadge = document.getElementById('scrubber-day-badge');
-    const liveIndicator = document.getElementById('scrubber-live-indicator');
-    const speedChips = document.querySelectorAll('.speed-chip');
+    const telemetryPill = document.getElementById('scrubber-telemetry-pill');
 
     let isPlaying = false;
     let playInterval = null;
-    let playbackSpeed = 1;
 
     const startDate = new Date("2026-06-01T00:00:00Z");
 
     const updateDayUI = (dayIndex) => {
-      const curDate = new Date(startDate.getTime() + (dayIndex - 1) * 86400000);
-      const dateStr = curDate.toISOString().substring(0, 10);
-      
-      if (dateBadge) dateBadge.textContent = dateStr;
-      if (dayBadge) dayBadge.textContent = `Day ${dayIndex} of 90`;
-      
-      if (liveIndicator) {
+      if (dayBadge) {
         if (dayIndex === 90) {
-          liveIndicator.textContent = "LIVE PASS";
-          liveIndicator.className = "scrubber-live-indicator";
+          dayBadge.textContent = "HISTORICAL: Day 90";
         } else {
-          liveIndicator.textContent = "HISTORICAL";
-          liveIndicator.className = "scrubber-live-indicator historical";
+          dayBadge.textContent = `HISTORICAL: Day -${90 - dayIndex}`;
         }
       }
-
       this.applyHistoricalDay(dayIndex);
     };
 
@@ -2377,46 +2517,12 @@ class HeatWatchApp {
       slider.addEventListener('change', handleSliderChange);
     }
 
-    if (prevBtn) {
-      prevBtn.addEventListener('click', () => {
-        if (slider) {
-          let val = Math.max(1, parseInt(slider.value) - 1);
-          slider.value = val;
-          updateDayUI(val);
-        }
-      });
-    }
-
-    if (nextBtn) {
-      nextBtn.addEventListener('click', () => {
-        if (slider) {
-          let val = Math.min(90, parseInt(slider.value) + 1);
-          slider.value = val;
-          updateDayUI(val);
-        }
-      });
-    }
-
-    speedChips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        speedChips.forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        playbackSpeed = parseFloat(chip.getAttribute('data-speed') || 1);
-        if (isPlaying) {
-          stopPlayback();
-          startPlayback();
-        }
-      });
-    });
-
     const startPlayback = () => {
       isPlaying = true;
       if (playBtn) playBtn.classList.add('playing');
-      if (playLabel) playLabel.textContent = "Pause";
       if (playIcon) playIcon.setAttribute('data-lucide', 'pause');
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
 
-      const intervalMs = Math.round(350 / playbackSpeed);
       playInterval = setInterval(() => {
         if (!slider) return;
         let val = parseInt(slider.value);
@@ -2430,7 +2536,7 @@ class HeatWatchApp {
         if (val === 90) {
           stopPlayback();
         }
-      }, intervalMs);
+      }, 300);
     };
 
     const stopPlayback = () => {
@@ -2440,9 +2546,8 @@ class HeatWatchApp {
         playInterval = null;
       }
       if (playBtn) playBtn.classList.remove('playing');
-      if (playLabel) playLabel.textContent = "Play";
       if (playIcon) playIcon.setAttribute('data-lucide', 'play');
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons();
     };
 
     if (playBtn) {
@@ -2458,8 +2563,8 @@ class HeatWatchApp {
 
   applyHistoricalDay(dayIndex) {
     if (!this.selectedObject) return;
-    const historyList = HISTORICAL_FRP_DATA[this.selectedObject.id] || [];
-    const record = historyList[dayIndex - 1];
+    const historyList = getHistoricalFrpForObject(this.selectedObject.id);
+    const record = historyList && historyList[dayIndex - 1];
     if (!record) return;
 
     // Update physical telemetry in Inspector HUD for selected day
@@ -2467,6 +2572,7 @@ class HeatWatchApp {
     const frpDevEl = document.getElementById('hud-stat-frp-dev');
     const tempEl = document.getElementById('hud-stat-temp');
     const statusTag = document.getElementById('hud-obj-severity');
+    const telemetryPill = document.getElementById('scrubber-telemetry-pill');
 
     if (frpEl) frpEl.textContent = `${record.frp} MW`;
     if (tempEl) tempEl.textContent = `${record.tempK} K`;
@@ -2477,25 +2583,274 @@ class HeatWatchApp {
       frpDevEl.style.color = ratio > 2.0 ? '#ff4747' : '#00f0ff';
     }
 
+    let statusText = "NORMAL OPERATIONAL BASELINE";
+    let statusClass = "severity-tag verified-clean";
+    let pillHtml = `${record.frp} MW • ${ratio}× Baseline`;
+
+    if (ratio >= 2.5) {
+      statusText = "HIGH-PRIORITY ANOMALY";
+      statusClass = "severity-tag high-priority";
+      pillHtml = `${record.frp} MW • <strong style="color:#ef4444;">${ratio}× SURGE</strong>`;
+    } else if (ratio >= 1.5) {
+      statusText = "ELEVATED THERMAL FLUX";
+      statusClass = "severity-tag elevated";
+      pillHtml = `${record.frp} MW • <span style="color:#f59e0b;">${ratio}× ELEVATED</span>`;
+    }
+
     if (statusTag) {
-      if (ratio >= 2.5) {
-        statusTag.textContent = "HIGH-PRIORITY ANOMALY";
-        statusTag.className = "severity-tag high-priority";
-      } else if (ratio >= 1.5) {
-        statusTag.textContent = "ELEVATED THERMAL FLUX";
-        statusTag.className = "severity-tag elevated";
-      } else {
-        statusTag.textContent = "NORMAL OPERATIONAL BASELINE";
-        statusTag.className = "severity-tag verified-clean";
-      }
+      statusTag.textContent = statusText;
+      statusTag.className = statusClass;
+    }
+
+    if (telemetryPill) {
+      telemetryPill.innerHTML = pillHtml;
     }
 
     // Refresh 90-Day Baseline Chart with highlighted day marker
-    this.analyticsInstance.renderFrpTimeSeriesChart('canvas-frp-baseline', this.selectedObject.id, dayIndex);
+    if (this.analyticsInstance) {
+      this.analyticsInstance.renderFrpTimeSeriesChart('canvas-analytics-timeseries', this.selectedObject.id, dayIndex);
+      this.analyticsInstance.renderFrpTimeSeriesChart('sidebar-frp-chart', this.selectedObject.id, dayIndex);
+    }
 
     // Refresh Map markers with day-wise FRP & color
     if (this.mapInstance && typeof this.mapInstance.updateHistoricalClusters === 'function') {
       this.mapInstance.updateHistoricalClusters(dayIndex);
+    }
+  }
+
+  setupGuidedTour() {
+    const btnStartTour = document.getElementById('btn-guided-demo');
+    const btnCloseTour = document.getElementById('btn-close-sih-tour');
+    const btnTourPrev = document.getElementById('btn-tour-prev');
+    const btnTourNext = document.getElementById('btn-tour-next');
+    const btnTourRestart = document.getElementById('btn-tour-restart');
+
+    if (btnStartTour) {
+      btnStartTour.addEventListener('click', () => {
+        if (this.demoEngine) {
+          this.demoEngine.startTour(0);
+        }
+      });
+    }
+
+    if (btnCloseTour) {
+      btnCloseTour.addEventListener('click', () => {
+        if (this.demoEngine) {
+          this.demoEngine.endTour();
+        }
+      });
+    }
+
+    if (btnTourPrev) {
+      btnTourPrev.addEventListener('click', () => {
+        if (this.demoEngine) {
+          this.demoEngine.prevStep();
+        }
+      });
+    }
+
+    if (btnTourNext) {
+      btnTourNext.addEventListener('click', () => {
+        if (this.demoEngine) {
+          this.demoEngine.nextStep();
+        }
+      });
+    }
+
+    if (btnTourRestart) {
+      btnTourRestart.addEventListener('click', () => {
+        if (this.demoEngine) {
+          this.demoEngine.restartTour();
+        }
+      });
+    }
+  }
+
+  renderDemoStepUI(stepData, index) {
+    const tourOverlay = document.getElementById('sih-tour-overlay');
+    if (!tourOverlay) return;
+
+    tourOverlay.style.display = 'flex';
+
+    // If on analytics steps (Step 6 / Step 7), refresh analytics view immediately
+    if (stepData.viewTab === 'view-analytics-tab' || stepData.viewTab === 'view-analytics') {
+      const targetObj = (stepData.targetObjectId ? (THERMAL_OBJECTS.find(o => o.id === stepData.targetObjectId) || this.selectedObject) : this.selectedObject) || THERMAL_OBJECTS[0];
+      this.updateAnalyticsTabView(targetObj);
+    }
+
+    // Header & Badges
+    const badgeEl = document.getElementById('tour-step-badge');
+    if (badgeEl) badgeEl.textContent = `STEP ${index + 1} / ${this.demoEngine.totalSteps}`;
+
+    const progressFill = document.getElementById('tour-progress-fill');
+    if (progressFill) {
+      progressFill.style.width = `${((index + 1) / this.demoEngine.totalSteps) * 100}%`;
+    }
+
+    // Texts
+    const titleEl = document.getElementById('tour-step-title');
+    if (titleEl) titleEl.textContent = stepData.title;
+
+    const subtitleEl = document.getElementById('tour-step-subtitle');
+    if (subtitleEl) subtitleEl.textContent = stepData.subtitle || '';
+
+    const narrationEl = document.getElementById('tour-narration-text');
+    if (narrationEl) narrationEl.textContent = stepData.narration;
+
+    const actionEl = document.getElementById('tour-action-text');
+    if (actionEl) actionEl.textContent = stepData.actionHighlight || '';
+
+    // Step Dots
+    const dotsContainer = document.getElementById('tour-step-dots');
+    if (dotsContainer) {
+      dotsContainer.innerHTML = '';
+      for (let i = 0; i < this.demoEngine.totalSteps; i++) {
+        const dot = document.createElement('span');
+        dot.className = `tour-dot ${i === index ? 'active' : ''}`;
+        dot.title = `Jump to Step ${i + 1}`;
+        dot.addEventListener('click', () => {
+          this.demoEngine.goToStep(i + 1);
+        });
+        dotsContainer.appendChild(dot);
+      }
+    }
+
+    // Prev / Next button states
+    const btnPrev = document.getElementById('btn-tour-prev');
+    if (btnPrev) {
+      btnPrev.disabled = index === 0;
+    }
+
+    const btnNext = document.getElementById('btn-tour-next');
+    if (btnNext) {
+      if (index === this.demoEngine.totalSteps - 1) {
+        btnNext.innerHTML = `Finish Tour <i data-lucide="check"></i>`;
+      } else {
+        btnNext.innerHTML = `Next <i data-lucide="chevron-right"></i>`;
+      }
+    }
+
+    // Dynamic Visual Block Render
+    const visualContainer = document.getElementById('tour-visual-container');
+    if (visualContainer) {
+      visualContainer.innerHTML = '';
+
+      if (stepData.visualFlow) {
+        visualContainer.innerHTML = `
+          <div class="tour-flow-grid">
+            ${stepData.visualFlow.map((node, nIdx) => `
+              <div class="tour-flow-node ${nIdx === stepData.visualFlow.length - 1 ? 'active-highlight' : ''}">
+                <strong>${node.label}</strong>
+                <small>${node.sub}</small>
+              </div>
+              ${nIdx < stepData.visualFlow.length - 1 ? '<span class="tour-flow-arrow">➔</span>' : ''}
+            `).join('')}
+          </div>
+        `;
+      } else if (stepData.pipelineStages) {
+        visualContainer.innerHTML = `
+          <div style="display: flex; flex-direction: column; gap: 0.3rem;">
+            <div style="font-size: 0.65rem; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Multimodal Context Pipeline</div>
+            <div class="tour-flow-grid">
+              ${stepData.pipelineStages.map((stg, sIdx) => `
+                <div class="tour-flow-node ${sIdx === stepData.pipelineStages.length - 1 ? 'active-highlight' : ''}">
+                  <strong>${stg.step}</strong>
+                  <small>${stg.note}</small>
+                </div>
+                ${sIdx < stepData.pipelineStages.length - 1 ? '<span class="tour-flow-arrow">➔</span>' : ''}
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } else if (stepData.callout) {
+        visualContainer.innerHTML = `
+          <div style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 6px; padding: 0.6rem 0.85rem; text-align: center;">
+            <span style="font-family: var(--font-heading); font-size: 0.95rem; font-weight: 800; color: #fca5a5; letter-spacing: 0.04em;">
+              ${stepData.callout}
+            </span>
+          </div>
+        `;
+      } else if (stepData.realMetrics) {
+        visualContainer.innerHTML = `
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem;">
+            ${Object.entries(stepData.realMetrics).map(([k, v]) => `
+              <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); padding: 0.3rem 0.5rem; border-radius: 4px; text-align: center;">
+                <div style="font-size: 0.62rem; color: #94a3b8; text-transform: uppercase;">${k.replace(/([A-Z])/g, ' $1')}</div>
+                <div style="font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; color: #f8fafc; margin-top: 1px;">${v}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else if (stepData.comparison) {
+        visualContainer.innerHTML = `
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem;">
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); padding: 0.5rem; border-radius: 6px;">
+              <strong style="font-size: 0.72rem; color: #94a3b8; display: block; margin-bottom: 0.3rem;">${stepData.comparison.left.title}</strong>
+              <div style="font-size: 0.7rem; color: #64748b; line-height: 1.4;">${stepData.comparison.left.steps.join(' ➔ ')}</div>
+            </div>
+            <div style="background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); padding: 0.5rem; border-radius: 6px;">
+              <strong style="font-size: 0.72rem; color: #38bdf8; display: block; margin-bottom: 0.3rem;">${stepData.comparison.right.title}</strong>
+              <div style="font-size: 0.7rem; color: #e2e8f0; line-height: 1.4;">${stepData.comparison.right.steps.join(' ➔ ')}</div>
+            </div>
+          </div>
+          <div style="text-align: center; margin-top: 0.45rem; font-size: 0.72rem; font-weight: 700; color: #38bdf8;">
+            "${stepData.comparison.footer}"
+          </div>
+        `;
+      } else if (stepData.pipeline) {
+        visualContainer.innerHTML = `
+          <div class="tour-flow-grid">
+            ${stepData.pipeline.map((p, pIdx) => `
+              <div class="tour-flow-node ${pIdx === stepData.pipeline.length - 1 ? 'active-highlight' : ''}">
+                <strong>${p}</strong>
+              </div>
+              ${pIdx < stepData.pipeline.length - 1 ? '<span class="tour-flow-arrow">➔</span>' : ''}
+            `).join('')}
+          </div>
+        `;
+      } else if (stepData.flow) {
+        visualContainer.innerHTML = `
+          <div style="text-align: center; padding: 0.4rem 0;">
+            <div class="tour-flow-grid" style="justify-content: center; margin-bottom: 0.4rem;">
+              ${stepData.flow.map((f, fIdx) => `
+                <span style="font-size: 0.72rem; font-weight: 700; color: #38bdf8;">${f}</span>
+                ${fIdx < stepData.flow.length - 1 ? '<span class="tour-flow-arrow">➔</span>' : ''}
+              `).join('')}
+            </div>
+            <p style="font-size: 0.76rem; color: #cbd5e1; font-weight: 500; margin: 0;">"${stepData.statement}"</p>
+          </div>
+        `;
+      }
+    }
+
+    if (window.lucide) {
+      window.lucide.createIcons();
+    }
+  }
+
+  handleTourEnd(prevTab) {
+    const tourOverlay = document.getElementById('sih-tour-overlay');
+    if (tourOverlay) {
+      tourOverlay.style.display = 'none';
+    }
+
+    // Restore previous active tab
+    if (prevTab) {
+      document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+      const targetSec = document.getElementById(prevTab);
+      if (targetSec) targetSec.classList.add('active');
+
+      document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+        if (btn.getAttribute('data-view') === prevTab) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+
+    if (window.lucide) {
+      window.lucide.createIcons();
     }
   }
 

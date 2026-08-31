@@ -1,0 +1,27 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# Scratch & test scripts
+scratch/
+audit_data.py
+audit_deps.py
+
+# Environment variables & secrets
+.env
+*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp

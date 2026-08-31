@@ -4,56 +4,33 @@
  * anomaly radar breakdowns, regional telemetry, Planck spectral curves, and SHAP bars.
  */
 
-import { HISTORICAL_FRP_DATA, THERMAL_OBJECTS } from './data.js';
+import { HISTORICAL_FRP_DATA, THERMAL_OBJECTS, getHistoricalFrpForObject } from './data.js';
 import { SatellitePyrometryEngine } from './pyrometry.js';
 
 export class HeatWatchAnalytics {
   constructor() {
     this.pyrometry = new SatellitePyrometryEngine();
-    this.charts = {
-      frpTimeSeries: null,
-      landCoverDoughnut: null,
-      anomalyRadar: null,
-      regionalFRPBar: null,
-      planckCurve: null,
-      shapBar: null
-    };
+    this.charts = {};
   }
 
   // Update FRP Baseline Time-Series Chart (with 90-day day scrubber highlight)
-  renderFrpTimeSeriesChart(canvasId, objectId, highlightedDayIndex = 90) {
+  renderFrpTimeSeriesChart(canvasId, objOrId, highlightedDayIndex = 90) {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
 
-    let dataPoints = HISTORICAL_FRP_DATA[objectId];
-    if (!dataPoints || !dataPoints.length) {
-      dataPoints = [];
-      const startDate = new Date("2026-06-01T00:00:00Z");
-      for (let i = 0; i < 90; i++) {
-        const curDate = new Date(startDate.getTime() + i * 86400000);
-        dataPoints.push({
-          dayIndex: i + 1,
-          day: `Day ${i + 1}`,
-          date: curDate.toISOString().substring(0, 10),
-          frp: 0,
-          baseline: 0,
-          threshold: 0,
-          tempK: 298,
-          status: "inactive"
-        });
-      }
-    }
+    const dataPoints = getHistoricalFrpForObject(objOrId);
+    if (!dataPoints || !dataPoints.length) return;
 
     const labels = dataPoints.map(d => d.day);
     const frpValues = dataPoints.map(d => d.frp);
     const baselineValues = dataPoints.map(d => d.baseline);
     const thresholdValues = dataPoints.map(d => d.threshold);
 
-    if (this.charts.frpTimeSeries) {
-      this.charts.frpTimeSeries.destroy();
+    if (this.charts[canvasId]) {
+      this.charts[canvasId].destroy();
     }
 
-    this.charts.frpTimeSeries = new Chart(ctx, {
+    this.charts[canvasId] = new Chart(ctx, {
       type: 'line',
       data: {
         labels: labels,
@@ -159,8 +136,8 @@ export class HeatWatchAnalytics {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
 
-    if (this.charts.landCoverDoughnut) {
-      this.charts.landCoverDoughnut.destroy();
+    if (this.charts[canvasId]) {
+      this.charts[canvasId].destroy();
     }
 
     const labels = [];
@@ -193,7 +170,7 @@ export class HeatWatchAnalytics {
       colors.push('#3b82f6');
     }
 
-    this.charts.landCoverDoughnut = new Chart(ctx, {
+    this.charts[canvasId] = new Chart(ctx, {
       type: 'doughnut',
       data: {
         labels: labels,
@@ -227,11 +204,11 @@ export class HeatWatchAnalytics {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
 
-    if (this.charts.anomalyRadar) {
-      this.charts.anomalyRadar.destroy();
+    if (this.charts[canvasId]) {
+      this.charts[canvasId].destroy();
     }
 
-    this.charts.anomalyRadar = new Chart(ctx, {
+    this.charts[canvasId] = new Chart(ctx, {
       type: 'radar',
       data: {
         labels: ['FRP Deviation', 'Spatial Footprint', 'Centroid Drift', 'Duration Spike', 'Temporal Pattern'],
@@ -284,11 +261,11 @@ export class HeatWatchAnalytics {
 
     const { wavelengths, radiances } = this.pyrometry.generatePlanckCurve(tempK);
 
-    if (this.charts.planckCurve) {
-      this.charts.planckCurve.destroy();
+    if (this.charts[canvasId]) {
+      this.charts[canvasId].destroy();
     }
 
-    this.charts.planckCurve = new Chart(ctx, {
+    this.charts[canvasId] = new Chart(ctx, {
       type: 'line',
       data: {
         labels: wavelengths.map(l => `${l} µm`),
@@ -336,31 +313,82 @@ export class HeatWatchAnalytics {
   }
 
   // Render Regional Thermal Overview
-  renderRegionalOverview(canvasId) {
+  renderRegionalOverview(canvasId, selectedId = 'OBJ-1045', activeObj = null) {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
 
-    if (this.charts.regionalFRPBar) {
-      this.charts.regionalFRPBar.destroy();
+    if (this.charts[canvasId]) {
+      this.charts[canvasId].destroy();
     }
 
-    const labels = THERMAL_OBJECTS.map(o => o.id);
-    const currentFRP = THERMAL_OBJECTS.map(o => o.thermal.currentFRP);
-    const baselineFRP = THERMAL_OBJECTS.map(o => o.thermal.historicalMeanFRP);
+    const defaultPeers = [
+      { id: 'FAC-REF-01', name: 'Jamnagar Petrochem', frp: 68.4, baseline: 18.2 },
+      { id: 'FAC-REF-03', name: 'Panipat Refinery', frp: 45.0, baseline: 45.0 },
+      { id: 'FAC-REF-08', name: 'Paradip Refinery', frp: 40.0, baseline: 40.0 },
+      { id: 'FAC-PWR-01', name: 'Vindhyachal Power', frp: 65.0, baseline: 65.0 },
+      { id: 'FAC-PWR-02', name: 'Korba Thermal', frp: 58.4, baseline: 58.4 },
+      { id: 'FAC-STL-01', name: 'Tata Steel', frp: 48.0, baseline: 48.0 },
+      { id: 'FAC-MINE-01', name: 'Jharia Coal', frp: 55.0, baseline: 55.0 },
+      { id: 'FAC-CHEM-03', name: 'Hazira Hub', frp: 35.8, baseline: 35.8 }
+    ];
 
-    this.charts.regionalFRPBar = new Chart(ctx, {
+    let comparativeFacilities = [...defaultPeers];
+
+    if (activeObj) {
+      const activeCleanId = String(activeObj.id || activeObj.regionId || '').replace(/^(FAC-|OBJ-)/, '');
+      const activeName = activeObj.name ? activeObj.name.split('(')[0].trim().slice(0, 18) : 'Selected Facility';
+      const activeFrp = activeObj.thermal?.currentFRP !== undefined ? Number(activeObj.thermal.currentFRP) : 35.0;
+      const activeBase = activeObj.thermal?.historicalMeanFRP !== undefined ? Number(activeObj.thermal.historicalMeanFRP) : 30.0;
+
+      const existingIdx = comparativeFacilities.findIndex(f => f.id.includes(activeCleanId) || activeObj.id.includes(f.id.replace('FAC-', '')));
+      if (existingIdx >= 0) {
+        comparativeFacilities[existingIdx].frp = activeFrp;
+        comparativeFacilities[existingIdx].baseline = activeBase;
+        comparativeFacilities[existingIdx].name = activeName;
+      } else {
+        // Insert active facility at the beginning
+        comparativeFacilities.unshift({
+          id: activeObj.id.startsWith('FAC-') ? activeObj.id : `FAC-${activeCleanId}`,
+          name: activeName,
+          frp: activeFrp,
+          baseline: activeBase
+        });
+        if (comparativeFacilities.length > 8) {
+          comparativeFacilities.pop();
+        }
+      }
+    }
+
+    const labels = comparativeFacilities.map(f => f.name);
+    const currentFRP = comparativeFacilities.map(f => f.frp);
+    const baselineFRP = comparativeFacilities.map(f => f.baseline);
+
+    const cleanSelected = String(selectedId || '').replace(/^(FAC-|OBJ-)/, '');
+    const bgColors = comparativeFacilities.map(f => {
+      const isMatch = f.id.includes(cleanSelected) || cleanSelected.includes(f.id.replace('FAC-', '')) || (activeObj && f.name.includes(activeObj.name.split(' ')[0]));
+      return isMatch ? '#00f0ff' : 'rgba(56, 189, 248, 0.45)';
+    });
+
+    const borderColors = comparativeFacilities.map(f => {
+      const isMatch = f.id.includes(cleanSelected) || cleanSelected.includes(f.id.replace('FAC-', '')) || (activeObj && f.name.includes(activeObj.name.split(' ')[0]));
+      return isMatch ? '#ffffff' : 'transparent';
+    });
+
+    this.charts[canvasId] = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: labels,
         datasets: [
           {
-            label: 'Current FRP (MW)',
+            label: 'Observed FRP (MW)',
             data: currentFRP,
-            backgroundColor: '#00f0ff',
+            backgroundColor: bgColors,
+            borderColor: borderColors,
+            borderWidth: 2,
             borderRadius: 4
           },
           {
-            label: 'Historical Baseline Mean (MW)',
+            label: '90-Day Baseline Mean (MW)',
             data: baselineFRP,
             backgroundColor: 'rgba(255, 255, 255, 0.2)',
             borderRadius: 4
@@ -377,7 +405,7 @@ export class HeatWatchAnalytics {
         },
         scales: {
           x: {
-            ticks: { color: '#9ca3af', font: { family: 'JetBrains Mono', size: 10 } },
+            ticks: { color: '#9ca3af', font: { family: 'JetBrains Mono', size: 9 } },
             grid: { color: 'rgba(255, 255, 255, 0.05)' }
           },
           y: {
@@ -388,5 +416,40 @@ export class HeatWatchAnalytics {
         }
       }
     });
+  }
+
+  updateAllAnalytics(obj) {
+    if (!obj) return;
+    const objId = obj.id || 'OBJ-1045';
+
+    // 1. Time-Series Baseline Charts (Analytics Tab + Sidebar)
+    this.renderFrpTimeSeriesChart('canvas-analytics-timeseries', obj, 90);
+    this.renderFrpTimeSeriesChart('sidebar-frp-chart', obj, 90);
+
+    // 2. Land Cover Composition Doughnut (Sidebar)
+    if (obj.landCover) {
+      this.renderLandCoverDoughnut('sidebar-landcover-chart', obj.landCover);
+    }
+
+    // 3. Anomaly Radar Chart (Sidebar)
+    if (obj.anomalyFormula) {
+      this.renderAnomalyRadar('sidebar-radar-chart', obj.anomalyFormula);
+    } else {
+      const frpRatio = obj.thermal?.frpDeviationRatio || 1.0;
+      this.renderAnomalyRadar('sidebar-radar-chart', {
+        frpDeviationScore: Math.min(1.0, (frpRatio / 3.0) * 0.4),
+        footprintExpansionScore: 0.15,
+        centroidDisplacementScore: 0.05,
+        durationDeviationScore: 0.20,
+        temporalPatternScore: 0.15
+      });
+    }
+
+    // 4. Regional Overview Bar (Analytics Tab)
+    this.renderRegionalOverview('canvas-regional-overview', objId, obj);
+
+    // 5. Planck Distribution Curve (Pyrometry Tab)
+    const tempK = obj.thermal?.currentBrightnessTempK || 368.5;
+    this.renderPlanckCurveChart('canvas-planck-curve', Math.round(tempK * 4.2));
   }
 }
