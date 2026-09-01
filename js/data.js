@@ -58,9 +58,7 @@ export const STUDY_REGIONS = [
     description: "Protected dense forest canopy with rapid spreading seasonal biomass wildfire."
   },
   {
-    id: "patiala",
-    name: "Patiala Agrarian Corridor (Punjab)",
-    center: [30.3398, 76.3869],
+    id: "patiala", name: "Patiala-Nabha Agrarian Corridor (Punjab)", center: [30.3750, 76.1520],
     zoom: 12,
     description: "Seasonal agricultural residue / crop stubble burning zone across high cropland fraction."
   },
@@ -389,10 +387,7 @@ export const THERMAL_OBJECTS = [
   },
   
   {
-    id: "OBJ-2019",
-    name: "Korba Super Thermal Power Ash Disposal & Flare Vent",
-    regionId: "korba",
-    centroid: [22.3785, 82.7245],
+    id: "OBJ-2019", name: "Korba Super Thermal Power Ash Disposal & Flue Flare", regionId: "korba", centroid: [22.3785, 82.7235],
     coordinates: [22.3785, 82.7245],
     categoryGroup: "industrial_fire",
     primaryCategory: "industrial",
@@ -1033,10 +1028,7 @@ export const THERMAL_OBJECTS = [
   },
 
   {
-    id: "OBJ-4012",
-    name: "Patiala-Nabha Paddy Residue Agricultural Burn Strip",
-    regionId: "patiala",
-    centroid: [30.3456, 76.4120],
+    id: "OBJ-4012", name: "Patiala-Nabha Paddy Residue Agricultural Burn Strip", regionId: "patiala", centroid: [30.3750, 76.1520],
     coordinates: [30.3456, 76.4120],
     categoryGroup: "agriculture_fire",
     primaryCategory: "agriculture",

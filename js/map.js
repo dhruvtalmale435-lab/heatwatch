@@ -442,8 +442,15 @@ export class HeatWatchMap {
       });
     }
 
-    // Render filtered facilities
+    // Render filtered facilities (only if no active thermal cluster marker already present)
     facilitiesToRender.forEach(fac => {
+      const matchedObj = this.findMatchingThermalObject(fac);
+      
+      // If there is already a thermal cluster marker active for this facility, skip duplicate circle marker
+      if (matchedObj && this.markers && this.markers[matchedObj.id]) {
+        return;
+      }
+
       let pinColor = '#00f0ff';
       let iconSymbol = '🏭';
       if (fac.type.includes('Thermal')) { pinColor = '#f59e0b'; iconSymbol = '⚡'; }
@@ -462,7 +469,6 @@ export class HeatWatchMap {
         weight: 2
       });
 
-      const matchedObj = this.findMatchingThermalObject(fac);
       const hasActiveHotspot = !!matchedObj || (fac.hasActiveDetection === true && fac.currentFRP);
       const statusText = hasActiveHotspot 
         ? `Satellite FRP: <strong style="color:#ff4747;">${matchedObj?.thermal?.currentFRP || fac.currentFRP} MW</strong> <span style="color:#ff8888; font-size:0.7rem;">(Active Hotspot)</span>`
@@ -480,7 +486,6 @@ export class HeatWatchMap {
 
       centerMarker.on('click', () => {
         this.map.flyTo(fac.coordinates, 14, { duration: 0.8 });
-        const matchedObj = this.findMatchingThermalObject(fac);
         const objToSelect = matchedObj || this.synthesizeObjectFromFacility(fac);
         this.selectObject(objToSelect.id, false);
       });

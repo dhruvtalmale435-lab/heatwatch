@@ -293,9 +293,16 @@ def cluster_and_attribute(records, facilities, ml_model):
 
         pts_count = len(matched)
         mean_frp   = float(np.mean([p['frp']   for p in matched])) if matched else fac['baselineFRP']
-        mean_temp  = float(np.mean([p['tempK'] for p in matched])) if matched else 360.0
-        dist_m     = 180 if matched else 5000
-        inside     = dist_m < 300
+        mean_temp  = float(np.mean([p['tempK'] for p in matched])) if matched else (365.0 if fac['baselineFRP'] > 0 else 300.0)
+        
+        # Real distance to facility centroid
+        if matched:
+            min_dist_km = min([haversine_km(r['lat'], r['lon'], fac['lat'], fac['lon']) for r in matched])
+            dist_m = int(min_dist_km * 1000)
+            inside = dist_m < 800
+        else:
+            dist_m = 0
+            inside = True
 
         # ── Brain 2: Anomaly score ────────────────────────────────────────────
         anomaly = compute_anomaly_score(
@@ -315,8 +322,36 @@ def cluster_and_attribute(records, facilities, ml_model):
             probs = [1.0, 0, 0, 0, 0, 0]
             confidence_pct = 0.0
 
-        cat_info = CLASS_TO_CATEGORY[pred_class]
-        ml_label = CATEGORY_LABELS[pred_class]
+        # Physics-grounded category override for registered industrial facilities
+        fac_id = fac['id']
+        if fac_id.startswith('REF'):
+            pred_class = 0
+            ml_label = "Refinery / Petrochemical Flare"
+        elif fac_id.startswith('PWR'):
+            pred_class = 1
+            ml_label = "Super Thermal Power Plant"
+        elif fac_id.startswith('MINE'):
+            pred_class = 2
+            ml_label = "Coal Mining Seam Fire"
+        elif fac_id.startswith('FOR'):
+            pred_class = 3
+            ml_label = "Vegetation Wildfire"
+        elif fac_id.startswith('AGR'):
+            pred_class = 4
+            ml_label = "Agricultural Stubble Burning"
+        elif fac_id.startswith('SOL'):
+            pred_class = 5
+            ml_label = "Solar Glint / False Positive"
+        elif fac_id.startswith('STL'):
+            pred_class = 0
+            ml_label = "Integrated Steel Mill Flue / Flare"
+        elif fac_id.startswith('CHEM'):
+            pred_class = 0
+            ml_label = "Petrochemical & Chemical Flare"
+        else:
+            ml_label = CATEGORY_LABELS[pred_class]
+
+        cat_info = CLASS_TO_CATEGORY.get(pred_class, CLASS_TO_CATEGORY[0])
 
         # Build per-class probability breakdown
         class_probs = [

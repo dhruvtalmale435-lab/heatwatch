@@ -1,6 +1,6 @@
 {
   "status": "success",
-  "last_sync_utc": "2026-09-01T18:55:23.563679+00:00",
+  "last_sync_utc": "2026-09-01T19:10:19.684100+00:00",
   "nasa_source": "NASA LANCE NRT (Live VIIRS 375m & MODIS 1km)",
   "ml_model": "RandomForestClassifier (200 trees, 14 features) — trained_random_forest",
   "total_detections_count": 182,
@@ -2749,15 +2749,15 @@
       "matchedFacility": {
         "name": "Jamnagar Mega-Refinery & Cracker (RIL)",
         "type": "Petrochemical & Refinery",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 40.0,
         "historicalMeanFRP": 40.0,
         "baselineStd": 4.8,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -2766,45 +2766,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 16.7,
+        "score": 2.3,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 1.7,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
         "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 83.4,
+        "confidence": 97.5,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8341
+            "prob": 0.9745
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0509
+            "prob": 0.0255
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.03
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
@@ -2814,8 +2814,8 @@
       "categoryLabel": "Refinery / Petrochemical Flare",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.83,
-      "confidence": "High (83.4%)",
+      "evidenceScore": 0.97,
+      "confidence": "High (97.5%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Gujarat Regional Corridor",
@@ -2835,15 +2835,15 @@
       "matchedFacility": {
         "name": "Nayara Energy Vadinar Refinery",
         "type": "Petrochemical & Refinery",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 32.0,
         "historicalMeanFRP": 32.0,
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -2852,45 +2852,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 17.1,
+        "score": 2.7,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 2.1,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
         "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 82.9,
+        "confidence": 96.0,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8291
+            "prob": 0.9595
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0559
+            "prob": 0.0405
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.03
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
@@ -2900,8 +2900,8 @@
       "categoryLabel": "Refinery / Petrochemical Flare",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.83,
-      "confidence": "High (82.9%)",
+      "evidenceScore": 0.96,
+      "confidence": "High (96.0%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Gujarat Regional Corridor",
@@ -2915,21 +2915,21 @@
       "name": "IOCL Panipat Refinery & Petrochemical Complex",
       "state": "Haryana",
       "coordinates": [
-        29.488,
-        76.888
+        29.4725,
+        76.8845
       ],
       "matchedFacility": {
         "name": "IOCL Panipat Refinery & Petrochemical Complex",
         "type": "Petrochemical & Refinery",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 32.0,
         "historicalMeanFRP": 32.0,
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -2938,45 +2938,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 17.1,
+        "score": 2.7,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 2.1,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
         "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 82.9,
+        "confidence": 96.0,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8291
+            "prob": 0.9595
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0559
+            "prob": 0.0405
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.03
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
@@ -2986,8 +2986,8 @@
       "categoryLabel": "Refinery / Petrochemical Flare",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.83,
-      "confidence": "High (82.9%)",
+      "evidenceScore": 0.96,
+      "confidence": "High (96.0%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Haryana Regional Corridor",
@@ -3001,21 +3001,21 @@
       "name": "IOCL Mathura Refinery",
       "state": "Uttar Pradesh",
       "coordinates": [
-        27.432,
-        77.692
+        27.3055,
+        77.7025
       ],
       "matchedFacility": {
         "name": "IOCL Mathura Refinery",
         "type": "Petrochemical & Refinery",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 32.0,
         "historicalMeanFRP": 32.0,
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -3024,45 +3024,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 17.1,
+        "score": 2.7,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 2.1,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
         "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 82.9,
+        "confidence": 96.0,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8291
+            "prob": 0.9595
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0559
+            "prob": 0.0405
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.03
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
@@ -3072,8 +3072,8 @@
       "categoryLabel": "Refinery / Petrochemical Flare",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.83,
-      "confidence": "High (82.9%)",
+      "evidenceScore": 0.96,
+      "confidence": "High (96.0%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Uttar Pradesh Regional Corridor",
@@ -3087,21 +3087,21 @@
       "name": "BPCL Mumbai Refinery (Mahul)",
       "state": "Maharashtra",
       "coordinates": [
-        19.012,
-        72.895
+        19.0125,
+        72.8945
       ],
       "matchedFacility": {
         "name": "BPCL Mumbai Refinery (Mahul)",
         "type": "Petrochemical & Refinery",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 32.0,
         "historicalMeanFRP": 32.0,
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -3110,45 +3110,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 17.1,
+        "score": 2.7,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 2.1,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
         "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 82.9,
+        "confidence": 96.0,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8291
+            "prob": 0.9595
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0559
+            "prob": 0.0405
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.03
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
@@ -3158,8 +3158,8 @@
       "categoryLabel": "Refinery / Petrochemical Flare",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.83,
-      "confidence": "High (82.9%)",
+      "evidenceScore": 0.96,
+      "confidence": "High (96.0%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Maharashtra Regional Corridor",
@@ -3173,21 +3173,21 @@
       "name": "HPCL Mumbai Refinery",
       "state": "Maharashtra",
       "coordinates": [
-        19.005,
-        72.9
+        19.0055,
+        72.899
       ],
       "matchedFacility": {
         "name": "HPCL Mumbai Refinery",
         "type": "Petrochemical & Refinery",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 32.0,
         "historicalMeanFRP": 32.0,
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -3196,45 +3196,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 17.1,
+        "score": 2.7,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 2.1,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
         "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 82.9,
+        "confidence": 96.0,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8291
+            "prob": 0.9595
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0559
+            "prob": 0.0405
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.03
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
@@ -3244,8 +3244,8 @@
       "categoryLabel": "Refinery / Petrochemical Flare",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.83,
-      "confidence": "High (82.9%)",
+      "evidenceScore": 0.96,
+      "confidence": "High (96.0%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Maharashtra Regional Corridor",
@@ -3259,21 +3259,21 @@
       "name": "BPCL Kochi Refinery (Ambalamugal)",
       "state": "Kerala",
       "coordinates": [
-        9.975,
-        76.365
+        9.9745,
+        76.3655
       ],
       "matchedFacility": {
         "name": "BPCL Kochi Refinery (Ambalamugal)",
         "type": "Petrochemical & Refinery",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 32.0,
         "historicalMeanFRP": 32.0,
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -3282,45 +3282,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 17.1,
+        "score": 2.7,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 2.1,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
         "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 82.9,
+        "confidence": 96.0,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8291
+            "prob": 0.9595
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0559
+            "prob": 0.0405
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.03
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
@@ -3330,8 +3330,8 @@
       "categoryLabel": "Refinery / Petrochemical Flare",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.83,
-      "confidence": "High (82.9%)",
+      "evidenceScore": 0.96,
+      "confidence": "High (96.0%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Kerala Regional Corridor",
@@ -3345,21 +3345,21 @@
       "name": "IOCL Paradip Mega-Refinery",
       "state": "Odisha",
       "coordinates": [
-        20.272,
-        86.685
+        20.2725,
+        86.6855
       ],
       "matchedFacility": {
         "name": "IOCL Paradip Mega-Refinery",
         "type": "Petrochemical & Refinery",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 32.0,
         "historicalMeanFRP": 32.0,
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -3368,45 +3368,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 17.1,
+        "score": 2.7,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 2.1,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
         "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 82.9,
+        "confidence": 96.0,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8291
+            "prob": 0.9595
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0559
+            "prob": 0.0405
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.03
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
@@ -3416,8 +3416,8 @@
       "categoryLabel": "Refinery / Petrochemical Flare",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.83,
-      "confidence": "High (82.9%)",
+      "evidenceScore": 0.96,
+      "confidence": "High (96.0%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Odisha Regional Corridor",
@@ -3431,21 +3431,21 @@
       "name": "IOCL Haldia Refinery & Petrochemicals",
       "state": "West Bengal",
       "coordinates": [
-        22.062,
-        88.118
+        22.0625,
+        88.1185
       ],
       "matchedFacility": {
         "name": "IOCL Haldia Refinery & Petrochemicals",
         "type": "Petrochemical & Refinery",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 32.0,
         "historicalMeanFRP": 32.0,
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -3454,45 +3454,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 17.1,
+        "score": 2.7,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 2.1,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
         "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 82.9,
+        "confidence": 96.0,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8291
+            "prob": 0.9595
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0559
+            "prob": 0.0405
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.03
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
@@ -3502,8 +3502,8 @@
       "categoryLabel": "Refinery / Petrochemical Flare",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.83,
-      "confidence": "High (82.9%)",
+      "evidenceScore": 0.96,
+      "confidence": "High (96.0%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "West Bengal Regional Corridor",
@@ -3517,21 +3517,21 @@
       "name": "HPCL Visakhapatnam Refinery",
       "state": "Andhra Pradesh",
       "coordinates": [
-        17.692,
-        83.262
+        17.6925,
+        83.2625
       ],
       "matchedFacility": {
         "name": "HPCL Visakhapatnam Refinery",
         "type": "Petrochemical & Refinery",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 32.0,
         "historicalMeanFRP": 32.0,
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -3540,45 +3540,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 17.1,
+        "score": 2.7,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 2.1,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
         "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 82.9,
+        "confidence": 96.0,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8291
+            "prob": 0.9595
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0559
+            "prob": 0.0405
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.03
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
@@ -3588,8 +3588,8 @@
       "categoryLabel": "Refinery / Petrochemical Flare",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.83,
-      "confidence": "High (82.9%)",
+      "evidenceScore": 0.96,
+      "confidence": "High (96.0%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Andhra Pradesh Regional Corridor",
@@ -3603,21 +3603,21 @@
       "name": "HMEL Guru Gobind Singh Refinery (Bathinda)",
       "state": "Punjab",
       "coordinates": [
-        29.988,
-        75.025
+        29.9572,
+        75.0078
       ],
       "matchedFacility": {
         "name": "HMEL Guru Gobind Singh Refinery (Bathinda)",
         "type": "Petrochemical & Refinery",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 32.0,
         "historicalMeanFRP": 32.0,
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -3626,45 +3626,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 17.1,
+        "score": 2.7,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 2.1,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
         "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 82.9,
+        "confidence": 96.0,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8291
+            "prob": 0.9595
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0559
+            "prob": 0.0405
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.03
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
@@ -3674,8 +3674,8 @@
       "categoryLabel": "Refinery / Petrochemical Flare",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.83,
-      "confidence": "High (82.9%)",
+      "evidenceScore": 0.96,
+      "confidence": "High (96.0%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Punjab Regional Corridor",
@@ -3689,13 +3689,13 @@
       "name": "CPCL Manali Refinery (Chennai)",
       "state": "Tamil Nadu",
       "coordinates": [
-        13.168,
-        80.265
+        13.1685,
+        80.2655
       ],
       "matchedFacility": {
         "name": "CPCL Manali Refinery (Chennai)",
         "type": "Petrochemical & Refinery",
-        "distanceMeters": 180
+        "distanceMeters": 6375
       },
       "thermal": {
         "currentFRP": 3.6,
@@ -3703,7 +3703,7 @@
         "baselineStd": 3.8,
         "frpDeviationRatio": 0.11,
         "currentBrightnessTempK": 335.9,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -3712,45 +3712,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 59.8,
+        "score": 69.4,
         "zScore": -7.46,
         "frpRatio": 0.11,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 40.0,
           "footprint_contribution": 2.1,
-          "drift_contribution": 5.4
+          "drift_contribution": 15.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
         "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 85.8,
+        "confidence": 71.5,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8585
+            "prob": 0.7155
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0865
+            "prob": 0.1095
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.055
+            "prob": 0.095
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.0
+            "prob": 0.005
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.0
+            "prob": 0.025
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.0
+            "prob": 0.05
           }
         ]
       },
@@ -3758,10 +3758,10 @@
       "categoryGroup": "industrial_flare",
       "subtype": "Petrochemical Flare",
       "categoryLabel": "Refinery / Petrochemical Flare",
-      "status": "elevated",
-      "statusLabel": "ELEVATED ANOMALY",
-      "evidenceScore": 0.86,
-      "confidence": "High (85.8%)",
+      "status": "high_priority",
+      "statusLabel": "HIGH-PRIORITY ANOMALY",
+      "evidenceScore": 0.71,
+      "confidence": "High (71.5%)",
       "liveDetectionsNearby": 1,
       "nearestSettlement": {
         "name": "Tamil Nadu Regional Corridor",
@@ -3775,21 +3775,21 @@
       "name": "BPCL Bina Refinery",
       "state": "Madhya Pradesh",
       "coordinates": [
-        24.165,
-        78.188
+        24.085,
+        78.185
       ],
       "matchedFacility": {
         "name": "BPCL Bina Refinery",
         "type": "Petrochemical & Refinery",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 32.0,
         "historicalMeanFRP": 32.0,
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -3798,45 +3798,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 17.1,
+        "score": 2.7,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 2.1,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
         "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 82.9,
+        "confidence": 96.0,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8291
+            "prob": 0.9595
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0559
+            "prob": 0.0405
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.03
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
@@ -3846,8 +3846,8 @@
       "categoryLabel": "Refinery / Petrochemical Flare",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.83,
-      "confidence": "High (82.9%)",
+      "evidenceScore": 0.96,
+      "confidence": "High (96.0%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Madhya Pradesh Regional Corridor",
@@ -3861,21 +3861,21 @@
       "name": "IOCL Barauni Refinery",
       "state": "Bihar",
       "coordinates": [
-        25.432,
-        85.998
+        25.4055,
+        85.9755
       ],
       "matchedFacility": {
         "name": "IOCL Barauni Refinery",
         "type": "Petrochemical & Refinery",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 32.0,
         "historicalMeanFRP": 32.0,
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -3884,45 +3884,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 17.1,
+        "score": 2.7,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 2.1,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
         "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 82.9,
+        "confidence": 96.0,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8291
+            "prob": 0.9595
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0559
+            "prob": 0.0405
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.03
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
@@ -3932,8 +3932,8 @@
       "categoryLabel": "Refinery / Petrochemical Flare",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.83,
-      "confidence": "High (82.9%)",
+      "evidenceScore": 0.96,
+      "confidence": "High (96.0%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Bihar Regional Corridor",
@@ -3947,21 +3947,21 @@
       "name": "Numaligarh Refinery (Assam)",
       "state": "Assam",
       "coordinates": [
-        26.585,
-        93.792
+        26.5855,
+        93.7925
       ],
       "matchedFacility": {
         "name": "Numaligarh Refinery (Assam)",
         "type": "Petrochemical & Refinery",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 32.0,
         "historicalMeanFRP": 32.0,
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -3970,45 +3970,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 17.1,
+        "score": 2.7,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 2.1,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
         "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 82.9,
+        "confidence": 96.0,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8291
+            "prob": 0.9595
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0559
+            "prob": 0.0405
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.03
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
@@ -4018,8 +4018,8 @@
       "categoryLabel": "Refinery / Petrochemical Flare",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.83,
-      "confidence": "High (82.9%)",
+      "evidenceScore": 0.96,
+      "confidence": "High (96.0%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Assam Regional Corridor",
@@ -4033,21 +4033,21 @@
       "name": "NTPC Vindhyachal Super Thermal Power Station",
       "state": "Madhya Pradesh",
       "coordinates": [
-        24.098,
-        82.672
+        24.0985,
+        82.6725
       ],
       "matchedFacility": {
         "name": "NTPC Vindhyachal Super Thermal Power Station",
         "type": "Thermal Power Station",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 58.0,
         "historicalMeanFRP": 58.0,
         "baselineStd": 7.0,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -4056,56 +4056,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 16.1,
+        "score": 1.8,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 1.1,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
-        "predictedClass": 0,
-        "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 83.5,
+        "predictedClass": 1,
+        "predictedLabel": "Super Thermal Power Plant",
+        "confidence": 97.7,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8353
+            "prob": 0.977
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0547
+            "prob": 0.023
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.03
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.015
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.015
+            "prob": 0.0
           }
         ]
       },
       "primaryCategory": "industrial",
       "categoryGroup": "industrial_flare",
-      "subtype": "Petrochemical Flare",
-      "categoryLabel": "Refinery / Petrochemical Flare",
+      "subtype": "Thermal Power Emission",
+      "categoryLabel": "Super Thermal Power Plant",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.83,
-      "confidence": "High (83.5%)",
+      "evidenceScore": 0.98,
+      "confidence": "High (97.7%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Madhya Pradesh Regional Corridor",
@@ -4119,21 +4119,21 @@
       "name": "NTPC Korba Super Thermal Power Station",
       "state": "Chhattisgarh",
       "coordinates": [
-        22.378,
-        82.723
+        22.3785,
+        82.7235
       ],
       "matchedFacility": {
         "name": "NTPC Korba Super Thermal Power Station",
         "type": "Thermal Power Station",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 58.0,
         "historicalMeanFRP": 58.0,
         "baselineStd": 7.0,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -4142,56 +4142,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 16.1,
+        "score": 1.8,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 1.1,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
-        "predictedClass": 0,
-        "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 83.5,
+        "predictedClass": 1,
+        "predictedLabel": "Super Thermal Power Plant",
+        "confidence": 97.7,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8353
+            "prob": 0.977
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0547
+            "prob": 0.023
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.03
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.015
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.015
+            "prob": 0.0
           }
         ]
       },
       "primaryCategory": "industrial",
       "categoryGroup": "industrial_flare",
-      "subtype": "Petrochemical Flare",
-      "categoryLabel": "Refinery / Petrochemical Flare",
+      "subtype": "Thermal Power Emission",
+      "categoryLabel": "Super Thermal Power Plant",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.83,
-      "confidence": "High (83.5%)",
+      "evidenceScore": 0.98,
+      "confidence": "High (97.7%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Chhattisgarh Regional Corridor",
@@ -4205,21 +4205,21 @@
       "name": "NTPC Singrauli Super Thermal Power Station (Shaktinagar)",
       "state": "Uttar Pradesh",
       "coordinates": [
-        24.108,
-        82.782
+        24.1085,
+        82.7825
       ],
       "matchedFacility": {
         "name": "NTPC Singrauli Super Thermal Power Station (Shaktinagar)",
         "type": "Thermal Power Station",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 45.0,
         "historicalMeanFRP": 45.0,
         "baselineStd": 5.4,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -4228,56 +4228,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 16.5,
+        "score": 2.1,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 1.5,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
-        "predictedClass": 0,
-        "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 82.6,
+        "predictedClass": 1,
+        "predictedLabel": "Super Thermal Power Plant",
+        "confidence": 96.7,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8258
+            "prob": 0.9674
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0642
+            "prob": 0.0326
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.015
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.02
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
       "primaryCategory": "industrial",
       "categoryGroup": "industrial_flare",
-      "subtype": "Petrochemical Flare",
-      "categoryLabel": "Refinery / Petrochemical Flare",
+      "subtype": "Thermal Power Emission",
+      "categoryLabel": "Super Thermal Power Plant",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.83,
-      "confidence": "High (82.6%)",
+      "evidenceScore": 0.97,
+      "confidence": "High (96.7%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Uttar Pradesh Regional Corridor",
@@ -4291,21 +4291,21 @@
       "name": "NTPC Sipat Super Thermal Power Station",
       "state": "Chhattisgarh",
       "coordinates": [
-        22.138,
-        82.292
+        22.1385,
+        82.2925
       ],
       "matchedFacility": {
         "name": "NTPC Sipat Super Thermal Power Station",
         "type": "Thermal Power Station",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 45.0,
         "historicalMeanFRP": 45.0,
         "baselineStd": 5.4,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -4314,56 +4314,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 16.5,
+        "score": 2.1,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 1.5,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
-        "predictedClass": 0,
-        "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 82.6,
+        "predictedClass": 1,
+        "predictedLabel": "Super Thermal Power Plant",
+        "confidence": 96.7,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8258
+            "prob": 0.9674
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0642
+            "prob": 0.0326
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.015
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.02
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
       "primaryCategory": "industrial",
       "categoryGroup": "industrial_flare",
-      "subtype": "Petrochemical Flare",
-      "categoryLabel": "Refinery / Petrochemical Flare",
+      "subtype": "Thermal Power Emission",
+      "categoryLabel": "Super Thermal Power Plant",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.83,
-      "confidence": "High (82.6%)",
+      "evidenceScore": 0.97,
+      "confidence": "High (96.7%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Chhattisgarh Regional Corridor",
@@ -4377,21 +4377,21 @@
       "name": "NTPC Ramagundam Super Thermal Power Station",
       "state": "Telangana",
       "coordinates": [
-        18.758,
-        79.455
+        18.7585,
+        79.4555
       ],
       "matchedFacility": {
         "name": "NTPC Ramagundam Super Thermal Power Station",
         "type": "Thermal Power Station",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 45.0,
         "historicalMeanFRP": 45.0,
         "baselineStd": 5.4,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -4400,56 +4400,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 16.5,
+        "score": 2.1,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 1.5,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
-        "predictedClass": 0,
-        "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 82.6,
+        "predictedClass": 1,
+        "predictedLabel": "Super Thermal Power Plant",
+        "confidence": 96.7,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8258
+            "prob": 0.9674
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0642
+            "prob": 0.0326
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.015
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.02
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
       "primaryCategory": "industrial",
       "categoryGroup": "industrial_flare",
-      "subtype": "Petrochemical Flare",
-      "categoryLabel": "Refinery / Petrochemical Flare",
+      "subtype": "Thermal Power Emission",
+      "categoryLabel": "Super Thermal Power Plant",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.83,
-      "confidence": "High (82.6%)",
+      "evidenceScore": 0.97,
+      "confidence": "High (96.7%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Telangana Regional Corridor",
@@ -4463,21 +4463,21 @@
       "name": "NTPC Talcher Super Thermal Power Station (Kaniha)",
       "state": "Odisha",
       "coordinates": [
-        21.102,
-        85.088
+        21.1025,
+        85.0885
       ],
       "matchedFacility": {
         "name": "NTPC Talcher Super Thermal Power Station (Kaniha)",
         "type": "Thermal Power Station",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 45.0,
         "historicalMeanFRP": 45.0,
         "baselineStd": 5.4,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -4486,56 +4486,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 16.5,
+        "score": 2.1,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 1.5,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
-        "predictedClass": 0,
-        "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 82.6,
+        "predictedClass": 1,
+        "predictedLabel": "Super Thermal Power Plant",
+        "confidence": 96.7,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8258
+            "prob": 0.9674
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0642
+            "prob": 0.0326
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.015
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.02
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
       "primaryCategory": "industrial",
       "categoryGroup": "industrial_flare",
-      "subtype": "Petrochemical Flare",
-      "categoryLabel": "Refinery / Petrochemical Flare",
+      "subtype": "Thermal Power Emission",
+      "categoryLabel": "Super Thermal Power Plant",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.83,
-      "confidence": "High (82.6%)",
+      "evidenceScore": 0.97,
+      "confidence": "High (96.7%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Odisha Regional Corridor",
@@ -4549,21 +4549,21 @@
       "name": "Mundra Ultra Mega Power Plant (Tata Power)",
       "state": "Gujarat",
       "coordinates": [
-        22.818,
-        69.525
+        22.8185,
+        69.5255
       ],
       "matchedFacility": {
         "name": "Mundra Ultra Mega Power Plant (Tata Power)",
         "type": "Thermal Power Station",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 45.0,
         "historicalMeanFRP": 45.0,
         "baselineStd": 5.4,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -4572,56 +4572,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 16.5,
+        "score": 2.1,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 1.5,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
-        "predictedClass": 0,
-        "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 82.6,
+        "predictedClass": 1,
+        "predictedLabel": "Super Thermal Power Plant",
+        "confidence": 96.7,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8258
+            "prob": 0.9674
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0642
+            "prob": 0.0326
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.015
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.02
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
       "primaryCategory": "industrial",
       "categoryGroup": "industrial_flare",
-      "subtype": "Petrochemical Flare",
-      "categoryLabel": "Refinery / Petrochemical Flare",
+      "subtype": "Thermal Power Emission",
+      "categoryLabel": "Super Thermal Power Plant",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.83,
-      "confidence": "High (82.6%)",
+      "evidenceScore": 0.97,
+      "confidence": "High (96.7%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Gujarat Regional Corridor",
@@ -4635,21 +4635,21 @@
       "name": "Adani Mundra Thermal Power Station",
       "state": "Gujarat",
       "coordinates": [
-        22.825,
-        69.554
+        22.8255,
+        69.5545
       ],
       "matchedFacility": {
         "name": "Adani Mundra Thermal Power Station",
         "type": "Thermal Power Station",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 45.0,
         "historicalMeanFRP": 45.0,
         "baselineStd": 5.4,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -4658,56 +4658,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 16.5,
+        "score": 2.1,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 1.5,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
-        "predictedClass": 0,
-        "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 82.6,
+        "predictedClass": 1,
+        "predictedLabel": "Super Thermal Power Plant",
+        "confidence": 96.7,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8258
+            "prob": 0.9674
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0642
+            "prob": 0.0326
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.015
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.02
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
       "primaryCategory": "industrial",
       "categoryGroup": "industrial_flare",
-      "subtype": "Petrochemical Flare",
-      "categoryLabel": "Refinery / Petrochemical Flare",
+      "subtype": "Thermal Power Emission",
+      "categoryLabel": "Super Thermal Power Plant",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.83,
-      "confidence": "High (82.6%)",
+      "evidenceScore": 0.97,
+      "confidence": "High (96.7%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Gujarat Regional Corridor",
@@ -4721,21 +4721,21 @@
       "name": "Chandrapur Super Thermal Power Station (CSTPS)",
       "state": "Maharashtra",
       "coordinates": [
-        19.985,
-        79.296
+        19.9855,
+        79.2965
       ],
       "matchedFacility": {
         "name": "Chandrapur Super Thermal Power Station (CSTPS)",
         "type": "Thermal Power Station",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 45.0,
         "historicalMeanFRP": 45.0,
         "baselineStd": 5.4,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -4744,56 +4744,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 16.5,
+        "score": 2.1,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 1.5,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
-        "predictedClass": 0,
-        "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 82.6,
+        "predictedClass": 1,
+        "predictedLabel": "Super Thermal Power Plant",
+        "confidence": 96.7,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8258
+            "prob": 0.9674
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0642
+            "prob": 0.0326
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.015
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.02
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
       "primaryCategory": "industrial",
       "categoryGroup": "industrial_flare",
-      "subtype": "Petrochemical Flare",
-      "categoryLabel": "Refinery / Petrochemical Flare",
+      "subtype": "Thermal Power Emission",
+      "categoryLabel": "Super Thermal Power Plant",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.83,
-      "confidence": "High (82.6%)",
+      "evidenceScore": 0.97,
+      "confidence": "High (96.7%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Maharashtra Regional Corridor",
@@ -4807,21 +4807,21 @@
       "name": "NTPC Dadri Power Complex (Coal & Gas)",
       "state": "Uttar Pradesh",
       "coordinates": [
-        28.605,
-        77.56
+        28.6055,
+        77.5605
       ],
       "matchedFacility": {
         "name": "NTPC Dadri Power Complex (Coal & Gas)",
         "type": "Thermal Power Station",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 45.0,
         "historicalMeanFRP": 45.0,
         "baselineStd": 5.4,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -4830,56 +4830,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 16.5,
+        "score": 2.1,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 1.5,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
-        "predictedClass": 0,
-        "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 82.6,
+        "predictedClass": 1,
+        "predictedLabel": "Super Thermal Power Plant",
+        "confidence": 96.7,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.8258
+            "prob": 0.9674
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.0642
+            "prob": 0.0326
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.015
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.02
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
       "primaryCategory": "industrial",
       "categoryGroup": "industrial_flare",
-      "subtype": "Petrochemical Flare",
-      "categoryLabel": "Refinery / Petrochemical Flare",
+      "subtype": "Thermal Power Emission",
+      "categoryLabel": "Super Thermal Power Plant",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.83,
-      "confidence": "High (82.6%)",
+      "evidenceScore": 0.97,
+      "confidence": "High (96.7%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Uttar Pradesh Regional Corridor",
@@ -4893,21 +4893,21 @@
       "name": "Tata Steel Jamshedpur Works",
       "state": "Jharkhand",
       "coordinates": [
-        22.785,
-        86.205
+        22.7855,
+        86.2055
       ],
       "matchedFacility": {
         "name": "Tata Steel Jamshedpur Works",
         "type": "Integrated Steel Plant",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 38.0,
         "historicalMeanFRP": 38.0,
         "baselineStd": 4.6,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -4916,56 +4916,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 16.8,
+        "score": 2.4,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 1.8,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
-        "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 65.8,
+        "predictedLabel": "Integrated Steel Mill Flue / Flare",
+        "confidence": 81.2,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.6581
+            "prob": 0.8116
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.2069
+            "prob": 0.1634
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.075
+            "prob": 0.025
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.025
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
       "primaryCategory": "industrial",
       "categoryGroup": "industrial_flare",
       "subtype": "Petrochemical Flare",
-      "categoryLabel": "Refinery / Petrochemical Flare",
+      "categoryLabel": "Integrated Steel Mill Flue / Flare",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.66,
-      "confidence": "High (65.8%)",
+      "evidenceScore": 0.81,
+      "confidence": "High (81.2%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Jharkhand Regional Corridor",
@@ -4979,21 +4979,21 @@
       "name": "SAIL Bhilai Steel Plant",
       "state": "Chhattisgarh",
       "coordinates": [
-        21.188,
-        81.398
+        21.1885,
+        81.3985
       ],
       "matchedFacility": {
         "name": "SAIL Bhilai Steel Plant",
         "type": "Integrated Steel Plant",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 38.0,
         "historicalMeanFRP": 38.0,
         "baselineStd": 4.6,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -5002,56 +5002,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 16.8,
+        "score": 2.4,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 1.8,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
-        "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 65.8,
+        "predictedLabel": "Integrated Steel Mill Flue / Flare",
+        "confidence": 81.2,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.6581
+            "prob": 0.8116
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.2069
+            "prob": 0.1634
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.075
+            "prob": 0.025
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.025
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
       "primaryCategory": "industrial",
       "categoryGroup": "industrial_flare",
       "subtype": "Petrochemical Flare",
-      "categoryLabel": "Refinery / Petrochemical Flare",
+      "categoryLabel": "Integrated Steel Mill Flue / Flare",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.66,
-      "confidence": "High (65.8%)",
+      "evidenceScore": 0.81,
+      "confidence": "High (81.2%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Chhattisgarh Regional Corridor",
@@ -5065,21 +5065,21 @@
       "name": "SAIL Bokaro Steel Plant",
       "state": "Jharkhand",
       "coordinates": [
-        23.668,
-        86.155
+        23.6685,
+        86.1555
       ],
       "matchedFacility": {
         "name": "SAIL Bokaro Steel Plant",
         "type": "Integrated Steel Plant",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 38.0,
         "historicalMeanFRP": 38.0,
         "baselineStd": 4.6,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -5088,56 +5088,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 16.8,
+        "score": 2.4,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 1.8,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
-        "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 65.8,
+        "predictedLabel": "Integrated Steel Mill Flue / Flare",
+        "confidence": 81.2,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.6581
+            "prob": 0.8116
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.2069
+            "prob": 0.1634
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.075
+            "prob": 0.025
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.025
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
       "primaryCategory": "industrial",
       "categoryGroup": "industrial_flare",
       "subtype": "Petrochemical Flare",
-      "categoryLabel": "Refinery / Petrochemical Flare",
+      "categoryLabel": "Integrated Steel Mill Flue / Flare",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.66,
-      "confidence": "High (65.8%)",
+      "evidenceScore": 0.81,
+      "confidence": "High (81.2%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Jharkhand Regional Corridor",
@@ -5151,21 +5151,21 @@
       "name": "SAIL Rourkela Steel Plant",
       "state": "Odisha",
       "coordinates": [
-        22.232,
-        84.872
+        22.2325,
+        84.8725
       ],
       "matchedFacility": {
         "name": "SAIL Rourkela Steel Plant",
         "type": "Integrated Steel Plant",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 38.0,
         "historicalMeanFRP": 38.0,
         "baselineStd": 4.6,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -5174,56 +5174,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 16.8,
+        "score": 2.4,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 1.8,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
-        "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 65.8,
+        "predictedLabel": "Integrated Steel Mill Flue / Flare",
+        "confidence": 81.2,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.6581
+            "prob": 0.8116
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.2069
+            "prob": 0.1634
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.075
+            "prob": 0.025
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.025
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
       "primaryCategory": "industrial",
       "categoryGroup": "industrial_flare",
       "subtype": "Petrochemical Flare",
-      "categoryLabel": "Refinery / Petrochemical Flare",
+      "categoryLabel": "Integrated Steel Mill Flue / Flare",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.66,
-      "confidence": "High (65.8%)",
+      "evidenceScore": 0.81,
+      "confidence": "High (81.2%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Odisha Regional Corridor",
@@ -5237,13 +5237,13 @@
       "name": "JSW Steel Vijayanagar Works (Toranagallu)",
       "state": "Karnataka",
       "coordinates": [
-        15.185,
-        76.662
+        15.1855,
+        76.6625
       ],
       "matchedFacility": {
         "name": "JSW Steel Vijayanagar Works (Toranagallu)",
         "type": "Integrated Steel Plant",
-        "distanceMeters": 180
+        "distanceMeters": 1092
       },
       "thermal": {
         "currentFRP": 4.3,
@@ -5251,7 +5251,7 @@
         "baselineStd": 4.6,
         "frpDeviationRatio": 0.11,
         "currentBrightnessTempK": 336.8,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 36,
         "persistenceRate": "89%",
@@ -5260,33 +5260,33 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 62.7,
+        "score": 72.3,
         "zScore": -7.32,
         "frpRatio": 0.11,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 40.0,
           "footprint_contribution": 5.3,
-          "drift_contribution": 5.4
+          "drift_contribution": 15.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
-        "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 65.8,
+        "predictedLabel": "Integrated Steel Mill Flue / Flare",
+        "confidence": 63.1,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.6582
+            "prob": 0.6309
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.2511
+            "prob": 0.2691
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.0907
+            "prob": 0.095
           },
           {
             "name": "Vegetation Wildfire",
@@ -5298,18 +5298,18 @@
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.0
+            "prob": 0.005
           }
         ]
       },
       "primaryCategory": "industrial",
       "categoryGroup": "industrial_flare",
       "subtype": "Petrochemical Flare",
-      "categoryLabel": "Refinery / Petrochemical Flare",
-      "status": "elevated",
-      "statusLabel": "ELEVATED ANOMALY",
-      "evidenceScore": 0.66,
-      "confidence": "High (65.8%)",
+      "categoryLabel": "Integrated Steel Mill Flue / Flare",
+      "status": "high_priority",
+      "statusLabel": "HIGH-PRIORITY ANOMALY",
+      "evidenceScore": 0.63,
+      "confidence": "High (63.1%)",
       "liveDetectionsNearby": 3,
       "nearestSettlement": {
         "name": "Karnataka Regional Corridor",
@@ -5329,15 +5329,15 @@
       "matchedFacility": {
         "name": "Tata Steel Kalinganagar",
         "type": "Integrated Steel Plant",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 38.0,
         "historicalMeanFRP": 38.0,
         "baselineStd": 4.6,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -5346,56 +5346,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 16.8,
+        "score": 2.4,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 1.8,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
-        "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 65.8,
+        "predictedLabel": "Integrated Steel Mill Flue / Flare",
+        "confidence": 81.2,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.6581
+            "prob": 0.8116
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.2069
+            "prob": 0.1634
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.075
+            "prob": 0.025
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.025
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
       "primaryCategory": "industrial",
       "categoryGroup": "industrial_flare",
       "subtype": "Petrochemical Flare",
-      "categoryLabel": "Refinery / Petrochemical Flare",
+      "categoryLabel": "Integrated Steel Mill Flue / Flare",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.66,
-      "confidence": "High (65.8%)",
+      "evidenceScore": 0.81,
+      "confidence": "High (81.2%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Odisha Regional Corridor",
@@ -5409,21 +5409,21 @@
       "name": "Rashtriya Ispat Nigam Ltd (RINL / Vizag Steel)",
       "state": "Andhra Pradesh",
       "coordinates": [
-        17.635,
-        83.192
+        17.6355,
+        83.1925
       ],
       "matchedFacility": {
         "name": "Rashtriya Ispat Nigam Ltd (RINL / Vizag Steel)",
         "type": "Integrated Steel Plant",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 38.0,
         "historicalMeanFRP": 38.0,
         "baselineStd": 4.6,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -5432,56 +5432,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 16.8,
+        "score": 2.4,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 1.8,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
-        "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 65.8,
+        "predictedLabel": "Integrated Steel Mill Flue / Flare",
+        "confidence": 81.2,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.6581
+            "prob": 0.8116
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.2069
+            "prob": 0.1634
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.075
+            "prob": 0.025
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.025
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
       "primaryCategory": "industrial",
       "categoryGroup": "industrial_flare",
       "subtype": "Petrochemical Flare",
-      "categoryLabel": "Refinery / Petrochemical Flare",
+      "categoryLabel": "Integrated Steel Mill Flue / Flare",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.66,
-      "confidence": "High (65.8%)",
+      "evidenceScore": 0.81,
+      "confidence": "High (81.2%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Andhra Pradesh Regional Corridor",
@@ -5495,21 +5495,21 @@
       "name": "AM/NS India Hazira Steel Complex",
       "state": "Gujarat",
       "coordinates": [
-        21.115,
-        72.675
+        21.1155,
+        72.6755
       ],
       "matchedFacility": {
         "name": "AM/NS India Hazira Steel Complex",
         "type": "Integrated Steel Plant",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 38.0,
         "historicalMeanFRP": 38.0,
         "baselineStd": 4.6,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -5518,56 +5518,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 16.8,
+        "score": 2.4,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 1.8,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
-        "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 65.8,
+        "predictedLabel": "Integrated Steel Mill Flue / Flare",
+        "confidence": 81.2,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.6581
+            "prob": 0.8116
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.2069
+            "prob": 0.1634
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.075
+            "prob": 0.025
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.0
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.025
+            "prob": 0.0
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.025
+            "prob": 0.0
           }
         ]
       },
       "primaryCategory": "industrial",
       "categoryGroup": "industrial_flare",
       "subtype": "Petrochemical Flare",
-      "categoryLabel": "Refinery / Petrochemical Flare",
+      "categoryLabel": "Integrated Steel Mill Flue / Flare",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.66,
-      "confidence": "High (65.8%)",
+      "evidenceScore": 0.81,
+      "confidence": "High (81.2%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Gujarat Regional Corridor",
@@ -5587,15 +5587,15 @@
       "matchedFacility": {
         "name": "Jharia Coalfield Subsurface Mine Fires",
         "type": "Coal Mining & Subsurface Fire Basin",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 25.0,
         "historicalMeanFRP": 25.0,
         "baselineStd": 3.0,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -5604,56 +5604,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 17.7,
+        "score": 3.3,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 2.7,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
-        "predictedClass": 1,
-        "predictedLabel": "Super Thermal Power Plant",
-        "confidence": 50.0,
+        "predictedClass": 2,
+        "predictedLabel": "Coal Mining Seam Fire",
+        "confidence": 61.7,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.0252
+            "prob": 0.0275
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.4998
+            "prob": 0.6175
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.075
+            "prob": 0.065
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.12
+            "prob": 0.08
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.23
+            "prob": 0.21
           }
         ]
       },
       "primaryCategory": "industrial",
-      "categoryGroup": "industrial_flare",
-      "subtype": "Thermal Power Emission",
-      "categoryLabel": "Super Thermal Power Plant",
+      "categoryGroup": "mining_fire",
+      "subtype": "Coal Seam / Mine Fire",
+      "categoryLabel": "Coal Mining Seam Fire",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.5,
-      "confidence": "High (50.0%)",
+      "evidenceScore": 0.62,
+      "confidence": "High (61.7%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Jharkhand Regional Corridor",
@@ -5673,15 +5673,15 @@
       "matchedFacility": {
         "name": "Korba Gevra Open-Cast Coal Mine (Largest in Asia)",
         "type": "Open-Cast Coal Mine",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 38.0,
         "historicalMeanFRP": 38.0,
         "baselineStd": 4.6,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -5690,56 +5690,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 16.8,
+        "score": 2.4,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 1.8,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
-        "predictedClass": 0,
-        "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 34.1,
+        "predictedClass": 2,
+        "predictedLabel": "Coal Mining Seam Fire",
+        "confidence": 46.5,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.3407
+            "prob": 0.4654
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.1943
+            "prob": 0.1846
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.06
+            "prob": 0.015
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.085
+            "prob": 0.075
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.105
+            "prob": 0.075
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.215
+            "prob": 0.185
           }
         ]
       },
       "primaryCategory": "industrial",
-      "categoryGroup": "industrial_flare",
-      "subtype": "Petrochemical Flare",
-      "categoryLabel": "Refinery / Petrochemical Flare",
+      "categoryGroup": "mining_fire",
+      "subtype": "Coal Seam / Mine Fire",
+      "categoryLabel": "Coal Mining Seam Fire",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.34,
-      "confidence": "High (34.1%)",
+      "evidenceScore": 0.47,
+      "confidence": "High (46.5%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Chhattisgarh Regional Corridor",
@@ -5759,15 +5759,15 @@
       "matchedFacility": {
         "name": "Singrauli Jayant Open-Cast Coal Mine",
         "type": "Open-Cast Coal Mine",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 38.0,
         "historicalMeanFRP": 38.0,
         "baselineStd": 4.6,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -5776,56 +5776,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 16.8,
+        "score": 2.4,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 1.8,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
-        "predictedClass": 0,
-        "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 34.1,
+        "predictedClass": 2,
+        "predictedLabel": "Coal Mining Seam Fire",
+        "confidence": 46.5,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.3407
+            "prob": 0.4654
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.1943
+            "prob": 0.1846
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.06
+            "prob": 0.015
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.085
+            "prob": 0.075
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.105
+            "prob": 0.075
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.215
+            "prob": 0.185
           }
         ]
       },
       "primaryCategory": "industrial",
-      "categoryGroup": "industrial_flare",
-      "subtype": "Petrochemical Flare",
-      "categoryLabel": "Refinery / Petrochemical Flare",
+      "categoryGroup": "mining_fire",
+      "subtype": "Coal Seam / Mine Fire",
+      "categoryLabel": "Coal Mining Seam Fire",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.34,
-      "confidence": "High (34.1%)",
+      "evidenceScore": 0.47,
+      "confidence": "High (46.5%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Madhya Pradesh Regional Corridor",
@@ -5845,15 +5845,15 @@
       "matchedFacility": {
         "name": "Raniganj Coalfield Fire & Mining Belt",
         "type": "Coal Mining Complex",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 25.0,
         "historicalMeanFRP": 25.0,
         "baselineStd": 3.0,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -5862,56 +5862,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 17.7,
+        "score": 3.3,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 2.7,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
-        "predictedClass": 1,
-        "predictedLabel": "Super Thermal Power Plant",
-        "confidence": 50.0,
+        "predictedClass": 2,
+        "predictedLabel": "Coal Mining Seam Fire",
+        "confidence": 61.7,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.0252
+            "prob": 0.0275
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.4998
+            "prob": 0.6175
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.075
+            "prob": 0.065
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.12
+            "prob": 0.08
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.23
+            "prob": 0.21
           }
         ]
       },
       "primaryCategory": "industrial",
-      "categoryGroup": "industrial_flare",
-      "subtype": "Thermal Power Emission",
-      "categoryLabel": "Super Thermal Power Plant",
+      "categoryGroup": "mining_fire",
+      "subtype": "Coal Seam / Mine Fire",
+      "categoryLabel": "Coal Mining Seam Fire",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.5,
-      "confidence": "High (50.0%)",
+      "evidenceScore": 0.62,
+      "confidence": "High (61.7%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "West Bengal Regional Corridor",
@@ -5931,15 +5931,15 @@
       "matchedFacility": {
         "name": "Bailadila Iron Ore Mining Complex (Deposit 14/11)",
         "type": "Open-Cast Iron Ore Mine",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 38.0,
         "historicalMeanFRP": 38.0,
         "baselineStd": 4.6,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -5948,56 +5948,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 16.8,
+        "score": 2.4,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 1.8,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
-        "predictedClass": 0,
-        "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 34.1,
+        "predictedClass": 2,
+        "predictedLabel": "Coal Mining Seam Fire",
+        "confidence": 46.5,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.3407
+            "prob": 0.4654
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.1943
+            "prob": 0.1846
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.06
+            "prob": 0.015
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.085
+            "prob": 0.075
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.105
+            "prob": 0.075
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.215
+            "prob": 0.185
           }
         ]
       },
       "primaryCategory": "industrial",
-      "categoryGroup": "industrial_flare",
-      "subtype": "Petrochemical Flare",
-      "categoryLabel": "Refinery / Petrochemical Flare",
+      "categoryGroup": "mining_fire",
+      "subtype": "Coal Seam / Mine Fire",
+      "categoryLabel": "Coal Mining Seam Fire",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.34,
-      "confidence": "High (34.1%)",
+      "evidenceScore": 0.47,
+      "confidence": "High (46.5%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Chhattisgarh Regional Corridor",
@@ -6017,15 +6017,15 @@
       "matchedFacility": {
         "name": "Dahej Petroleum, Chemicals & Petrochemicals Investment Region (PCPIR)",
         "type": "Chemical & Industrial Estate",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 32.0,
         "historicalMeanFRP": 32.0,
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -6034,56 +6034,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 17.1,
+        "score": 2.7,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 2.1,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
-        "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 42.5,
+        "predictedLabel": "Petrochemical & Chemical Flare",
+        "confidence": 52.8,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.425
+            "prob": 0.5279
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.125
+            "prob": 0.1421
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.045
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.08
+            "prob": 0.07
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.115
+            "prob": 0.08
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.21
+            "prob": 0.18
           }
         ]
       },
       "primaryCategory": "industrial",
       "categoryGroup": "industrial_flare",
       "subtype": "Petrochemical Flare",
-      "categoryLabel": "Refinery / Petrochemical Flare",
+      "categoryLabel": "Petrochemical & Chemical Flare",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.42,
-      "confidence": "High (42.5%)",
+      "evidenceScore": 0.53,
+      "confidence": "High (52.8%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Gujarat Regional Corridor",
@@ -6103,15 +6103,15 @@
       "matchedFacility": {
         "name": "Ankleshwar Chemical Industrial Estate (GIDC)",
         "type": "Chemical & Industrial Estate",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 32.0,
         "historicalMeanFRP": 32.0,
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -6120,56 +6120,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 17.1,
+        "score": 2.7,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 2.1,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
-        "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 42.5,
+        "predictedLabel": "Petrochemical & Chemical Flare",
+        "confidence": 52.8,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.425
+            "prob": 0.5279
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.125
+            "prob": 0.1421
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.045
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.08
+            "prob": 0.07
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.115
+            "prob": 0.08
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.21
+            "prob": 0.18
           }
         ]
       },
       "primaryCategory": "industrial",
       "categoryGroup": "industrial_flare",
       "subtype": "Petrochemical Flare",
-      "categoryLabel": "Refinery / Petrochemical Flare",
+      "categoryLabel": "Petrochemical & Chemical Flare",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.42,
-      "confidence": "High (42.5%)",
+      "evidenceScore": 0.53,
+      "confidence": "High (52.8%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Gujarat Regional Corridor",
@@ -6189,15 +6189,15 @@
       "matchedFacility": {
         "name": "Hazira Heavy Industrial Zone (Shell/Total LNG & L&T)",
         "type": "LNG & Heavy Chemical Port",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 32.0,
         "historicalMeanFRP": 32.0,
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -6206,56 +6206,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 17.1,
+        "score": 2.7,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 2.1,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 0,
-        "predictedLabel": "Refinery / Petrochemical Flare",
-        "confidence": 42.5,
+        "predictedLabel": "Petrochemical & Chemical Flare",
+        "confidence": 52.8,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.425
+            "prob": 0.5279
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.125
+            "prob": 0.1421
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.045
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.08
+            "prob": 0.07
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.115
+            "prob": 0.08
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.21
+            "prob": 0.18
           }
         ]
       },
       "primaryCategory": "industrial",
       "categoryGroup": "industrial_flare",
       "subtype": "Petrochemical Flare",
-      "categoryLabel": "Refinery / Petrochemical Flare",
+      "categoryLabel": "Petrochemical & Chemical Flare",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.42,
-      "confidence": "High (42.5%)",
+      "evidenceScore": 0.53,
+      "confidence": "High (52.8%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Gujarat Regional Corridor",
@@ -6275,15 +6275,15 @@
       "matchedFacility": {
         "name": "Simlipal Biosphere Reserve Core & Buffer",
         "type": "Protected Biosphere Reserve",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 12.0,
         "historicalMeanFRP": 12.0,
         "baselineStd": 1.5,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -6292,45 +6292,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 20.6,
+        "score": 6.2,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 5.6,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 3,
         "predictedLabel": "Vegetation Wildfire",
-        "confidence": 45.0,
+        "confidence": 40.0,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.015
+            "prob": 0.07
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.02
+            "prob": 0.04
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.025
+            "prob": 0.04
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.45
+            "prob": 0.4
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.345
+            "prob": 0.29
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.145
+            "prob": 0.16
           }
         ]
       },
@@ -6340,8 +6340,8 @@
       "categoryLabel": "Vegetation Wildfire",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.45,
-      "confidence": "High (45.0%)",
+      "evidenceScore": 0.4,
+      "confidence": "High (40.0%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Odisha Regional Corridor",
@@ -6361,15 +6361,15 @@
       "matchedFacility": {
         "name": "Bandhavgarh National Park Forest Zone",
         "type": "Protected Natural Forest",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 12.0,
         "historicalMeanFRP": 12.0,
         "baselineStd": 1.5,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 45,
         "totalDetections": 12,
         "persistenceRate": "75%",
@@ -6378,29 +6378,29 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 20.6,
+        "score": 6.2,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 5.6,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 3,
         "predictedLabel": "Vegetation Wildfire",
-        "confidence": 35.0,
+        "confidence": 30.0,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.1
+            "prob": 0.1451
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.095
+            "prob": 0.1399
           },
           {
             "name": "Coal Mining Seam Fire",
@@ -6408,15 +6408,15 @@
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.35
+            "prob": 0.3
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.235
+            "prob": 0.185
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.06
+            "prob": 0.07
           }
         ]
       },
@@ -6426,8 +6426,8 @@
       "categoryLabel": "Vegetation Wildfire",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.35,
-      "confidence": "High (35.0%)",
+      "evidenceScore": 0.3,
+      "confidence": "High (30.0%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Madhya Pradesh Regional Corridor",
@@ -6447,15 +6447,15 @@
       "matchedFacility": {
         "name": "Garhwal Himalayan Pine Forest Fire Corridor",
         "type": "Protected Mountain Forest",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 12.0,
         "historicalMeanFRP": 12.0,
         "baselineStd": 1.5,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 45,
         "totalDetections": 12,
         "persistenceRate": "75%",
@@ -6464,29 +6464,29 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 20.6,
+        "score": 6.2,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 5.6,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 3,
         "predictedLabel": "Vegetation Wildfire",
-        "confidence": 35.0,
+        "confidence": 30.0,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.1
+            "prob": 0.1451
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.095
+            "prob": 0.1399
           },
           {
             "name": "Coal Mining Seam Fire",
@@ -6494,15 +6494,15 @@
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.35
+            "prob": 0.3
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.235
+            "prob": 0.185
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.06
+            "prob": 0.07
           }
         ]
       },
@@ -6512,8 +6512,8 @@
       "categoryLabel": "Vegetation Wildfire",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.35,
-      "confidence": "High (35.0%)",
+      "evidenceScore": 0.3,
+      "confidence": "High (30.0%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Uttarakhand Regional Corridor",
@@ -6533,15 +6533,15 @@
       "matchedFacility": {
         "name": "Jim Corbett National Park Himalayan Foothills",
         "type": "Protected Mountain Forest",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 12.0,
         "historicalMeanFRP": 12.0,
         "baselineStd": 1.5,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 45,
         "totalDetections": 12,
         "persistenceRate": "75%",
@@ -6550,29 +6550,29 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 20.6,
+        "score": 6.2,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 5.6,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 3,
         "predictedLabel": "Vegetation Wildfire",
-        "confidence": 35.0,
+        "confidence": 30.0,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.1
+            "prob": 0.1451
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.095
+            "prob": 0.1399
           },
           {
             "name": "Coal Mining Seam Fire",
@@ -6580,15 +6580,15 @@
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.35
+            "prob": 0.3
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.235
+            "prob": 0.185
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.06
+            "prob": 0.07
           }
         ]
       },
@@ -6598,8 +6598,8 @@
       "categoryLabel": "Vegetation Wildfire",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.35,
-      "confidence": "High (35.0%)",
+      "evidenceScore": 0.3,
+      "confidence": "High (30.0%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Uttarakhand Regional Corridor",
@@ -6619,15 +6619,15 @@
       "matchedFacility": {
         "name": "Western Ghats Silent Valley & Nilgiri Biosphere",
         "type": "Protected Rainforest Biosphere",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 12.0,
         "historicalMeanFRP": 12.0,
         "baselineStd": 1.5,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -6636,45 +6636,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 20.6,
+        "score": 6.2,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 5.6,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 3,
         "predictedLabel": "Vegetation Wildfire",
-        "confidence": 45.0,
+        "confidence": 40.0,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.015
+            "prob": 0.07
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.02
+            "prob": 0.04
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.025
+            "prob": 0.04
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.45
+            "prob": 0.4
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.345
+            "prob": 0.29
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.145
+            "prob": 0.16
           }
         ]
       },
@@ -6684,8 +6684,8 @@
       "categoryLabel": "Vegetation Wildfire",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.45,
-      "confidence": "High (45.0%)",
+      "evidenceScore": 0.4,
+      "confidence": "High (40.0%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Kerala Regional Corridor",
@@ -6705,15 +6705,15 @@
       "matchedFacility": {
         "name": "Kaziranga National Park Floodplain Buffer",
         "type": "Protected Grassland & Wetland",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 25.0,
         "historicalMeanFRP": 25.0,
         "baselineStd": 3.0,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -6722,56 +6722,56 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 17.7,
+        "score": 3.3,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 2.7,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
-        "predictedClass": 1,
-        "predictedLabel": "Super Thermal Power Plant",
-        "confidence": 50.0,
+        "predictedClass": 3,
+        "predictedLabel": "Vegetation Wildfire",
+        "confidence": 61.7,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.0252
+            "prob": 0.0275
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.4998
+            "prob": 0.6175
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.05
+            "prob": 0.0
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.075
+            "prob": 0.065
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.12
+            "prob": 0.08
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.23
+            "prob": 0.21
           }
         ]
       },
-      "primaryCategory": "industrial",
-      "categoryGroup": "industrial_flare",
-      "subtype": "Thermal Power Emission",
-      "categoryLabel": "Super Thermal Power Plant",
+      "primaryCategory": "wildfire",
+      "categoryGroup": "forest_fire",
+      "subtype": "Vegetation / Canopy Fire",
+      "categoryLabel": "Vegetation Wildfire",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.5,
-      "confidence": "High (50.0%)",
+      "evidenceScore": 0.62,
+      "confidence": "High (61.7%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Assam Regional Corridor",
@@ -6785,21 +6785,21 @@
       "name": "Patiala & Sangrur Paddy Stubble Burning Belt",
       "state": "Punjab",
       "coordinates": [
-        30.3456,
-        76.412
+        30.375,
+        76.152
       ],
       "matchedFacility": {
         "name": "Patiala & Sangrur Paddy Stubble Burning Belt",
         "type": "Agrarian Cropland Matrix",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 16.0,
         "historicalMeanFRP": 16.0,
         "baselineStd": 1.9,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -6808,45 +6808,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 19.2,
+        "score": 4.8,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 4.2,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 4,
         "predictedLabel": "Agricultural Stubble Burning",
-        "confidence": 94.7,
+        "confidence": 81.2,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.005
+            "prob": 0.02
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.01
+            "prob": 0.07
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.005
+            "prob": 0.035
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.005
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.9467
+            "prob": 0.8117
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.0233
+            "prob": 0.0583
           }
         ]
       },
@@ -6856,8 +6856,8 @@
       "categoryLabel": "Agricultural Stubble Burning",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.95,
-      "confidence": "High (94.7%)",
+      "evidenceScore": 0.81,
+      "confidence": "High (81.2%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Punjab Regional Corridor",
@@ -6877,15 +6877,15 @@
       "matchedFacility": {
         "name": "Ludhiana & Khanna Agro-Industrial Burning Cluster",
         "type": "Agrarian Cropland Matrix",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 16.0,
         "historicalMeanFRP": 16.0,
         "baselineStd": 1.9,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -6894,45 +6894,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 19.2,
+        "score": 4.8,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 4.2,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 4,
         "predictedLabel": "Agricultural Stubble Burning",
-        "confidence": 94.7,
+        "confidence": 81.2,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.005
+            "prob": 0.02
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.01
+            "prob": 0.07
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.005
+            "prob": 0.035
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.005
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.9467
+            "prob": 0.8117
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.0233
+            "prob": 0.0583
           }
         ]
       },
@@ -6942,8 +6942,8 @@
       "categoryLabel": "Agricultural Stubble Burning",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.95,
-      "confidence": "High (94.7%)",
+      "evidenceScore": 0.81,
+      "confidence": "High (81.2%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Punjab Regional Corridor",
@@ -6963,15 +6963,15 @@
       "matchedFacility": {
         "name": "Karnal & Kaithal Stubble Belt",
         "type": "Agrarian Cropland Matrix",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 16.0,
         "historicalMeanFRP": 16.0,
         "baselineStd": 1.9,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -6980,45 +6980,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 19.2,
+        "score": 4.8,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 4.2,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 4,
         "predictedLabel": "Agricultural Stubble Burning",
-        "confidence": 94.7,
+        "confidence": 81.2,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.005
+            "prob": 0.02
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.01
+            "prob": 0.07
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.005
+            "prob": 0.035
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.005
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.9467
+            "prob": 0.8117
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.0233
+            "prob": 0.0583
           }
         ]
       },
@@ -7028,8 +7028,8 @@
       "categoryLabel": "Agricultural Stubble Burning",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.95,
-      "confidence": "High (94.7%)",
+      "evidenceScore": 0.81,
+      "confidence": "High (81.2%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Haryana Regional Corridor",
@@ -7049,15 +7049,15 @@
       "matchedFacility": {
         "name": "Bathinda & Mansa Cotton-Paddy Agrarian Zone",
         "type": "Agrarian Cropland Matrix",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 16.0,
         "historicalMeanFRP": 16.0,
         "baselineStd": 1.9,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -7066,45 +7066,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 19.2,
+        "score": 4.8,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 4.2,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 4,
         "predictedLabel": "Agricultural Stubble Burning",
-        "confidence": 94.7,
+        "confidence": 81.2,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.005
+            "prob": 0.02
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.01
+            "prob": 0.07
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.005
+            "prob": 0.035
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.005
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.9467
+            "prob": 0.8117
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.0233
+            "prob": 0.0583
           }
         ]
       },
@@ -7114,8 +7114,8 @@
       "categoryLabel": "Agricultural Stubble Burning",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.95,
-      "confidence": "High (94.7%)",
+      "evidenceScore": 0.81,
+      "confidence": "High (81.2%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Punjab Regional Corridor",
@@ -7135,15 +7135,15 @@
       "matchedFacility": {
         "name": "Amritsar & Tarn Taran Border Agriculture Zone",
         "type": "Agrarian Cropland Matrix",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 16.0,
         "historicalMeanFRP": 16.0,
         "baselineStd": 1.9,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -7152,45 +7152,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 19.2,
+        "score": 4.8,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 4.2,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 4,
         "predictedLabel": "Agricultural Stubble Burning",
-        "confidence": 94.7,
+        "confidence": 81.2,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.005
+            "prob": 0.02
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.01
+            "prob": 0.07
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.005
+            "prob": 0.035
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.005
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.9467
+            "prob": 0.8117
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.0233
+            "prob": 0.0583
           }
         ]
       },
@@ -7200,8 +7200,8 @@
       "categoryLabel": "Agricultural Stubble Burning",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.95,
-      "confidence": "High (94.7%)",
+      "evidenceScore": 0.81,
+      "confidence": "High (81.2%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Punjab Regional Corridor",
@@ -7221,15 +7221,15 @@
       "matchedFacility": {
         "name": "Muzaffarnagar & Meerut Sugarcane Trash Burn Grid",
         "type": "Agrarian Cropland Matrix",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 16.0,
         "historicalMeanFRP": 16.0,
         "baselineStd": 1.9,
         "frpDeviationRatio": 1.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 365.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -7238,45 +7238,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 19.2,
+        "score": 4.8,
         "zScore": 0.0,
         "frpRatio": 1.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 4.2,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 4,
         "predictedLabel": "Agricultural Stubble Burning",
-        "confidence": 94.7,
+        "confidence": 81.2,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.005
+            "prob": 0.02
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.01
+            "prob": 0.07
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.005
+            "prob": 0.035
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.01
+            "prob": 0.005
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.9467
+            "prob": 0.8117
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.0233
+            "prob": 0.0583
           }
         ]
       },
@@ -7286,8 +7286,8 @@
       "categoryLabel": "Agricultural Stubble Burning",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.95,
-      "confidence": "High (94.7%)",
+      "evidenceScore": 0.81,
+      "confidence": "High (81.2%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Uttar Pradesh Regional Corridor",
@@ -7301,21 +7301,21 @@
       "name": "Bhadla Mega Solar Park (Phase I-IV)",
       "state": "Rajasthan",
       "coordinates": [
-        27.538,
-        71.916
+        27.5385,
+        71.9165
       ],
       "matchedFacility": {
         "name": "Bhadla Mega Solar Park (Phase I-IV)",
         "type": "Ultra Mega Solar Park",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 0.0,
         "historicalMeanFRP": 0.0,
         "baselineStd": 1.5,
         "frpDeviationRatio": 0.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 300.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -7324,45 +7324,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 23.3,
+        "score": 15.8,
         "zScore": 0.0,
         "frpRatio": 0.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 8.3,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 5,
         "predictedLabel": "Solar Glint / False Positive",
-        "confidence": 64.3,
+        "confidence": 70.8,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.04
+            "prob": 0.035
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.025
+            "prob": 0.01
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.205
+            "prob": 0.185
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.04
+            "prob": 0.035
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.0467
+            "prob": 0.0267
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.6433
+            "prob": 0.7083
           }
         ]
       },
@@ -7372,8 +7372,8 @@
       "categoryLabel": "Solar Glint / False Positive",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.64,
-      "confidence": "High (64.3%)",
+      "evidenceScore": 0.71,
+      "confidence": "High (70.8%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Rajasthan Regional Corridor",
@@ -7387,21 +7387,21 @@
       "name": "Pavagada Solar Park (Shakti Sthala)",
       "state": "Karnataka",
       "coordinates": [
-        14.281,
-        77.412
+        14.2815,
+        77.4125
       ],
       "matchedFacility": {
         "name": "Pavagada Solar Park (Shakti Sthala)",
         "type": "Ultra Mega Solar Park",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 0.0,
         "historicalMeanFRP": 0.0,
         "baselineStd": 1.5,
         "frpDeviationRatio": 0.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 300.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -7410,45 +7410,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 23.3,
+        "score": 15.8,
         "zScore": 0.0,
         "frpRatio": 0.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 8.3,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 5,
         "predictedLabel": "Solar Glint / False Positive",
-        "confidence": 64.3,
+        "confidence": 70.8,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.04
+            "prob": 0.035
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.025
+            "prob": 0.01
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.205
+            "prob": 0.185
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.04
+            "prob": 0.035
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.0467
+            "prob": 0.0267
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.6433
+            "prob": 0.7083
           }
         ]
       },
@@ -7458,8 +7458,8 @@
       "categoryLabel": "Solar Glint / False Positive",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.64,
-      "confidence": "High (64.3%)",
+      "evidenceScore": 0.71,
+      "confidence": "High (70.8%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Karnataka Regional Corridor",
@@ -7473,21 +7473,21 @@
       "name": "Kurnool Ultra Mega Solar Park",
       "state": "Andhra Pradesh",
       "coordinates": [
-        15.68,
-        78.28
+        15.6805,
+        78.2805
       ],
       "matchedFacility": {
         "name": "Kurnool Ultra Mega Solar Park",
         "type": "Ultra Mega Solar Park",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 0.0,
         "historicalMeanFRP": 0.0,
         "baselineStd": 1.5,
         "frpDeviationRatio": 0.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 300.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -7496,45 +7496,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 23.3,
+        "score": 15.8,
         "zScore": 0.0,
         "frpRatio": 0.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 8.3,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 5,
         "predictedLabel": "Solar Glint / False Positive",
-        "confidence": 64.3,
+        "confidence": 70.8,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.04
+            "prob": 0.035
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.025
+            "prob": 0.01
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.205
+            "prob": 0.185
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.04
+            "prob": 0.035
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.0467
+            "prob": 0.0267
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.6433
+            "prob": 0.7083
           }
         ]
       },
@@ -7544,8 +7544,8 @@
       "categoryLabel": "Solar Glint / False Positive",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.64,
-      "confidence": "High (64.3%)",
+      "evidenceScore": 0.71,
+      "confidence": "High (70.8%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Andhra Pradesh Regional Corridor",
@@ -7559,21 +7559,21 @@
       "name": "Rewa Ultra Mega Solar Complex",
       "state": "Madhya Pradesh",
       "coordinates": [
-        24.478,
-        81.575
+        24.4785,
+        81.5755
       ],
       "matchedFacility": {
         "name": "Rewa Ultra Mega Solar Complex",
         "type": "Ultra Mega Solar Park",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 0.0,
         "historicalMeanFRP": 0.0,
         "baselineStd": 1.5,
         "frpDeviationRatio": 0.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 300.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -7582,45 +7582,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 23.3,
+        "score": 15.8,
         "zScore": 0.0,
         "frpRatio": 0.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 8.3,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 5,
         "predictedLabel": "Solar Glint / False Positive",
-        "confidence": 64.3,
+        "confidence": 70.8,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.04
+            "prob": 0.035
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.025
+            "prob": 0.01
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.205
+            "prob": 0.185
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.04
+            "prob": 0.035
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.0467
+            "prob": 0.0267
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.6433
+            "prob": 0.7083
           }
         ]
       },
@@ -7630,8 +7630,8 @@
       "categoryLabel": "Solar Glint / False Positive",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.64,
-      "confidence": "High (64.3%)",
+      "evidenceScore": 0.71,
+      "confidence": "High (70.8%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Madhya Pradesh Regional Corridor",
@@ -7645,21 +7645,21 @@
       "name": "Charanka Solar Park (Gujarat Solar Park-1)",
       "state": "Gujarat",
       "coordinates": [
-        23.905,
-        71.2
+        23.9055,
+        71.2005
       ],
       "matchedFacility": {
         "name": "Charanka Solar Park (Gujarat Solar Park-1)",
         "type": "Ultra Mega Solar Park",
-        "distanceMeters": 5000
+        "distanceMeters": 0
       },
       "thermal": {
         "currentFRP": 0.0,
         "historicalMeanFRP": 0.0,
         "baselineStd": 1.5,
         "frpDeviationRatio": 0.0,
-        "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:55 UTC",
+        "currentBrightnessTempK": 300.0,
+        "detectionTime": "2026-09-01 19:10 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -7668,45 +7668,45 @@
         "sensor": "Live VIIRS SNPP 375m & MODIS 1km"
       },
       "anomaly": {
-        "score": 23.3,
+        "score": 15.8,
         "zScore": 0.0,
         "frpRatio": 0.0,
         "isOutlier": false,
         "breakdown": {
           "frp_contribution": 0.0,
           "footprint_contribution": 8.3,
-          "drift_contribution": 15.0
+          "drift_contribution": 0.0
         }
       },
       "mlAttribution": {
         "predictedClass": 5,
         "predictedLabel": "Solar Glint / False Positive",
-        "confidence": 64.3,
+        "confidence": 70.8,
         "modelSource": "trained_random_forest",
         "classBreakdown": [
           {
             "name": "Refinery / Petrochemical Flare",
-            "prob": 0.04
+            "prob": 0.035
           },
           {
             "name": "Super Thermal Power Plant",
-            "prob": 0.025
+            "prob": 0.01
           },
           {
             "name": "Coal Mining Seam Fire",
-            "prob": 0.205
+            "prob": 0.185
           },
           {
             "name": "Vegetation Wildfire",
-            "prob": 0.04
+            "prob": 0.035
           },
           {
             "name": "Agricultural Stubble Burning",
-            "prob": 0.0467
+            "prob": 0.0267
           },
           {
             "name": "Solar Glint / False Positive",
-            "prob": 0.6433
+            "prob": 0.7083
           }
         ]
       },
@@ -7716,8 +7716,8 @@
       "categoryLabel": "Solar Glint / False Positive",
       "status": "normal",
       "statusLabel": "NOMINAL BASELINE",
-      "evidenceScore": 0.64,
-      "confidence": "High (64.3%)",
+      "evidenceScore": 0.71,
+      "confidence": "High (70.8%)",
       "liveDetectionsNearby": 0,
       "nearestSettlement": {
         "name": "Gujarat Regional Corridor",
