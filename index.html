@@ -1501,6 +1501,34 @@
         lucide.createIcons();
       }
     });
+
+    // === HeatWatch Error Diagnostics Overlay ===
+    (function() {
+      const overlay = document.createElement('div');
+      overlay.id = 'hw-error-overlay';
+      overlay.style.cssText = `
+        display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 999999;
+        background: #1a0000; color: #ff4444; font-family: monospace; font-size: 13px;
+        padding: 12px 16px; border-bottom: 2px solid #ff4444; max-height: 45vh;
+        overflow-y: auto; box-shadow: 0 4px 20px rgba(255,0,0,0.4);
+      `;
+      overlay.innerHTML = '<strong style="color:#ff6666;font-size:15px;">⚠️ HeatWatch JS Error (open DevTools Console for full trace)</strong><br/><div id="hw-error-body" style="margin-top:8px;white-space:pre-wrap;"></div>';
+      document.body.appendChild(overlay);
+
+      function showError(msg, src, line, col) {
+        overlay.style.display = 'block';
+        const body = document.getElementById('hw-error-body');
+        body.textContent += '\n' + msg + (src ? '\n  at ' + src + ':' + line + ':' + col : '');
+      }
+
+      window.addEventListener('error', function(e) {
+        showError(e.message, e.filename ? e.filename.split('/').pop() : '', e.lineno, e.colno);
+      });
+
+      window.addEventListener('unhandledrejection', function(e) {
+        showError('Unhandled Promise Rejection: ' + (e.reason?.message || e.reason || e), '', '', '');
+      });
+    })();
   </script>
 </body>
 </html>
