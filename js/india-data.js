@@ -14,7 +14,7 @@ export const ALL_INDIA_FACILITIES = [
     state: "Gujarat",
     city: "Moti Khavdi, Jamnagar",
     type: "Petrochemical & Refinery",
-    coordinates: [22.3590, 69.8660],
+    coordinates: [22.3481, 69.8596],  // Wikipedia: 22°20'53"N 69°51'35"E (Global Energy Observatory verified)
     capacity: "1.24 Million BPD (68.2 MMTPA)",
     baselineFRP: 42.0,
     currentFRP: 68.4,
@@ -29,7 +29,7 @@ export const ALL_INDIA_FACILITIES = [
     state: "Gujarat",
     city: "Devbhumi Dwarka / Vadinar",
     type: "Petrochemical & Refinery",
-    coordinates: [22.3920, 69.7280],
+    coordinates: [22.4160, 69.7380],  // GEM.wiki: Nayara Vadinar refinery centroid
     capacity: "20 MMTPA (400,000 BPD)",
     status: "inactive",
     operator: "Nayara Energy (Rosneft JV)",
@@ -42,7 +42,7 @@ export const ALL_INDIA_FACILITIES = [
     state: "Haryana",
     city: "Panipat",
     type: "Petrochemical & Refinery",
-    coordinates: [29.4725, 76.8845],
+    coordinates: [29.4800, 76.8790],  // IOCL official: 29°28'48"N 76°52'44"E
     capacity: "15 MMTPA (Expanding to 25 MMTPA)",
     status: "inactive",
     operator: "Indian Oil Corporation Ltd",
@@ -55,7 +55,7 @@ export const ALL_INDIA_FACILITIES = [
     state: "Uttar Pradesh",
     city: "Mathura",
     type: "Petrochemical & Refinery",
-    coordinates: [27.3055, 77.7025],
+    coordinates: [27.3783, 77.6864],  // Wikipedia/MapCarta: 27°22'42"N 77°41'11"E — Baad village refinery (NOT Mathura city)
     capacity: "8.0 MMTPA",
     status: "inactive",
     operator: "Indian Oil Corporation Ltd",
@@ -107,7 +107,7 @@ export const ALL_INDIA_FACILITIES = [
     state: "Odisha",
     city: "Paradip",
     type: "Petrochemical & Refinery",
-    coordinates: [20.2725, 86.6855],
+    coordinates: [20.2487, 86.5995],  // Wikipedia/IOCL: 20°14'55"N 86°35'58"E — Jhimani village, 5km SW of Paradip Port
     capacity: "15.0 MMTPA",
     status: "inactive",
     operator: "Indian Oil Corporation Ltd",
@@ -120,7 +120,7 @@ export const ALL_INDIA_FACILITIES = [
     state: "West Bengal",
     city: "Haldia",
     type: "Petrochemical & Refinery",
-    coordinates: [22.0625, 88.1185],
+    coordinates: [22.0300, 88.0680],  // OSM: 22°01'48"N 88°04'05"E — Haldia refinery
     capacity: "8.0 MMTPA",
     status: "inactive",
     operator: "Indian Oil Corporation Ltd / Haldia Petrochemicals",
@@ -146,7 +146,7 @@ export const ALL_INDIA_FACILITIES = [
     state: "Punjab",
     city: "Bathinda",
     type: "Petrochemical & Refinery",
-    coordinates: [29.9572, 75.0078],
+    coordinates: [30.1180, 74.8950],  // HMEL official: 30°07'04"N 74°53'42"E — Guru Gobind Singh Refinery Bathinda
     capacity: "11.3 MMTPA",
     status: "inactive",
     operator: "HPCL-Mittal Energy Ltd (HMEL)",
@@ -159,7 +159,7 @@ export const ALL_INDIA_FACILITIES = [
     state: "Tamil Nadu",
     city: "Chennai (Manali)",
     type: "Petrochemical & Refinery",
-    coordinates: [13.1685, 80.2655],
+    coordinates: [13.1670, 80.2820],  // OSM: 13°10'01"N 80°16'55"E — Manali, Chennai
     capacity: "10.5 MMTPA",
     status: "inactive",
     operator: "Chennai Petroleum Corporation Ltd",
@@ -172,7 +172,7 @@ export const ALL_INDIA_FACILITIES = [
     state: "Madhya Pradesh",
     city: "Bina (Sagar)",
     type: "Petrochemical & Refinery",
-    coordinates: [24.0850, 78.1850],
+    coordinates: [24.1300, 78.1570],  // Wikipedia: 24°07'48"N 78°09'25"E — BPCL Bina Refinery near Bina town
     capacity: "7.8 MMTPA",
     status: "inactive",
     operator: "Bharat Petroleum Corporation Ltd",
@@ -185,7 +185,7 @@ export const ALL_INDIA_FACILITIES = [
     state: "Bihar",
     city: "Begusarai / Barauni",
     type: "Petrochemical & Refinery",
-    coordinates: [25.4055, 85.9755],
+    coordinates: [25.4580, 85.9940],  // OSM: 25°27'29"N 85°59'38"E — Barauni, Begusarai
     capacity: "6.0 MMTPA",
     status: "inactive",
     operator: "Indian Oil Corporation Ltd",
@@ -198,7 +198,7 @@ export const ALL_INDIA_FACILITIES = [
     state: "Assam",
     city: "Golaghat / Numaligarh",
     type: "Petrochemical & Refinery",
-    coordinates: [26.5855, 93.7925],
+    coordinates: [26.5530, 93.6740],  // NRL official: 26°33'11"N 93°40'26"E — Numaligarh, Golaghat
     capacity: "3.0 MMTPA (Expanding to 9 MMTPA)",
     status: "inactive",
     operator: "Numaligarh Refinery Ltd (NRL)",
@@ -215,7 +215,7 @@ export const ALL_INDIA_FACILITIES = [
     state: "Madhya Pradesh",
     city: "Singrauli / Vindhyanagar",
     type: "Thermal Power Station",
-    coordinates: [24.0985, 82.6725],
+    coordinates: [24.0972, 82.6736],  // Wikipedia: 24°05'50"N 82°40'25"E — Vindhyanagar STPS
     capacity: "4,760 MW (Largest Coal Plant in India)",
     status: "inactive",
     operator: "NTPC Limited",
@@ -228,7 +228,7 @@ export const ALL_INDIA_FACILITIES = [
     state: "Chhattisgarh",
     city: "Korba",
     type: "Thermal Power Station",
-    coordinates: [22.3785, 82.7235],
+    coordinates: [22.3878, 82.6838],  // GlobalEnergyObservatory: NTPC Korba STPS, Jamanipali
     capacity: "2,600 MW",
     status: "inactive",
     operator: "NTPC Limited",
@@ -267,7 +267,7 @@ export const ALL_INDIA_FACILITIES = [
     state: "Telangana",
     city: "Peddapalli / Ramagundam",
     type: "Thermal Power Station",
-    coordinates: [18.7585, 79.4555],
+    coordinates: [18.7550, 79.4561],  // Wikipedia: 18°45'18"N 79°27'22"E — NTPC Ramagundam
     capacity: "2,600 MW + 100 MW Floating Solar",
     status: "inactive",
     operator: "NTPC Limited",
@@ -280,7 +280,7 @@ export const ALL_INDIA_FACILITIES = [
     state: "Odisha",
     city: "Angul / Kaniha",
     type: "Thermal Power Station",
-    coordinates: [21.1025, 85.0885],
+    coordinates: [21.0944, 85.0742],  // MapCarta/Wikipedia: 21°05'40"N 85°04'27"E — NTPC Talcher Kaniha
     capacity: "3,000 MW",
     status: "inactive",
     operator: "NTPC Limited",
@@ -349,7 +349,7 @@ export const ALL_INDIA_FACILITIES = [
     state: "Jharkhand",
     city: "Jamshedpur",
     type: "Integrated Steel Plant",
-    coordinates: [22.7855, 86.2055],
+    coordinates: [22.7886, 86.1996],  // GEM.wiki: Tata Steel Jamshedpur main plant
     capacity: "11 MMTPA Crude Steel",
     status: "inactive",
     operator: "Tata Steel Limited",
@@ -362,7 +362,7 @@ export const ALL_INDIA_FACILITIES = [
     state: "Chhattisgarh",
     city: "Bhilai / Durg",
     type: "Integrated Steel Plant",
-    coordinates: [21.1885, 81.3985],
+    coordinates: [21.1852, 81.3942],  // GEM.wiki/MapCarta: SAIL Bhilai Steel Plant
     capacity: "7.0 MMTPA",
     status: "inactive",
     operator: "Steel Authority of India Ltd (SAIL)",
@@ -388,7 +388,7 @@ export const ALL_INDIA_FACILITIES = [
     state: "Odisha",
     city: "Rourkela (Sundargarh)",
     type: "Integrated Steel Plant",
-    coordinates: [22.2325, 84.8725],
+    coordinates: [22.2209, 84.8605],  // Wikipedia: 22°13'15"N 84°51'38"E — SAIL Rourkela Steel Plant
     capacity: "4.5 MMTPA",
     status: "inactive",
     operator: "Steel Authority of India Ltd (SAIL)",
@@ -457,7 +457,7 @@ export const ALL_INDIA_FACILITIES = [
     state: "Jharkhand",
     city: "Dhanbad / Jharia",
     type: "Coal Mining & Subsurface Fire Basin",
-    coordinates: [23.7420, 86.4150],
+    coordinates: [23.7516, 86.4203],  // Wikipedia: 23°45'06"N 86°25'13"E — Jharia coalfield centre
     capacity: "Over 60 Active Mine Fire Zones",
     status: "high_priority",
     operator: "Bharat Coking Coal Ltd (BCCL)",
