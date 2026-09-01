@@ -1,6 +1,6 @@
 {
   "status": "success",
-  "last_sync_utc": "2026-09-01T18:48:35.991871+00:00",
+  "last_sync_utc": "2026-09-01T18:55:23.563679+00:00",
   "nasa_source": "NASA LANCE NRT (Live VIIRS 375m & MODIS 1km)",
   "ml_model": "RandomForestClassifier (200 trees, 14 features) — trained_random_forest",
   "total_detections_count": 182,
@@ -2757,7 +2757,7 @@
         "baselineStd": 4.8,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -2829,8 +2829,8 @@
       "name": "Nayara Energy Vadinar Refinery",
       "state": "Gujarat",
       "coordinates": [
-        22.395,
-        69.721
+        22.392,
+        69.728
       ],
       "matchedFacility": {
         "name": "Nayara Energy Vadinar Refinery",
@@ -2843,7 +2843,7 @@
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -2915,8 +2915,8 @@
       "name": "IOCL Panipat Refinery & Petrochemical Complex",
       "state": "Haryana",
       "coordinates": [
-        29.472,
-        76.885
+        29.488,
+        76.888
       ],
       "matchedFacility": {
         "name": "IOCL Panipat Refinery & Petrochemical Complex",
@@ -2929,7 +2929,7 @@
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -3001,8 +3001,8 @@
       "name": "IOCL Mathura Refinery",
       "state": "Uttar Pradesh",
       "coordinates": [
-        27.428,
-        77.689
+        27.432,
+        77.692
       ],
       "matchedFacility": {
         "name": "IOCL Mathura Refinery",
@@ -3015,7 +3015,7 @@
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -3087,8 +3087,8 @@
       "name": "BPCL Mumbai Refinery (Mahul)",
       "state": "Maharashtra",
       "coordinates": [
-        19.014,
-        72.898
+        19.012,
+        72.895
       ],
       "matchedFacility": {
         "name": "BPCL Mumbai Refinery (Mahul)",
@@ -3101,7 +3101,7 @@
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -3173,8 +3173,8 @@
       "name": "HPCL Mumbai Refinery",
       "state": "Maharashtra",
       "coordinates": [
-        19.008,
-        72.902
+        19.005,
+        72.9
       ],
       "matchedFacility": {
         "name": "HPCL Mumbai Refinery",
@@ -3187,7 +3187,7 @@
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -3259,8 +3259,8 @@
       "name": "BPCL Kochi Refinery (Ambalamugal)",
       "state": "Kerala",
       "coordinates": [
-        9.978,
-        76.368
+        9.975,
+        76.365
       ],
       "matchedFacility": {
         "name": "BPCL Kochi Refinery (Ambalamugal)",
@@ -3273,7 +3273,7 @@
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -3345,8 +3345,8 @@
       "name": "IOCL Paradip Mega-Refinery",
       "state": "Odisha",
       "coordinates": [
-        20.288,
-        86.634
+        20.272,
+        86.685
       ],
       "matchedFacility": {
         "name": "IOCL Paradip Mega-Refinery",
@@ -3359,7 +3359,7 @@
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -3431,8 +3431,8 @@
       "name": "IOCL Haldia Refinery & Petrochemicals",
       "state": "West Bengal",
       "coordinates": [
-        22.048,
-        88.082
+        22.062,
+        88.118
       ],
       "matchedFacility": {
         "name": "IOCL Haldia Refinery & Petrochemicals",
@@ -3445,7 +3445,7 @@
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -3517,8 +3517,8 @@
       "name": "HPCL Visakhapatnam Refinery",
       "state": "Andhra Pradesh",
       "coordinates": [
-        17.685,
-        83.254
+        17.692,
+        83.262
       ],
       "matchedFacility": {
         "name": "HPCL Visakhapatnam Refinery",
@@ -3531,7 +3531,7 @@
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -3603,8 +3603,8 @@
       "name": "HMEL Guru Gobind Singh Refinery (Bathinda)",
       "state": "Punjab",
       "coordinates": [
-        29.982,
-        75.018
+        29.988,
+        75.025
       ],
       "matchedFacility": {
         "name": "HMEL Guru Gobind Singh Refinery (Bathinda)",
@@ -3617,7 +3617,7 @@
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -3689,8 +3689,8 @@
       "name": "CPCL Manali Refinery (Chennai)",
       "state": "Tamil Nadu",
       "coordinates": [
-        13.165,
-        80.262
+        13.168,
+        80.265
       ],
       "matchedFacility": {
         "name": "CPCL Manali Refinery (Chennai)",
@@ -3703,7 +3703,7 @@
         "baselineStd": 3.8,
         "frpDeviationRatio": 0.11,
         "currentBrightnessTempK": 335.9,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -3775,8 +3775,8 @@
       "name": "BPCL Bina Refinery",
       "state": "Madhya Pradesh",
       "coordinates": [
-        24.168,
-        78.182
+        24.165,
+        78.188
       ],
       "matchedFacility": {
         "name": "BPCL Bina Refinery",
@@ -3789,7 +3789,7 @@
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -3861,8 +3861,8 @@
       "name": "IOCL Barauni Refinery",
       "state": "Bihar",
       "coordinates": [
-        25.424,
-        85.992
+        25.432,
+        85.998
       ],
       "matchedFacility": {
         "name": "IOCL Barauni Refinery",
@@ -3875,7 +3875,7 @@
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -3947,8 +3947,8 @@
       "name": "Numaligarh Refinery (Assam)",
       "state": "Assam",
       "coordinates": [
-        26.584,
-        93.748
+        26.585,
+        93.792
       ],
       "matchedFacility": {
         "name": "Numaligarh Refinery (Assam)",
@@ -3961,7 +3961,7 @@
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -4047,7 +4047,7 @@
         "baselineStd": 7.0,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -4119,8 +4119,8 @@
       "name": "NTPC Korba Super Thermal Power Station",
       "state": "Chhattisgarh",
       "coordinates": [
-        22.3712,
-        82.6954
+        22.378,
+        82.723
       ],
       "matchedFacility": {
         "name": "NTPC Korba Super Thermal Power Station",
@@ -4133,7 +4133,7 @@
         "baselineStd": 7.0,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -4205,8 +4205,8 @@
       "name": "NTPC Singrauli Super Thermal Power Station (Shaktinagar)",
       "state": "Uttar Pradesh",
       "coordinates": [
-        24.112,
-        82.784
+        24.108,
+        82.782
       ],
       "matchedFacility": {
         "name": "NTPC Singrauli Super Thermal Power Station (Shaktinagar)",
@@ -4219,7 +4219,7 @@
         "baselineStd": 5.4,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -4291,8 +4291,8 @@
       "name": "NTPC Sipat Super Thermal Power Station",
       "state": "Chhattisgarh",
       "coordinates": [
-        22.132,
-        82.285
+        22.138,
+        82.292
       ],
       "matchedFacility": {
         "name": "NTPC Sipat Super Thermal Power Station",
@@ -4305,7 +4305,7 @@
         "baselineStd": 5.4,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -4377,8 +4377,8 @@
       "name": "NTPC Ramagundam Super Thermal Power Station",
       "state": "Telangana",
       "coordinates": [
-        18.756,
-        79.452
+        18.758,
+        79.455
       ],
       "matchedFacility": {
         "name": "NTPC Ramagundam Super Thermal Power Station",
@@ -4391,7 +4391,7 @@
         "baselineStd": 5.4,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -4463,8 +4463,8 @@
       "name": "NTPC Talcher Super Thermal Power Station (Kaniha)",
       "state": "Odisha",
       "coordinates": [
-        21.096,
-        85.082
+        21.102,
+        85.088
       ],
       "matchedFacility": {
         "name": "NTPC Talcher Super Thermal Power Station (Kaniha)",
@@ -4477,7 +4477,7 @@
         "baselineStd": 5.4,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -4563,7 +4563,7 @@
         "baselineStd": 5.4,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -4649,7 +4649,7 @@
         "baselineStd": 5.4,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -4721,8 +4721,8 @@
       "name": "Chandrapur Super Thermal Power Station (CSTPS)",
       "state": "Maharashtra",
       "coordinates": [
-        19.982,
-        79.294
+        19.985,
+        79.296
       ],
       "matchedFacility": {
         "name": "Chandrapur Super Thermal Power Station (CSTPS)",
@@ -4735,7 +4735,7 @@
         "baselineStd": 5.4,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -4807,8 +4807,8 @@
       "name": "NTPC Dadri Power Complex (Coal & Gas)",
       "state": "Uttar Pradesh",
       "coordinates": [
-        28.602,
-        77.558
+        28.605,
+        77.56
       ],
       "matchedFacility": {
         "name": "NTPC Dadri Power Complex (Coal & Gas)",
@@ -4821,7 +4821,7 @@
         "baselineStd": 5.4,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -4893,8 +4893,8 @@
       "name": "Tata Steel Jamshedpur Works",
       "state": "Jharkhand",
       "coordinates": [
-        22.788,
-        86.208
+        22.785,
+        86.205
       ],
       "matchedFacility": {
         "name": "Tata Steel Jamshedpur Works",
@@ -4907,7 +4907,7 @@
         "baselineStd": 4.6,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -4979,7 +4979,7 @@
       "name": "SAIL Bhilai Steel Plant",
       "state": "Chhattisgarh",
       "coordinates": [
-        21.185,
+        21.188,
         81.398
       ],
       "matchedFacility": {
@@ -4993,7 +4993,7 @@
         "baselineStd": 4.6,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -5065,8 +5065,8 @@
       "name": "SAIL Bokaro Steel Plant",
       "state": "Jharkhand",
       "coordinates": [
-        23.672,
-        86.148
+        23.668,
+        86.155
       ],
       "matchedFacility": {
         "name": "SAIL Bokaro Steel Plant",
@@ -5079,7 +5079,7 @@
         "baselineStd": 4.6,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -5151,8 +5151,8 @@
       "name": "SAIL Rourkela Steel Plant",
       "state": "Odisha",
       "coordinates": [
-        22.224,
-        84.868
+        22.232,
+        84.872
       ],
       "matchedFacility": {
         "name": "SAIL Rourkela Steel Plant",
@@ -5165,7 +5165,7 @@
         "baselineStd": 4.6,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -5251,7 +5251,7 @@
         "baselineStd": 4.6,
         "frpDeviationRatio": 0.11,
         "currentBrightnessTempK": 336.8,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 36,
         "persistenceRate": "89%",
@@ -5323,8 +5323,8 @@
       "name": "Tata Steel Kalinganagar",
       "state": "Odisha",
       "coordinates": [
-        20.958,
-        86.012
+        20.965,
+        86.018
       ],
       "matchedFacility": {
         "name": "Tata Steel Kalinganagar",
@@ -5337,7 +5337,7 @@
         "baselineStd": 4.6,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -5409,8 +5409,8 @@
       "name": "Rashtriya Ispat Nigam Ltd (RINL / Vizag Steel)",
       "state": "Andhra Pradesh",
       "coordinates": [
-        17.625,
-        83.185
+        17.635,
+        83.192
       ],
       "matchedFacility": {
         "name": "Rashtriya Ispat Nigam Ltd (RINL / Vizag Steel)",
@@ -5423,7 +5423,7 @@
         "baselineStd": 4.6,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -5495,8 +5495,8 @@
       "name": "AM/NS India Hazira Steel Complex",
       "state": "Gujarat",
       "coordinates": [
-        21.112,
-        72.678
+        21.115,
+        72.675
       ],
       "matchedFacility": {
         "name": "AM/NS India Hazira Steel Complex",
@@ -5509,7 +5509,7 @@
         "baselineStd": 4.6,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 88,
         "totalDetections": 12,
         "persistenceRate": "89%",
@@ -5595,7 +5595,7 @@
         "baselineStd": 3.0,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -5681,7 +5681,7 @@
         "baselineStd": 4.6,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -5767,7 +5767,7 @@
         "baselineStd": 4.6,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -5853,7 +5853,7 @@
         "baselineStd": 3.0,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -5939,7 +5939,7 @@
         "baselineStd": 4.6,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -6025,7 +6025,7 @@
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -6111,7 +6111,7 @@
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -6197,7 +6197,7 @@
         "baselineStd": 3.8,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -6283,7 +6283,7 @@
         "baselineStd": 1.5,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -6369,7 +6369,7 @@
         "baselineStd": 1.5,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 45,
         "totalDetections": 12,
         "persistenceRate": "75%",
@@ -6455,7 +6455,7 @@
         "baselineStd": 1.5,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 45,
         "totalDetections": 12,
         "persistenceRate": "75%",
@@ -6541,7 +6541,7 @@
         "baselineStd": 1.5,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 45,
         "totalDetections": 12,
         "persistenceRate": "75%",
@@ -6627,7 +6627,7 @@
         "baselineStd": 1.5,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -6713,7 +6713,7 @@
         "baselineStd": 3.0,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -6799,7 +6799,7 @@
         "baselineStd": 1.9,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -6885,7 +6885,7 @@
         "baselineStd": 1.9,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -6971,7 +6971,7 @@
         "baselineStd": 1.9,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -7057,7 +7057,7 @@
         "baselineStd": 1.9,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -7143,7 +7143,7 @@
         "baselineStd": 1.9,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -7229,7 +7229,7 @@
         "baselineStd": 1.9,
         "frpDeviationRatio": 1.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -7315,7 +7315,7 @@
         "baselineStd": 1.5,
         "frpDeviationRatio": 0.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -7401,7 +7401,7 @@
         "baselineStd": 1.5,
         "frpDeviationRatio": 0.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -7487,7 +7487,7 @@
         "baselineStd": 1.5,
         "frpDeviationRatio": 0.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -7573,7 +7573,7 @@
         "baselineStd": 1.5,
         "frpDeviationRatio": 0.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
@@ -7659,7 +7659,7 @@
         "baselineStd": 1.5,
         "frpDeviationRatio": 0.0,
         "currentBrightnessTempK": 360.0,
-        "detectionTime": "2026-09-01 18:48 UTC",
+        "detectionTime": "2026-09-01 18:55 UTC",
         "activeDays": 28,
         "totalDetections": 12,
         "persistenceRate": "69%",
