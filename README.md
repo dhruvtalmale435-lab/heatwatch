@@ -1,214 +1,194 @@
-# ?? HeatWatch � Satellite Industrial Thermal Radiometry & Anomaly Intelligence Platform
+# 🔥 HeatWatch — Satellite Industrial Thermal Intelligence & Anomaly Platform
 
-<div align="center">
+> **Transforming raw satellite radiometry into facility-aware industrial intelligence, statistical baseline deviation models, and automated disaster triage.**
 
-[![Smart India Hackathon 2026](https://img.shields.io/badge/SIH-2026_Finalist-orange.svg?style=for-the-badge&logo=target)](https://sih.gov.in/)
-[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg?style=for-the-badge&logo=python)](https://www.python.org/)
-[![NASA FIRMS NRT](https://img.shields.io/badge/NASA-FIRMS_LANCE_NRT-red.svg?style=for-the-badge&logo=nasa)](https://firms.modaps.eosdis.nasa.gov/)
-[![ESA Copernicus](https://img.shields.io/badge/ESA-Copernicus_Sentinel-003399.svg?style=for-the-badge&logo=esa)](https://dataspace.copernicus.eu/)
-[![Scikit-Learn](https://img.shields.io/badge/ML-Random_Forest_Ensemble-F7931E.svg?style=for-the-badge&logo=scikit-learn)](https://scikit-learn.org/)
-[![Leaflet GIS](https://img.shields.io/badge/GIS-Leaflet_Engine-199900.svg?style=for-the-badge&logo=leaflet)](https://leafletjs.com/)
-
-**From Raw Satellite Infrared Hotspots to Prioritized Industrial Incident Intelligence**
-
-[Live Features](#-key-capabilities) � [Scientific Architecture](#-system-architecture) � [ML Attribution Pipeline](#-two-tier-intelligence-engine) � [Quickstart](#-quickstart-guide) � [API Reference](#-rest-api-endpoints)
-
-</div>
+[![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=flat&logo=python&logoColor=white)](https://python.org)
+[![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=flat&logo=javascript&logoColor=black)](https://developer.mozilla.org)
+[![Leaflet](https://img.shields.io/badge/Leaflet-1.9.4-199900?style=flat&logo=leaflet&logoColor=white)](https://leafletjs.com)
+[![NASA FIRMS](https://img.shields.io/badge/NASA-LANCE%20FIRMS%20NRT-E03C31?style=flat&logo=nasa&logoColor=white)](https://firms.modaps.eosdis.nasa.gov)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ---
 
-## ?? Executive Summary
+## 📌 Executive Summary
 
-Traditional satellite hotspot platforms (such as basic NASA FIRMS or generic fire maps) provide point coordinates where infrared heat is detected. However, **raw hotspots do not explain what caused the heat, whether it is routine industrial operation, or whether it represents a critical operational surge**.
+Traditional satellite fire detection platforms (such as raw NASA FIRMS) detect thermal infrared radiometry and mark thermal anomalies as generic 'fire pins' on a map. However, for industrial surveillance, disaster response, and environmental monitoring:
 
-**HeatWatch** closes the critical intelligence gap between orbital radiometry and ground disaster response:
-1. **Object-Oriented Thermal Clustering**: Aggregates raw 375m VIIRS pixels into persistent **Thermal Objects** (`ST-DBSCAN`) retaining multi-year history, centroid stability, and flare footprint geometry.
-2. **Two-Tier Physics & Machine Learning Pipeline**:
-   - **Engine 1 (Source Classification)**: Random Forest model (14 radiometric and geospatial features) predicting industrial flaring vs agricultural burning vs wildfire vs urban noise.
-   - **Engine 2 (Statistical Baseline Deviation)**: Dynamic 90-day operational baseline modeling normal capacity and triggering alerts when Radiative Power (FRP) surges abnormally ($\ge 3.0\times$ baseline).
-3. **Nationwide Industrial Footprint**: Overlays OpenStreetMap (OSM) plant boundaries, ESA WorldCover 10m land cover rasters, and VIIRS Nighttime Lights (DNB) across **58+ key industrial complexes throughout India**.
-4. **Actionable Disaster Management Triage**: Automated 1-page Official Incident Triage Dossiers, settlement vulnerability exposure buffers, and Sentinel-2 SWIR false-color spectral verification.
+1. **A hotspot inside a petrochemical refinery flare stack is expected operational behaviour**, not an emergency.
+2. **A sudden 3.8x surge in thermal radiative power (FRP) with spatial plume expansion** at that same refinery indicates an acute containment failure or uncontrolled blowout requiring urgent triage.
+3. **Solar panels and metal roofs trigger optical glint false alarms** during mid-day orbital passes.
+4. **Coal seam auto-oxidation fires in mines** require subsurface thermal tracking distinct from agricultural crop residue burning.
 
----
-
-## ??? System Architecture
-
-```
-                                  ORBITAL SENSING
-      VIIRS SNPP (375m)  �  NOAA-20 / NOAA-21  �  MODIS Terra/Aqua (1km)
-                                        �
-                                        ?
-                           DATA INGESTION & SYNC DAEMON
-                 NASA LANCE FIRMS NRT API (India Area Coverage)
-                                        �
-                        +-------------------------------+
-                        ?                               ?
-               SPATIAL-TEMPORAL                GEOSPATIAL CONTEXT
-               ST-DBSCAN CLUSTERING            ENRICHMENT PIPELINE
-            (Pixel-to-Object Formation)         � OSM Industrial Plant Polygons
-                        �                       � ESA WorldCover 10m Rasters
-                        �                       � VIIRS Nighttime Lights (DNB)
-                        +-------------------------------+
-                                        ?
-                        TWO-TIER INTELLIGENCE ENGINE
-  +---------------------------------------------------------------------------+
-  �                                                                           �
-  ?                                                                           ?
-ENGINE 1: SOURCE ATTRIBUTION                                 ENGINE 2: BASELINE & ANOMALY
-Random Forest Classifier (14 Features)                       Statistical 90-Day Time-Series
-  � Radiative Power (FRP MW)                                   � Dynamic Facility Median FRP
-  � Brightness Temp (I-4 & I-5 Band)                           � Acute Surge Ratio (?FRP)
-  � Nightlight Radiance (nW/cm�/sr)                            � Footprint Expansion (+281%)
-  � Land Cover Composition (% Built/Tree/Crop)                 � Centroid Stack Displacement
-  � Distance to Known Plant Perimeter                          � Escalation: Normal ? High Priority
-  �                                                                           �
-  +---------------------------------------------------------------------------+
-                                        ?
-                        MISSION-CONTROL PRESENTATION LAYER
-  +---------------------------------------------------------------------------+
-  ?                  ?                  ?                  ?                  ?
-GIS Command Map   Analytics & Baseline   SIH Jury Tour    Alert Center   Incident Dossier
-(Leaflet + GIBS)  (90-Day Time Series)  (10-Step Guided) (Triage Queue)  (1-Page Official)
-```
+**HeatWatch** bridges this critical gap. It ingests live 375m VIIRS & 1km MODIS satellite telemetry, clusters raw radiometry into persistent **Thermal Objects**, contextualizes them with OpenStreetMap industrial boundaries and ESA WorldCover land use, and applies a **Two-Brain Decision Architecture**:
+- 🧠 **Brain 1 (Source Attribution):** Multi-modal physics & ML classifier that identifies *what* the heat source is (Refinery Flare, Power Plant, Coal Seam Fire, Forest Wildfire, Crop Stubble, or Solar Glint).
+- 🚨 **Brain 2 (Baseline & Anomaly Engine):** Statistical 90-day time-series baseline model that answers *is today's behaviour normal for this exact location?*, generating automated priority alerts (NOMINAL, ELEVATED, HIGH-PRIORITY).
 
 ---
 
-## ?? Two-Tier Intelligence Engine
+## 🏛️ System Architecture
 
-### Engine 1: Multi-Spectral Source Attribution
-Trained on multi-sensor radiometry with high-confidence cross-validation:
-$$\hat{y} = \arg\max_{c} P(C = c \mid \mathbf{x})$$
-where $\mathbf{x} \in \mathbb{R}^{14}$ encompasses:
-* **Thermal Features**: FRP ($\text{MW}$), Brightness Temperature $T_{3.74\mu\text{m}}$ ($\text{K}$), Brightness Temp Delta $\Delta T_{3.74-11.45}$, Day/Night flag.
-* **Geospatial Context**: Nearest facility distance ($d_{\text{fac}}$), Facility category, Inside boundary boolean.
-* **Land & Albedo**: Built-up %, Tree cover %, Cropland %, Water %, Bare ground % (ESA WorldCover 10m).
-* **Nighttime Radiance**: Nightlights intensity $L_{\text{DNB}}$ ($\text{nW}\cdot\text{cm}^{-2}\cdot\text{sr}^{-1}$).
-
-### Engine 2: Statistical Baseline Anomaly Detection
-Operational safety cannot be determined by classification alone. HeatWatch continuously calculates:
-$$\text{Anomaly Score} = w_1 \left(\frac{\text{FRP}_{\text{obs}}}{\mu_{\text{baseline}}}\right) + w_2 \left(\frac{A_{\text{footprint}}}{A_{\text{norm}}}\right) + w_3 \cdot d_{\text{centroid}} + w_4 \cdot \text{Persistence}$$
-
-| Operational State | Deviation Factor | Severity Level | Action Protocol |
-| :--- | :--- | :--- | :--- |
-| **Normal Operational Flaring** | $0.5\times - 1.5\times$ | ?? `NORMAL` | Passive continuous logging |
-| **Elevated Plant Load** | $1.5\times - 2.8\times$ | ?? `ELEVATED` | Automated watch notice |
-| **Acute Flare Surge / Fire Incident** | $\ge 3.0\times$ | ?? `HIGH PRIORITY` | Instant Disaster Authority Triage |
-
----
-
-## ?? Key Capabilities
-
-### 1. GIS Command Center
-* Multi-satellite raster basemaps with NASA GIBS NRT layers.
-* Filter by sector: **Refineries**, **Thermal Power**, **Steel Plants**, **Coal Mines**, **Chemicals**, **Agricultural Stubble**, **Forest Reserves**, and **Solar Parks**.
-* Real-time spatial search across 58+ facilities nationwide (Jamnagar, Nayara Vadinar, Panipat, Paradip, Singrauli, Korba, Vindhyachal, Tata Steel Jamshedpur, Simlipal, Patiala, etc.).
-
-### 2. Analytics & 90-Day Baseline Deep-Dive
-* Interactive time-series charts displaying 90 days of daily FRP measurements against operational mean and $+3\sigma$ threshold lines.
-* Cross-facility regional comparison bar charts dynamically highlighting the active asset.
-* 4 real-time KPI cards: Observed FRP, Baseline Mean, Radiative Temp (K / �C), and Attribution Confidence.
-
-### 3. Sub-Pixel Pyrometry & Emissions Calculator
-* **Planck Radiation Curve Fitting**:
-  $$B(\lambda, T) = \frac{2hc^2}{\lambda^5 \left(e^{\frac{hc}{\lambda k_B T}} - 1\right)}$$
-* Interactive emitter temperature slider ($500\,\text{K} - 2200\,\text{K}$) calculating sub-pixel flare area ($A_{\text{flare}} \approx 17.4\,\text{m}^2$).
-* **World Bank GGFR Emission Estimator**: Converts flared natural gas volume into daily and annual $\text{CO}_2$ metric tonnes.
-
-### 4. 10-Step Interactive SIH Jury Tour Mode
-* Step-by-step presentation flow built into the UI.
-* Transitions smoothly between the GIS Command Map and Analytics views, showcasing the entire end-to-end detection-to-decision pipeline.
-
-### 5. Official Incident Triage Dossier
-* Generates an official, printable 1-page Incident Dossier for District Disaster Management Authorities (DDMA) with nearest settlement distances, population exposure estimates, and field verification sign-off checklists.
-
----
-
-## ? Quickstart Guide
-
-### Option 1: Standalone Web Application (Zero Dependencies)
-You can launch the frontend immediately using any static web server:
-
-```bash
-# Using Python
-python -m http.server 3000
-
-# Or using Node.js
-npx serve .
-```
-Open **`http://localhost:3000`** in your browser.
+`
+                               ┌──────────────────────────────────────────────┐
+                               │       LIVE ORBITAL PASS TELEMETRY            │
+                               │  NASA FIRMS (VIIRS 375m I-Band, MODIS 1km)   │
+                               └──────────────────────┬───────────────────────┘
+                                                      │
+                                                      ▼
+                               ┌──────────────────────────────────────────────┐
+                               │           INGESTION & CLEANING               │
+                               │  Strict Geofencing, SNR Gating, Temporal Sync│
+                               └──────────────────────┬───────────────────────┘
+                                                      │
+                                                      ▼
+                               ┌──────────────────────────────────────────────┐
+                               │            SPATIOTEMPORAL DBSCAN             │
+                               │   Pixel Radiative Clustering -> Thermal Objs │
+                               └──────────────────────┬───────────────────────┘
+                                                      │
+                      ┌───────────────────────────────┴───────────────────────────────┐
+                      ▼                                                               ▼
+       ┌──────────────────────────────┐                                ┌──────────────────────────────┐
+       │   GEOSPATIAL CONTEXTUALIZER  │                                │     TIME-SERIES TELEMETRY    │
+       │ OSM Polygons + ESA WorldCover│                                │ 90-Day Rolling Baseline FRP  │
+       │ VIIRS Nighttime Lights (DNB) │                                │ Gaussian Anomaly & Deviation │
+       └──────────────┬───────────────┘                                └──────────────┬───────────────┘
+                      │                                                               │
+                      ▼                                                               ▼
+       ┌──────────────────────────────┐                                ┌──────────────────────────────┐
+       │     BRAIN 1: SOURCE ATTRIB   │                                │   BRAIN 2: ANOMALY ENGINE    │
+       │ Trained Random Forest (200t) │                                │ Multi-Factor Deviation Ratio │
+       │ 14-Feature Multi-Modal Infr. │                                │ Z-Score + Footprint Dynamics │
+       └──────────────┬───────────────┘                                └──────────────┬───────────────┘
+                      │                                                               │
+                      └───────────────────────────────┬───────────────────────────────┘
+                                                      │
+                                                      ▼
+                               ┌──────────────────────────────────────────────┐
+                               │            OPERATIONAL TRIAGE                │
+                               │  • High-Priority Anomaly Detection & Alerts  │
+                               │  • Sub-Pixel Planck Pyrometry & Emissions    │
+                               │  • 1-Page Actionable Incident Dossier Export │
+                               │  • Live REST API / GeoJSON Interoperability  │
+                               └──────────────────────────────────────────────┘
+`
 
 ---
 
-### Option 2: Full-Stack Dev Server with Live Background Sync
-To run the automated 15-minute NASA FIRMS sync daemon with machine learning inference:
+## 🇮🇳 Comprehensive All-India Industrial & Environmental Catalog
 
-```bash
-# 1. Install dependencies
-pip install scikit-learn numpy requests
+HeatWatch monitors **58 high-impact industrial and ecological complexes** across India with high-precision coordinates:
 
-# 2. Start the full-stack server
-python dev_server.py
-```
-* **Web UI**: `http://localhost:3000`
-* **Live Ingestion Endpoint**: `http://localhost:3000/api/firms/sync`
-* **Health Endpoint**: `http://localhost:3000/api/health`
-
----
-
-## ?? Repository Structure
-
-```
-SIHFIREDETECTION/
-+-- backend/
-�   +-- live_service.py         # NASA FIRMS sync, ST-DBSCAN & RF inference service
-+-- data/
-�   +-- live_firms_india.json   # Live telemetry cache for all India facilities
-+-- js/
-�   +-- analytics.js            # Chart.js time-series & regional bar charts
-�   +-- app.js                  # Main application controller & event coordinator
-�   +-- data.js                 # Thermal objects, baselines & SIH tour definitions
-�   +-- demo-story.js           # 10-Step guided SIH presentation tour engine
-�   +-- firms-fetcher.js        # NASA FIRMS API client with fallback telemetry
-�   +-- india-data.js           # 58+ Indian industrial complexes & metadata
-�   +-- map.js                  # Leaflet radar canvas, layers & spatial filters
-+-- ml_engine1/
-�   +-- models/                 # Model training & feature engineering pipelines
-�   +-- data_ingestion/         # FIRMS data verification & calibration scripts
-+-- attribution_model.pkl       # Trained Random Forest classifier (14 features)
-+-- model_metadata.json         # Feature definitions, class mappings & metrics
-+-- dev_server.py               # Full-stack Python server with auto-sync daemon
-+-- index.html                  # Master application interface
-+-- styles.css                  # Mission-control geospatial design system
-+-- README.md                   # Project documentation
-```
+| Sector | Count | Major Facilities Monitored |
+| :--- | :---: | :--- |
+| **Petrochemical Refineries** | 15 | Reliance Jamnagar (68.2 MMTPA), Nayara Vadinar, IOCL Panipat, BPCL Mumbai, BPCL Kochi, IOCL Paradip, IOCL Haldia, HPCL Vizag, HMEL Bathinda, CPCL Manali, BPCL Bina, IOCL Mathura |
+| **Super Thermal Power** | 10 | NTPC Vindhyachal (4.7 GW), NTPC Korba (2.6 GW), NTPC Singrauli (2.0 GW), NTPC Sipat, NTPC Ramagundam, Tata & Adani Mundra (8.6 GW), Chandrapur, NTPC Dadri |
+| **Integrated Steel Mills** | 8 | Tata Steel Jamshedpur, SAIL Bhilai, SAIL Bokaro, SAIL Rourkela, JSW Vijayanagar (Toranagallu), AM/NS Hazira, Tata Steel Kalinganagar, RINL Vizag |
+| **Coal Basins & Mines** | 5 | Jharia Coalfield Seam Fires, Korba Gevra Open-Cast Mine, Singrauli Jayant Coal Pit, Raniganj Coalfield, Bailadila Iron Ore Complex |
+| **Chemical & SEZ Hubs** | 3 | Dahej PCPIR Petrochemical Megazone, Ankleshwar Chemical Estate, Hazira Heavy Industrial Zone (Shell/KRIBHCO) |
+| **Forest Reserves** | 6 | Simlipal Biosphere Core (Odisha), Bandhavgarh National Park (MP), Garhwal Himalayan Forest Corridor, Jim Corbett (Uttarakhand), Silent Valley (Kerala), Kaziranga (Assam) |
+| **Agricultural Stubble** | 6 | Patiala-Sangrur Paddy Stubble, Ludhiana-Khanna, Karnal-Kaithal, Bathinda-Mansa, Amritsar-Tarn Taran, Muzaffarnagar Sugarcane Belt |
+| **Solar Park Benchmarks** | 5 | Bhadla Mega Solar Park (2,245 MW Rajasthan), Pavagada Solar (2.0 GW Karnataka), Kurnool Ultra Mega (1.0 GW AP), Rewa Solar (MP), Charanka (Gujarat) |
 
 ---
 
-## ?? REST API Endpoints
+## ✨ Core Features & Platform Capabilities
 
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/health` | Server status, satellite feeds, and active anomaly count |
-| `GET` | `/api/firms/sync` | Triggers on-demand NASA FIRMS fetch & ML attribution |
-| `GET` | `/api/hotspots` | Returns active thermal objects with ML attribution |
-| `GET` | `/api/facilities` | Returns all 58+ Indian industrial assets with baselines |
-| `GET` | `/api/alerts` | Returns active high-priority triage incident list |
-| `GET` | `/api/export/geojson` | Exports standard GeoJSON FeatureCollection for GIS software |
+### 1. Interactive GIS Command Map
+- **Leaflet Engine** with NASA GIBS 24-hour real-time satellite imagery basemaps, CartoDB Dark Matter, and OpenStreetMap layers.
+- **Multimodal Layer Toggles:** Raw NASA FIRMS 375m points, Attributed Thermal Clusters, OSM Industrial Boundaries, ESA WorldCover 1km Land-Cover Buffers, NASA Static Anomaly Masks, and 2km Population Exposure Risk Buffers.
+- **Live Search & Region Selector:** Instant flight navigation to 58+ Indian facilities or 9 curated study corridors.
+
+### 2. Evidence Inspector HUD
+- On-demand slide-out telemetry dossier with complete multi-tier diagnostic breakdown:
+  - **Step 1:** Sensor metadata, observed FRP (MW), raw confidence, brightness temp (K), acquisition UTC.
+  - **Step 2:** Nearest infrastructure distance (e.g. *Inside Facility Perimeter*, *Adjacent Industrial Buffer*, *Open Regional Sector*), ESA WorldCover composition.
+  - **Step 3:** Historical FRP deviation ratio vs 30-day baseline mean, risk severity badge (NOMINAL, ELEVATED, HIGH-PRIORITY).
+  - **Step 4:** AI Source Attribution confidence and classification breakdown.
+  - **Step 5:** Operational Action Plan, nearest population settlement exposure, and field operator verification status.
+
+### 3. Sub-Pixel Pyrometry & Flaring Emissions
+- **Planck Blackbody Curve Fitting:** Models radiance distribution across 1.6um (SWIR), 2.2um, 3.7um (MWIR), and 10.8um (TIR).
+- **Dozier Dual-Band Inversion:** Resolves sub-pixel sub-surface fire/flare temperature (800 - 1800 K) and true active combustion area.
+- **World Bank GGFR Emission Calculator:** Quantifies volumetric gas flaring rates (m3/hr), annual mass combusted, and equivalent metric tons of CO2 emissions.
+
+### 4. Alert Center & Triage Queue
+- Fluidly scrollable operational table listing all active alerts, anomalies, and monitored assets across India.
+- Category filters (Industrial Fires, Routine Flares, Coal Mining, Wildfires, Agricultural Stubble, Glint Filtered).
+- Live keyword search, multi-factor sorting, and 1-click inspection navigation.
+
+### 5. 1-Page Actionable Incident Dossier (Export & Print)
+- Clean, ISO-compliant printable PDF/HTML dispatch brief generated dynamically for emergency response teams and State Pollution Control Boards.
+
+### 6. Frozen REST API & GeoJSON Playground
+- Interactive playground to test live REST API endpoints, inspect JSON schemas, and export OGC-compliant GeoJSON payloads for GIS integration (QGIS / ArcGIS / Disaster Command Portals).
 
 ---
 
-## ??? Earth Observation Data Providers
+## 🚀 Getting Started
 
-* **NASA LANCE FIRMS**: VIIRS S-NPP (375m), NOAA-20, NOAA-21, MODIS Terra/Aqua.
-* **NASA GIBS WMS**: Corrected Reflectance True-Color Imagery & Night Lights.
-* **ESA Copernicus**: Sentinel-2 MSI Multi-Spectral Instrument (SWIR B12, B8A, RGB).
-* **OpenStreetMap**: Global industrial infrastructure polygons via Overpass API.
-* **ESA WorldCover 10m**: Global land cover raster classification.
+### Prerequisites
+- Python 3.9 or higher
+- Modern web browser (Chrome, Edge, Firefox, Safari)
+
+### Installation
+
+1. **Clone the repository:**
+   `ash
+   git clone https://github.com/dhruvtalmale435-lab/HeatWatch.git
+   cd HeatWatch
+   `
+
+2. **Install Python dependencies:**
+   `ash
+   pip install requests numpy scikit-learn
+   `
+
+3. **Start the Full-Stack HeatWatch Server:**
+   `ash
+   python dev_server.py
+   `
+
+4. **Access the application:**
+   - Web Interface: http://127.0.0.1:3000
+   - Health Check: http://127.0.0.1:3000/api/health
+   - Live Detections API: http://127.0.0.1:3000/api/v1/detections
+   - GeoJSON Export: http://127.0.0.1:3000/api/v1/export/geojson
 
 ---
 
-## ?? Smart India Hackathon (SIH 2026)
+## 📡 REST API Reference
 
-* **Problem Statement**: Satellite Thermal Hotspot Source Attribution & Industrial Anomaly Detection.
-* **Team**: HeatWatch Engineering Lab
-* **License**: MIT Open Source License
+| Endpoint | Method | Description |
+| :--- | :---: | :--- |
+| /api/health | GET | System health status, ML model readiness, background sync state. |
+| /api/v1/detections | GET | Returns all active thermal objects with ML attribution and anomaly scores. |
+| /api/v1/detections?region={id} | GET | Filter detections by specific region (e.g. jamnagar, korba, singrauli). |
+| /api/v1/facilities | GET | Returns catalog of all 58 Indian industrial and ecological facilities. |
+| /api/v1/export/geojson | GET | Standard GeoJSON FeatureCollection of all active thermal anomalies. |
+| /api/v1/pyrometry | POST | Calculates sub-pixel temperature, fire area, and CO2 emissions given FRP and MWIR/TIR brightness temps. |
+| /api/v1/verify | POST | Logs ground-truth verification tag from field operators into the active learning database. |
+
+---
+
+## 🛠️ Technology Stack
+
+- **Frontend:** Vanilla JavaScript (ES6+ Modules), Semantic HTML5, Custom High-Performance CSS3 (Dark Mode, Glassmorphism, Micro-Animations).
+- **Mapping & GIS:** Leaflet 1.9.4, NASA GIBS WMS Layers, OpenStreetMap CartoDB Tiles.
+- **Charts & Telemetry:** Chart.js 4.4.1 (Planck Blackbody Curves, 90-Day Historical Time-Series, Multi-Factor Deviation Distributions).
+- **Backend & Ingestion:** Python HTTP Server, NASA FIRMS LANCE API Client, Background Threading Auto-Sync.
+- **Machine Learning (Brain 1):** Scikit-Learn RandomForestClassifier (200 Estimators, 14 Multi-Modal Features).
+- **Anomaly Detection (Brain 2):** Statistical Gaussian Deviation Model, Centroid Stability Vector Tracking, Volumetric FRP Ratio Expansion.
+
+---
+
+## 👥 Authors & Acknowledgments
+
+- Developed for the **Smart India Hackathon (SIH 2024)**.
+- Telemetry provided by **NASA LANCE FIRMS** (MODIS & VIIRS active thermal radiometry).
+- Basemap and infrastructure boundary data from **OpenStreetMap Contributors** and **ESA WorldCover 10m Land Cover**.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.

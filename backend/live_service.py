@@ -9,6 +9,7 @@ for EVERY facility cluster. Also computes Brain-2 anomaly score for every cluste
 
 import os
 import sys
+import re
 import json
 import math
 import pickle
@@ -57,148 +58,88 @@ CLASS_TO_CATEGORY = {
 }
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Facility definitions — includes full land-cover & nightlight data for ML
+# Facility definitions — parsed dynamically from js/india-data.js for all 58 sites
 # ──────────────────────────────────────────────────────────────────────────────
 def load_indian_facilities():
-    """All 26 monitored facilities with baseline FRP, land-cover %, nightlight, and persistence."""
-    return [
-        # ── Refineries & Petrochemicals ──────────────────────────────────────
-        {"id":"REF-01","name":"Jamnagar Mega-Refinery (RIL)","type":"Petrochemical & Refinery",
-         "lat":22.3590,"lon":69.8660,"state":"Gujarat","baselineFRP":42.0,"baselineStd":4.8,
-         "landCover":{"industrialBuiltUp":82.0,"vegetationTree":5.0,"waterBody":10.0,"bareSoilPaved":3.0,"cropland":0.0},
-         "nightlight":94.2,"persistence_days":90},
+    """Dynamically parses all 58 facilities from js/india-data.js ensuring 100% sync."""
+    js_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "js", "india-data.js")
+    if not os.path.exists(js_path):
+        js_path = os.path.join(os.getcwd(), "js", "india-data.js")
+    
+    facilities = []
+    if os.path.exists(js_path):
+        with open(js_path, "r", encoding="utf-8") as f:
+            text = f.read()
+        
+        matches = re.findall(r'id:\s*"([^"]+)",\s*name:\s*"([^"]+)",\s*state:\s*"([^"]+)",\s*city:\s*"([^"]+)",\s*type:\s*"([^"]+)",\s*coordinates:\s*\[([0-9\.\s,\-]+)\]', text)
+        for m in matches:
+            fac_id, name, state, city, fac_type, coords = m
+            lat, lon = [float(x.strip()) for x in coords.split(',')]
+            
+            # Baseline FRP estimation based on capacity and facility type
+            if "Refinery" in fac_type or "Chemical" in fac_type:
+                base_frp = 40.0 if "Jamnagar" in name else 32.0
+                lc = {"industrialBuiltUp": 80.0, "vegetationTree": 5.0, "waterBody": 10.0, "bareSoilPaved": 5.0, "cropland": 0.0}
+                nightlight = 88.0
+            elif "Thermal" in fac_type or "Power" in fac_type:
+                base_frp = 58.0 if "Korba" in name or "Vindhyachal" in name else 45.0
+                lc = {"industrialBuiltUp": 72.0, "bareSoilPaved": 18.0, "waterBody": 6.0, "vegetationTree": 4.0, "cropland": 0.0}
+                nightlight = 68.0
+            elif "Steel" in fac_type or "Mine" in fac_type:
+                base_frp = 38.0
+                lc = {"industrialBuiltUp": 75.0, "bareSoilPaved": 15.0, "vegetationTree": 8.0, "waterBody": 2.0, "cropland": 0.0}
+                nightlight = 72.0
+            elif "Forest" in fac_type or "Biosphere" in fac_type or "National Park" in fac_type:
+                base_frp = 12.0
+                lc = {"industrialBuiltUp": 2.0, "vegetationTree": 88.0, "waterBody": 4.0, "bareSoilPaved": 6.0, "cropland": 0.0}
+                nightlight = 3.5
+            elif "Agrarian" in fac_type or "Stubble" in fac_type or "Paddy" in fac_type or "Sugarcane" in fac_type:
+                base_frp = 16.0
+                lc = {"industrialBuiltUp": 4.0, "cropland": 88.0, "bareSoilPaved": 6.0, "vegetationTree": 2.0, "waterBody": 0.0}
+                nightlight = 14.0
+            elif "Solar" in fac_type:
+                base_frp = 0.0
+                lc = {"industrialBuiltUp": 30.0, "bareSoilPaved": 65.0, "vegetationTree": 1.0, "waterBody": 0.0, "cropland": 4.0}
+                nightlight = 15.0
+            else:
+                base_frp = 25.0
+                lc = {"industrialBuiltUp": 50.0, "vegetationTree": 20.0, "waterBody": 10.0, "bareSoilPaved": 10.0, "cropland": 10.0}
+                nightlight = 45.0
 
-        {"id":"REF-02","name":"Nayara Energy Vadinar Refinery","type":"Petrochemical & Refinery",
-         "lat":22.3950,"lon":69.7210,"state":"Gujarat","baselineFRP":36.5,"baselineStd":4.2,
-         "landCover":{"industrialBuiltUp":78.0,"vegetationTree":5.0,"waterBody":12.0,"bareSoilPaved":5.0,"cropland":0.0},
-         "nightlight":88.4,"persistence_days":88},
+            facilities.append({
+                "id": fac_id,
+                "name": name,
+                "type": fac_type,
+                "lat": lat,
+                "lon": lon,
+                "state": state,
+                "city": city,
+                "baselineFRP": base_frp,
+                "baselineStd": round(max(base_frp * 0.12, 1.5), 1),
+                "landCover": lc,
+                "nightlight": nightlight,
+                "persistence_days": 88 if ("Refinery" in fac_type or "Thermal" in fac_type or "Steel" in fac_type) else (45 if "Forest" in fac_type else 28)
+            })
+    return facilities
 
-        {"id":"REF-03","name":"IOCL Panipat Refinery","type":"Petrochemical & Refinery",
-         "lat":29.4720,"lon":76.8850,"state":"Haryana","baselineFRP":45.0,"baselineStd":5.2,
-         "landCover":{"industrialBuiltUp":74.0,"cropland":18.0,"bareSoilPaved":6.0,"vegetationTree":2.0,"waterBody":0.0},
-         "nightlight":82.6,"persistence_days":87},
 
-        {"id":"REF-04","name":"IOCL Mathura Refinery","type":"Petrochemical & Refinery",
-         "lat":27.4280,"lon":77.6890,"state":"Uttar Pradesh","baselineFRP":28.0,"baselineStd":3.5,
-         "landCover":{"industrialBuiltUp":70.0,"cropland":22.0,"bareSoilPaved":5.0,"vegetationTree":3.0,"waterBody":0.0},
-         "nightlight":76.4,"persistence_days":86},
-
-        {"id":"REF-05","name":"BPCL/HPCL Mumbai Refinery","type":"Petrochemical & Refinery",
-         "lat":19.0140,"lon":72.8980,"state":"Maharashtra","baselineFRP":32.0,"baselineStd":3.8,
-         "landCover":{"industrialBuiltUp":65.0,"waterBody":25.0,"bareSoilPaved":8.0,"vegetationTree":2.0,"cropland":0.0},
-         "nightlight":98.6,"persistence_days":90},
-
-        {"id":"REF-07","name":"BPCL Kochi Refinery","type":"Petrochemical & Refinery",
-         "lat":9.9780,"lon":76.3680,"state":"Kerala","baselineFRP":31.0,"baselineStd":3.6,
-         "landCover":{"industrialBuiltUp":65.0,"vegetationTree":25.0,"waterBody":8.0,"bareSoilPaved":2.0,"cropland":0.0},
-         "nightlight":80.2,"persistence_days":85},
-
-        {"id":"REF-08","name":"IOCL Paradip Refinery","type":"Petrochemical & Refinery",
-         "lat":20.2880,"lon":86.6340,"state":"Odisha","baselineFRP":40.0,"baselineStd":4.5,
-         "landCover":{"industrialBuiltUp":70.0,"waterBody":18.0,"bareSoilPaved":8.0,"vegetationTree":4.0,"cropland":0.0},
-         "nightlight":72.8,"persistence_days":88},
-
-        {"id":"REF-09","name":"IOCL Haldia Petrochemicals","type":"Petrochemical & Refinery",
-         "lat":22.0480,"lon":88.0820,"state":"West Bengal","baselineFRP":30.0,"baselineStd":3.4,
-         "landCover":{"industrialBuiltUp":74.0,"waterBody":16.0,"bareSoilPaved":6.0,"vegetationTree":4.0,"cropland":0.0},
-         "nightlight":84.6,"persistence_days":86},
-
-        {"id":"REF-10","name":"HPCL Visakhapatnam Refinery","type":"Petrochemical & Refinery",
-         "lat":17.6850,"lon":83.2540,"state":"Andhra Pradesh","baselineFRP":34.0,"baselineStd":3.9,
-         "landCover":{"industrialBuiltUp":78.0,"waterBody":12.0,"bareSoilPaved":6.0,"vegetationTree":4.0,"cropland":0.0},
-         "nightlight":78.4,"persistence_days":87},
-
-        {"id":"REF-11","name":"HMEL Bathinda Refinery","type":"Petrochemical & Refinery",
-         "lat":29.9820,"lon":75.0180,"state":"Punjab","baselineFRP":33.0,"baselineStd":3.8,
-         "landCover":{"industrialBuiltUp":64.0,"cropland":30.0,"bareSoilPaved":6.0,"vegetationTree":0.0,"waterBody":0.0},
-         "nightlight":74.2,"persistence_days":85},
-
-        # ── Thermal Power Plants ──────────────────────────────────────────────
-        {"id":"PWR-01","name":"NTPC Vindhyachal Super Thermal Power (4.7 GW)","type":"Thermal Power Station",
-         "lat":24.0980,"lon":82.6720,"state":"Madhya Pradesh","baselineFRP":65.0,"baselineStd":7.2,
-         "landCover":{"industrialBuiltUp":72.0,"bareSoilPaved":18.0,"waterBody":6.0,"vegetationTree":4.0,"cropland":0.0},
-         "nightlight":68.4,"persistence_days":90},
-
-        {"id":"PWR-02","name":"NTPC Korba Super Thermal Power (2.6 GW)","type":"Thermal Power Station",
-         "lat":22.3712,"lon":82.6954,"state":"Chhattisgarh","baselineFRP":58.4,"baselineStd":6.5,
-         "landCover":{"industrialBuiltUp":68.2,"bareSoilPaved":18.3,"vegetationTree":9.1,"waterBody":4.4,"cropland":0.0},
-         "nightlight":62.8,"persistence_days":89},
-
-        {"id":"PWR-03","name":"NTPC Singrauli Super Thermal (2.0 GW)","type":"Thermal Power Station",
-         "lat":24.1120,"lon":82.7840,"state":"Uttar Pradesh","baselineFRP":52.0,"baselineStd":5.8,
-         "landCover":{"industrialBuiltUp":66.0,"waterBody":20.0,"bareSoilPaved":10.0,"vegetationTree":4.0,"cropland":0.0},
-         "nightlight":60.4,"persistence_days":88},
-
-        {"id":"PWR-06","name":"NTPC Talcher Super Thermal (3.0 GW)","type":"Thermal Power Station",
-         "lat":21.0960,"lon":85.0820,"state":"Odisha","baselineFRP":60.0,"baselineStd":6.8,
-         "landCover":{"industrialBuiltUp":65.0,"cropland":20.0,"bareSoilPaved":10.0,"vegetationTree":5.0,"waterBody":0.0},
-         "nightlight":58.6,"persistence_days":87},
-
-        {"id":"PWR-07","name":"Mundra Mega Power Complex (Tata & Adani 8.6 GW)","type":"Thermal Power Station",
-         "lat":22.8180,"lon":69.5250,"state":"Gujarat","baselineFRP":62.0,"baselineStd":7.0,
-         "landCover":{"industrialBuiltUp":65.0,"waterBody":22.0,"bareSoilPaved":13.0,"vegetationTree":0.0,"cropland":0.0},
-         "nightlight":72.4,"persistence_days":90},
-
-        # ── Integrated Steel Plants ───────────────────────────────────────────
-        {"id":"STL-01","name":"Tata Steel Jamshedpur Works","type":"Integrated Steel Plant",
-         "lat":22.7880,"lon":86.2080,"state":"Jharkhand","baselineFRP":48.0,"baselineStd":5.5,
-         "landCover":{"industrialBuiltUp":82.0,"bareSoilPaved":10.0,"vegetationTree":6.0,"waterBody":2.0,"cropland":0.0},
-         "nightlight":78.6,"persistence_days":90},
-
-        {"id":"STL-02","name":"SAIL Bhilai Steel Plant","type":"Integrated Steel Plant",
-         "lat":21.1850,"lon":81.3980,"state":"Chhattisgarh","baselineFRP":44.0,"baselineStd":5.0,
-         "landCover":{"industrialBuiltUp":78.0,"bareSoilPaved":14.0,"vegetationTree":6.0,"waterBody":2.0,"cropland":0.0},
-         "nightlight":74.2,"persistence_days":89},
-
-        {"id":"STL-03","name":"SAIL Bokaro Steel Plant","type":"Integrated Steel Plant",
-         "lat":23.6720,"lon":86.1480,"state":"Jharkhand","baselineFRP":42.0,"baselineStd":4.8,
-         "landCover":{"industrialBuiltUp":76.0,"bareSoilPaved":15.0,"vegetationTree":6.0,"waterBody":3.0,"cropland":0.0},
-         "nightlight":72.8,"persistence_days":88},
-
-        {"id":"STL-05","name":"JSW Steel Vijayanagar Works","type":"Integrated Steel Plant",
-         "lat":15.1850,"lon":76.6620,"state":"Karnataka","baselineFRP":52.0,"baselineStd":5.8,
-         "landCover":{"industrialBuiltUp":80.0,"bareSoilPaved":12.0,"vegetationTree":6.0,"waterBody":2.0,"cropland":0.0},
-         "nightlight":76.4,"persistence_days":89},
-
-        # ── Coal Mining ───────────────────────────────────────────────────────
-        {"id":"MINE-01","name":"Jharia Coalfield Subsurface Fires (BCCL)","type":"Coal Mine & Subsurface Fire",
-         "lat":23.7420,"lon":86.4150,"state":"Jharkhand","baselineFRP":55.0,"baselineStd":6.2,
-         "landCover":{"bareSoilPaved":58.4,"industrialBuiltUp":34.2,"vegetationTree":4.1,"cropland":2.1,"waterBody":1.2},
-         "nightlight":62.4,"persistence_days":90},
-
-        {"id":"MINE-02","name":"Korba Gevra Open-Cast Pit (SECL)","type":"Open-Cast Coal Mine",
-         "lat":22.3380,"lon":82.5920,"state":"Chhattisgarh","baselineFRP":35.0,"baselineStd":4.0,
-         "landCover":{"bareSoilPaved":62.0,"industrialBuiltUp":28.0,"vegetationTree":6.0,"cropland":4.0,"waterBody":0.0},
-         "nightlight":52.6,"persistence_days":88},
-
-        {"id":"MINE-03","name":"Singrauli Jayant Coal Pit (NCL)","type":"Open-Cast Coal Mine",
-         "lat":24.1845,"lon":82.6482,"state":"Madhya Pradesh","baselineFRP":32.0,"baselineStd":3.7,
-         "landCover":{"bareSoilPaved":60.0,"industrialBuiltUp":30.0,"vegetationTree":5.0,"cropland":5.0,"waterBody":0.0},
-         "nightlight":48.4,"persistence_days":86},
-
-        # ── Chemical & Industrial ─────────────────────────────────────────────
-        {"id":"CHEM-01","name":"Dahej PCPIR Petrochemical Megazone","type":"Chemical & Industrial Estate",
-         "lat":21.7120,"lon":72.5850,"state":"Gujarat","baselineFRP":40.0,"baselineStd":4.6,
-         "landCover":{"industrialBuiltUp":76.4,"bareSoilPaved":14.2,"waterBody":6.4,"vegetationTree":3.0,"cropland":0.0},
-         "nightlight":80.4,"persistence_days":88},
-
-        {"id":"CHEM-03","name":"Hazira Heavy Industry & LNG Hub","type":"LNG & Petrochemicals",
-         "lat":21.0945,"lon":72.6682,"state":"Gujarat","baselineFRP":35.8,"baselineStd":4.1,
-         "landCover":{"industrialBuiltUp":72.0,"waterBody":14.0,"bareSoilPaved":10.0,"vegetationTree":4.0,"cropland":0.0},
-         "nightlight":82.6,"persistence_days":87},
-
-        # ── Forest / Wildfire ─────────────────────────────────────────────────
-        {"id":"FOR-01","name":"Simlipal Biosphere Reserve","type":"Protected Forest Reserve",
-         "lat":21.8651,"lon":86.3294,"state":"Odisha","baselineFRP":12.0,"baselineStd":3.2,
-         "landCover":{"vegetationTree":88.0,"bareSoilPaved":8.0,"cropland":2.0,"waterBody":2.0,"industrialBuiltUp":0.0},
-         "nightlight":2.1,"persistence_days":42},
-
-        # ── Agriculture ───────────────────────────────────────────────────────
-        {"id":"AGR-01","name":"Patiala-Sangrur Crop Stubble Belt","type":"Agricultural Farmland",
-         "lat":30.3456,"lon":76.4120,"state":"Punjab","baselineFRP":15.2,"baselineStd":4.8,
-         "landCover":{"cropland":91.5,"industrialBuiltUp":4.2,"vegetationTree":3.1,"bareSoilPaved":1.2,"waterBody":0.0},
-         "nightlight":18.4,"persistence_days":28},
-    ]
+def is_point_in_india(lat, lon):
+    """Filters out open ocean (Sri Lanka / Arabian Sea / Bay of Bengal) and foreign territory."""
+    if lat < 8.08 or lat > 36.5 or lon < 68.1 or lon > 97.4:
+        return False
+    # Filter out Sri Lanka / Gulf of Mannar ocean points
+    if lat < 9.8 and lon > 79.5:
+        return False
+    # Filter out southern Indian ocean below Kanyakumari
+    if lat < 8.1:
+        return False
+    # Filter out Arabian sea west of Mumbai/Goa/Kerala
+    if lon < 71.8 and lat < 18.0 and (lon < 69.5 or lat < 16.0):
+        return False
+    # Filter out northwest beyond Punjab/J&K border
+    if lat > 32.5 and lon < 73.8:
+        return False
+    return True
 
 
 def haversine_km(lat1, lon1, lat2, lon2):
@@ -234,7 +175,7 @@ def fetch_live_nasa_firms():
                             temp = float(row.get('bright_ti4', row.get('brightness', 340.0)))
                             scan = float(row.get('scan', 0.38))
                             track = float(row.get('track', 0.38))
-                            if 6.0 <= lat <= 37.0 and 68.0 <= lon <= 98.0:  # India only
+                            if is_point_in_india(lat, lon):  # Strict Indian territory check
                                 all_records.append({
                                     "id": f"NASA-{src[:5]}-{i:04d}",
                                     "lat": round(lat, 5),

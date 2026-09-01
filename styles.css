@@ -121,39 +121,61 @@ body {
 .brand-logo {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.65rem;
   user-select: none;
-  cursor: default;
+  cursor: pointer;
+  text-decoration: none;
 }
 
-.brand-flame-icon {
-  width: 20px;
-  height: 20px;
-  color: #ea580c;
+.brand-logo-icon-wrap {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 8px rgba(255, 87, 34, 0.4));
+  transition: transform var(--ease-fast);
 }
 
-.brand-name {
+.brand-logo:hover .brand-logo-icon-wrap {
+  transform: scale(1.06);
+}
+
+.brand-text-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1.05;
+}
+
+.brand-name-row {
   font-family: var(--font-heading);
-  font-size: 1.15rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: #f8fafc;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   display: inline-flex;
   align-items: center;
 }
 
-.brand-accent {
+.brand-heat {
+  color: #ff5722;
   font-weight: 800;
-  color: #38bdf8;
 }
 
-.brand-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #38bdf8;
-  margin-left: 2px;
-  margin-bottom: 6px;
+.brand-watch {
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.brand-tagline {
+  font-size: 0.52rem;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin-top: 1px;
 }
 
 /* Nav Tabs */
@@ -1507,6 +1529,27 @@ input:checked+.slider:before {
   border-color: var(--accent-cyan);
 }
 
+.btn-close-hud {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--ease-fast);
+  flex-shrink: 0;
+}
+
+.btn-close-hud:hover {
+  background: rgba(255, 71, 71, 0.2);
+  border-color: rgba(255, 71, 71, 0.4);
+  color: #ff8888;
+}
+
 /* ==========================================================================
    Interactive SIH Guided Tour Overlay & Presentation Card
    ========================================================================== */
@@ -2190,9 +2233,9 @@ input:checked+.slider:before {
 
 .alerts-view-container {
   width: 100%;
-  height: 100%;
-  padding: 1.5rem;
-  overflow-y: auto;
+  min-height: 100%;
+  padding: 1.5rem 2rem 4rem 2rem;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -2201,36 +2244,76 @@ input:checked+.slider:before {
 .alert-table-card {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  border-radius: 8px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
+}
+
+.alert-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 68vh;
+  position: relative;
+  background: rgba(10, 15, 25, 0.4);
+}
+
+.alert-table-wrapper::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+.alert-table-wrapper::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.alert-table-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.35);
+  border-radius: 4px;
+}
+
+.alert-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.65);
 }
 
 .table-custom {
   width: 100%;
+  min-width: 960px;
   border-collapse: collapse;
   text-align: left;
   font-size: 0.82rem;
 }
 
+.table-custom thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
 .table-custom th {
-  background: rgba(0, 0, 0, 0.35);
-  padding: 0.75rem 1rem;
+  background: #0f172a;
+  padding: 0.85rem 1rem;
   font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
-  font-size: 0.7rem;
-  letter-spacing: 0.04em;
-  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
 }
 
 .table-custom td {
   padding: 0.85rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   vertical-align: middle;
 }
 
 .table-custom tr:hover {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(56, 189, 248, 0.04);
 }
 
 /* ==========================================================================
@@ -2996,9 +3079,8 @@ input:checked+.slider:before {
 .analytics-view-container,
 .comparison-view-container {
   width: 100%;
-  height: 100%;
-  overflow-y: auto;
-  padding: 1.5rem 2rem;
+  min-height: 100%;
+  padding: 1.5rem 2rem 4rem 2rem;
   background: var(--bg-primary, #080c14);
   box-sizing: border-box;
   display: flex;
@@ -3016,6 +3098,7 @@ input:checked+.slider:before {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  overflow: hidden;
 }
 
 .alert-table-controls-row {
@@ -3121,15 +3204,19 @@ input:checked+.slider:before {
   }
 
   .charts-split-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
   }
 
   .spectral-split-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
   }
 
   .dossier-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
+  }
+
+  .matrix-grid {
+    grid-template-columns: 1fr !important;
   }
 }
 
@@ -3142,15 +3229,16 @@ input:checked+.slider:before {
   body {
     height: 100%;
     min-height: 100vh;
+    overflow-x: hidden;
   }
 
-  /* Header Mobile Stack */
+  /* Header Mobile 2-Row Stack */
   .app-header {
     height: auto;
     min-height: 52px;
     padding: 0.5rem 0.75rem;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.45rem;
   }
 
   .brand-container {
@@ -3160,33 +3248,56 @@ input:checked+.slider:before {
   .header-actions {
     display: flex;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.3rem;
     flex-wrap: wrap;
   }
 
   .header-actions button {
-    padding: 0 0.55rem;
+    padding: 0 0.5rem;
     height: 28px;
-    font-size: 0.72rem;
+    font-size: 0.7rem;
+    border-radius: 4px;
   }
 
   /* Nav Tabs Horizontal Scrollable Ribbon */
   .nav-tabs {
     order: 3;
     width: 100%;
-    height: 36px;
+    height: 38px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     white-space: nowrap;
-    padding: 2px;
-    gap: 0.2rem;
+    padding: 2px 4px;
+    gap: 0.25rem;
+    border-radius: 6px;
+    scrollbar-width: none;
+  }
+
+  .nav-tabs::-webkit-scrollbar {
+    display: none;
   }
 
   .nav-tab-btn {
-    padding: 0 0.55rem;
-    height: 28px;
+    padding: 0 0.6rem;
+    height: 30px;
     font-size: 0.72rem;
     flex-shrink: 0;
+    border-radius: 4px;
+  }
+
+  /* More Tools Dropdown on Mobile */
+  .nav-dropdown-menu {
+    position: fixed !important;
+    top: auto !important;
+    bottom: 4.5rem !important;
+    left: 0.5rem !important;
+    right: 0.5rem !important;
+    width: auto !important;
+    max-width: calc(100vw - 1rem) !important;
+    max-height: 65vh !important;
+    overflow-y: auto !important;
+    z-index: 9999 !important;
+    border-radius: 10px !important;
   }
 
   /* Telemetry Live Ticker Mobile */
@@ -3199,6 +3310,11 @@ input:checked+.slider:before {
     white-space: nowrap;
     gap: 1rem;
     justify-content: flex-start;
+    scrollbar-width: none;
+  }
+
+  .telemetry-ticker::-webkit-scrollbar {
+    display: none;
   }
 
   .ticker-status-item {
@@ -3218,12 +3334,13 @@ input:checked+.slider:before {
     bottom: 0;
     width: 100vw;
     max-width: 100vw;
-    z-index: 1200;
+    z-index: 2500;
     margin-right: 0;
     transform: translateX(0);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     background: rgba(10, 14, 23, 0.98);
     backdrop-filter: blur(20px);
+    overflow-y: auto;
   }
 
   .map-sidebar-inspector.collapsed {
@@ -3232,8 +3349,10 @@ input:checked+.slider:before {
   }
 
   .sidebar-toggle-tab {
-    left: -32px;
-    top: 4rem;
+    left: -34px;
+    top: 5rem;
+    width: 34px;
+    height: 42px;
   }
 
   /* Floating HUD Panels Mobile */
@@ -3244,6 +3363,7 @@ input:checked+.slider:before {
   .map-region-selector {
     top: 0.5rem;
     left: 0.5rem;
+    right: 0.5rem;
     width: calc(100vw - 1rem);
   }
 
@@ -3251,12 +3371,26 @@ input:checked+.slider:before {
     top: auto;
     bottom: 1rem;
     left: 0.5rem;
+    right: 0.5rem;
     width: calc(100vw - 1rem);
   }
 
-  /* Analytics Mobile View */
-  .analytics-view-container {
-    padding: 0.75rem 0.75rem 3rem 0.75rem;
+  .map-category-ribbon {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    scrollbar-width: none;
+  }
+
+  .map-category-ribbon::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Analytics & Baseline Mobile View */
+  .analytics-view-container,
+  .alerts-view-container,
+  .comparison-view-container {
+    padding: 0.75rem 0.5rem 3.5rem 0.5rem;
     gap: 0.85rem;
   }
 
@@ -3279,7 +3413,7 @@ input:checked+.slider:before {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.65rem;
-    padding: 0.75rem 1rem !important;
+    padding: 0.75rem 0.85rem !important;
   }
 
   .analytics-grid-4col {
@@ -3287,34 +3421,118 @@ input:checked+.slider:before {
     gap: 0.6rem;
   }
 
+  .charts-split-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.85rem;
+  }
+
+  .chart-canvas-wrap {
+    height: 240px !important;
+  }
+
   .kpi-card {
-    padding: 0.75rem 1rem;
+    padding: 0.75rem 0.85rem;
   }
 
   .kpi-value {
     font-size: 1.25rem;
   }
 
-  .chart-canvas-wrap {
-    height: 240px;
+  /* Alert Center Mobile View */
+  .alert-table-card {
+    padding: 0.75rem 0.5rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .alert-table-controls-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+
+  .alert-category-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+
+  .alert-category-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .alert-tab-btn {
+    flex-shrink: 0;
+    padding: 0.3rem 0.65rem;
+  }
+
+  .alert-search-input {
+    width: 100% !important;
+    min-width: 100% !important;
+  }
+
+  .table-custom {
+    min-width: 650px;
+  }
+
+  /* Comparison Matrix Mobile View */
+  .matrix-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.85rem;
+  }
+
+  /* REST API Playground Mobile View */
+  .api-endpoint-selector {
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    gap: 0.35rem;
+    padding-bottom: 0.5rem;
+    scrollbar-width: none;
+  }
+
+  .api-endpoint-selector::-webkit-scrollbar {
+    display: none;
+  }
+
+  .api-method-btn {
+    flex-shrink: 0;
+    font-size: 0.72rem;
+    padding: 0.35rem 0.65rem;
   }
 
   /* Modals on Mobile */
   .modal-backdrop {
-    padding: 0.5rem;
+    padding: 0.25rem;
     align-items: flex-end;
   }
 
   .modal-window {
     max-width: 100vw;
     width: 100%;
-    max-height: 88vh;
+    max-height: 90vh;
     border-radius: 12px 12px 0 0;
   }
 
-  /* SIH Tour Card on Mobile */
+  .dossier-grid,
+  .spectral-split-grid,
+  .dos-checklist-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .dossier-alert-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  /* SIH Tour Floating Presentation Modal on Mobile */
   .sih-tour-overlay {
-    top: 3.8rem;
+    top: auto;
+    bottom: 0.5rem;
     width: 96%;
     max-width: 96vw;
     padding: 0 0.25rem;
@@ -3322,7 +3540,7 @@ input:checked+.slider:before {
 
   .sih-tour-card {
     padding: 0.75rem 0.85rem;
-    max-height: 80vh;
+    max-height: 75vh;
     overflow-y: auto;
   }
 
@@ -3333,20 +3551,20 @@ input:checked+.slider:before {
   }
 
   .tour-flow-node {
-    min-width: 70px;
-    padding: 0.25rem 0.4rem;
+    min-width: 65px;
+    padding: 0.25rem 0.35rem;
   }
 }
 
 /* Small SmartPhones (<= 480px) */
 @media (max-width: 480px) {
   .brand-name {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   .brand-flame-icon {
-    width: 16px;
-    height: 16px;
+    width: 15px;
+    height: 15px;
   }
 
   .header-actions button {
@@ -3362,5 +3580,9 @@ input:checked+.slider:before {
 
   .kpi-value {
     font-size: 1.15rem;
+  }
+
+  .table-custom {
+    min-width: 580px;
   }
 }

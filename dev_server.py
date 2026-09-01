@@ -304,6 +304,6 @@ class DevHandler(SimpleHTTPRequestHandler):
         self.end_headers()
 
 if __name__ == '__main__':
-    server = HTTPServer(('127.0.0.1', PORT), DevHandler)
-    print(f"[HeatWatch] Full-Stack AI & Web Server listening on http://127.0.0.1:{PORT}", flush=True)
+    server = HTTPServer(('0.0.0.0', PORT), DevHandler)
+    print(f"[HeatWatch] Full-Stack AI & Web Server listening on http://0.0.0.0:{PORT} (Local: http://127.0.0.1:{PORT})", flush=True)
     server.serve_forever()

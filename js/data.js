@@ -63,6 +63,13 @@ export const STUDY_REGIONS = [
     center: [30.3398, 76.3869],
     zoom: 12,
     description: "Seasonal agricultural residue / crop stubble burning zone across high cropland fraction."
+  },
+  {
+    id: "bhadla",
+    name: "Bhadla Mega Solar Park (Rajasthan)",
+    center: [27.5380, 71.9160],
+    zoom: 13,
+    description: "World's largest solar park (2,245 MW) with high-albedo optical glint false alarm suppression."
   }
 ];
 
@@ -511,6 +518,134 @@ export const THERMAL_OBJECTS = [
   },
 
   {
+    id: "OBJ-5012",
+    name: "NTPC Vindhyachal Super Thermal & Singrauli Coal Basin",
+    regionId: "singrauli",
+    centroid: [24.0980, 82.6720],
+    coordinates: [24.0980, 82.6720],
+    categoryGroup: "industrial_fire",
+    primaryCategory: "industrial",
+    categoryLabel: "Super Thermal Power Plant & Coal Pithead",
+    subtype: "Thermal Power Generation (4,760 MW)",
+    status: "normal",
+    statusLabel: "ROUTINE POWER GENERATION BASELINE",
+    evidenceScore: 0.93,
+    confidence: "High (93%)",
+    
+    matchedFacility: {
+      name: "NTPC Vindhyachal Super Thermal Power Station (4,760 MW)",
+      type: "Coal Thermal Power Plant",
+      osmId: "way/55819204",
+      distanceMeters: 160,
+      tags: {
+        "power": "plant",
+        "plant:source": "coal",
+        "operator": "NTPC Limited"
+      }
+    },
+    
+    thermal: {
+      currentFRP: 65.0,
+      historicalMeanFRP: 62.0,
+      frpDeviationRatio: 1.05,
+      currentBrightnessTempK: 412.5,
+      historicalMeanTempK: 408.0,
+      sensor: "VIIRS SNPP 375m",
+      detectionTime: "2026-08-28 02:40 UTC",
+      firstSeen: "2022-01-10",
+      lastSeen: "2026-08-28",
+      totalDetections: 410,
+      activeDays: 320,
+      persistenceRate: "94.2% (High persistent emitter)",
+      centroidStabilityScore: 0.95,
+      footprintAreaHa: 6.8,
+      historicalFootprintHa: 6.5,
+      adjacentHotspotsDetected: 2
+    },
+    
+    landCover: {
+      industrialBuiltUp: 72.0,
+      bareSoilPaved: 18.0,
+      waterBody: 6.0,
+      vegetationTree: 4.0,
+      cropland: 0.0
+    },
+    
+    nighttimeLight: {
+      radianceValue: 68.4,
+      backgroundRatio: "11.2x ambient",
+      classification: "Heavy Industrial Grid"
+    },
+    
+    anomalyFormula: {
+      frpDeviationScore: 0.40 * 0.05,
+      footprintExpansionScore: 0.25 * 0.04,
+      centroidDisplacementScore: 0.15 * 0.03,
+      durationDeviationScore: 0.10 * 0.05,
+      temporalPatternScore: 0.10 * 0.04,
+      totalAnomalyScore: 0.046
+    },
+    
+    evidencePoints: [
+      { text: "Continuous multi-year thermal signature at India's largest thermal power station (4.76 GW)", verified: true, type: "pro-industrial" },
+      { text: "OSM mapped boiler and generator island 160m from centroid", verified: true, type: "pro-industrial" },
+      { text: "72.0% industrial built-up surface context", verified: true, type: "pro-industrial" },
+      { text: "FRP (65.0 MW) is strictly within nominal baseline operating envelope (62.0 MW)", verified: true, type: "normal-behavior" }
+    ],
+    
+    nasaComparison: {
+      nasaLabel: "Static Thermal Anomaly (Power Plant)",
+      heatwatchLabel: "Nominal Power Generation Baseline",
+      agreementStatus: "Full Agreement (Verified Safe)",
+      explanation: "Both systems recognize this as routine baseload thermal generation. HeatWatch confirms operations remain within standard operating limits."
+    },
+    
+    spectralData: {
+      sentinel2Acquisition: "2026-08-26 05:35 UTC",
+      swir2Radiance: 0.76,
+      swir1Radiance: 0.62,
+      ndvi: 0.05,
+      nbr: -0.22,
+      smokeAerosolIndex: 1.1,
+      plumeDetected: true,
+      plumeDirection: "North-West"
+    },
+    
+    glintFilter: {
+      passed: true,
+      glintProbability: 0.02,
+      albedoReflectance: 0.09,
+      solarElevationDeg: 48.9,
+      statusLabel: "PASSED: Verified High-Temp Power Plant Combustion"
+    },
+
+    spatialDynamics: {
+      centroidStabilityPct: 96.2,
+      isStationary: true,
+      spreadVelocityKmH: 0.0,
+      motionType: "Stationary Facility Generation Island",
+      driftVectorMeters: 24,
+      plumeDispersion: "North-West (10 km/h)"
+    },
+
+    hazardProximity: {
+      isEncroaching: false,
+      facilityStatus: "Inside Designated Power Station Boundary",
+      nearestInfrastructure: "Singrauli 765kV Grid Substation (420m)",
+      threatLevel: "NOMINAL_OPERATION",
+      bufferDistanceKm: 0.42,
+      summary: "Normal baseload thermal generation; within approved environmental buffer."
+    },
+
+    recommendedAction: "Routine automated monitoring. Thermal metrics within standard envelope.",
+    nearestSettlement: {
+      name: "Vindhyanagar Township",
+      distanceKm: 2.4,
+      populationEstimate: "45,000 residents"
+    }
+  },
+
+  {
     id: "OBJ-3041",
     name: "Simlipal Biosphere Core Reserve Buffer Zone",
     regionId: "simlipal",
@@ -643,7 +778,7 @@ export const THERMAL_OBJECTS = [
   {
     id: "OBJ-8021",
     name: "Bhadla Mega Solar Park Photovoltaic Glint & Reflection Zone",
-    regionId: "jamnagar",
+    regionId: "bhadla",
     centroid: [27.5380, 71.9160],
     coordinates: [27.5380, 71.9160],
     categoryGroup: "glint_filtered",
@@ -1040,6 +1175,10 @@ export const RAW_FIRMS_DETECTIONS = [
   // Korba Super Thermal Power Points (Calibrated to NTPC Korba Power Island)
   { id: "RAW-301", lat: 22.3785, lon: 82.7245, frp: 112.5, tempK: 448.6, sat: "MODIS Terra", time: "2026-08-28 03:10", clusterId: "OBJ-2019", conf: "high" },
   { id: "RAW-302", lat: 22.3795, lon: 82.7260, frp: 45.0, tempK: 402.0, sat: "VIIRS NOAA-20", time: "2026-08-28 03:10", clusterId: "OBJ-2019", conf: "nominal" },
+
+  // Singrauli Super Thermal & Coal Basin Points
+  { id: "RAW-401", lat: 24.0980, lon: 82.6720, frp: 65.0, tempK: 412.5, sat: "VIIRS SNPP", time: "2026-08-28 02:40", clusterId: "OBJ-5012", conf: "high" },
+  { id: "RAW-402", lat: 24.0995, lon: 82.6740, frp: 38.4, tempK: 380.2, sat: "VIIRS NOAA-20", time: "2026-08-28 02:40", clusterId: "OBJ-5012", conf: "nominal" },
   
   // Jharia Coalfield Fire Points (Calibrated to Kusunda Open Cast Pit)
   { id: "RAW-701", lat: 23.7420, lon: 86.4150, frp: 135.0, tempK: 462.0, sat: "VIIRS NOAA-20", time: "2026-08-28 02:45", clusterId: "OBJ-7011", conf: "high" },

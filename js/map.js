@@ -586,19 +586,51 @@ export class HeatWatchMap {
     });
   }
 
+  getGeoSectorInfo(lat, lon) {
+    if (lat >= 32.0 && lon < 79.0) {
+      return { name: "Jammu & Kashmir / Himalayan Foothills", state: "Jammu & Kashmir", type: "Vegetation Forest / Mountain Ridge", isForest: true };
+    } else if (lat >= 29.0 && lat < 32.5 && lon >= 74.0 && lon <= 77.8) {
+      return { name: "Punjab & Haryana Agrarian Belt", state: "Punjab / Haryana", type: "Agrarian Stubble Biomass", isForest: false };
+    } else if (lat >= 24.0 && lat < 30.5 && lon >= 69.5 && lon < 77.0) {
+      return { name: "Rajasthan Semi-Arid Basin", state: "Rajasthan", type: "Open Arid Terrain / Glint", isForest: false };
+    } else if (lat >= 20.0 && lat < 24.8 && lon >= 68.5 && lon < 74.5) {
+      return { name: "Gujarat Coastal / Industrial Corridor", state: "Gujarat", type: "Industrial / Coastal Belt", isForest: false };
+    } else if (lat >= 24.0 && lat < 30.0 && lon >= 77.0 && lon < 85.0) {
+      return { name: "Gangetic Plain & Central Basin", state: "Uttar Pradesh / Bihar", type: "Agrarian / Biomass Front", isForest: false };
+    } else if (lat >= 21.0 && lat < 25.5 && lon >= 75.0 && lon < 82.0) {
+      return { name: "Madhya Pradesh Forest & Agro Belt", state: "Madhya Pradesh", type: "Deciduous Forest Canopy", isForest: true };
+    } else if (lat >= 20.0 && lat < 25.0 && lon >= 82.0 && lon < 88.0) {
+      return { name: "Chhota Nagpur & Mineral Basin", state: "Jharkhand / Chhattisgarh", type: "Mining & Canopy Wildfire", isForest: true };
+    } else if (lat >= 18.0 && lat < 22.0 && lon >= 82.0 && lon < 87.5) {
+      return { name: "Odisha Eastern Highlands", state: "Odisha", type: "Dense Forest Wildfire", isForest: true };
+    } else if (lat >= 15.0 && lat < 22.0 && lon >= 72.5 && lon < 80.5) {
+      return { name: "Maharashtra & Western Ghats Corridor", state: "Maharashtra", type: "Western Ghats Scrub & Forest", isForest: true };
+    } else if (lat >= 13.0 && lat < 19.5 && lon >= 76.5 && lon < 84.5) {
+      return { name: "Deccan Plateau & Krishna-Godavari Basin", state: "Telangana / Andhra Pradesh", type: "Deccan Agrarian & Scrub", isForest: false };
+    } else if (lat >= 11.5 && lat < 16.0 && lon >= 74.0 && lon < 78.5) {
+      return { name: "Karnataka Western Ridge & Plateau", state: "Karnataka", type: "Protected Forest Reserve", isForest: true };
+    } else if (lat >= 8.0 && lat < 14.0 && lon >= 76.5 && lon < 80.5) {
+      return { name: "Tamil Nadu & Coromandel Basin", state: "Tamil Nadu", type: "Peninsular Agrarian / Scrub", isForest: false };
+    } else if (lat >= 8.0 && lat < 13.0 && lon >= 74.8 && lon < 77.5) {
+      return { name: "Kerala & Cardamom Hills", state: "Kerala", type: "Tropical Canopy & Agro", isForest: true };
+    } else if (lat >= 22.0 && lon >= 88.0) {
+      return { name: "Northeast Highlands & Brahmaputra Basin", state: "Northeast India", type: "Tropical Rainforest Canopy", isForest: true };
+    } else {
+      return { name: `Regional Sector (${lat.toFixed(2)}°N, ${lon.toFixed(2)}°E)`, state: "India", type: "Open Regional Terrain", isForest: false };
+    }
+  }
+
   synthesizeObjectFromDetection(det) {
     const lat = det.lat;
     const lon = det.lon;
     const frp = parseFloat(det.frp || 25.0);
     const tempK = parseFloat(det.tempK || 345.0);
     
-    // Find closest facility among 50+ Indian facilities
+    // Find closest facility among 58+ Indian facilities using accurate spherical distance
     let nearestFac = ALL_INDIA_FACILITIES[0];
     let minDist = 999999999;
     ALL_INDIA_FACILITIES.forEach(fac => {
-      const dLat = (fac.coordinates[0] - lat) * 111000;
-      const dLon = (fac.coordinates[1] - lon) * 105000;
-      const d = Math.sqrt(dLat * dLat + dLon * dLon);
+      const d = this.haversineDistance(lat, lon, fac.coordinates[0], fac.coordinates[1]);
       if (d < minDist) {
         minDist = d;
         nearestFac = fac;
@@ -606,39 +638,69 @@ export class HeatWatchMap {
     });
 
     const isClose = minDist < 2000;
-    const isForest = nearestFac.type.includes('Biosphere') || nearestFac.type.includes('Forest') || minDist > 8000;
-    const isAgri = !isClose && !isForest;
+    const isNearby = minDist <= 12000;
+    const geo = this.getGeoSectorInfo(lat, lon);
 
-    let categoryLabel = isClose ? `${nearestFac.type} Operational Thermal Emission` : (isForest ? "Protected Canopy Vegetation Wildfire" : "Agricultural Stubble Burning Front");
-    let primaryCategory = isClose ? "industrial" : (isForest ? "wildfire" : "agriculture");
-    let categoryGroup = isClose ? "industrial_fire" : (isForest ? "forest_fire" : "agriculture_fire");
+    let name = '';
+    let categoryLabel = '';
+    let primaryCategory = '';
+    let categoryGroup = '';
+    let subtype = '';
+    let regionId = '';
+    let matchedFacility = {};
+
+    if (isNearby) {
+      // Associated with or in perimeter of known industrial facility
+      name = isClose ? `${nearestFac.name} Active Hotspot` : `${nearestFac.name} Peripheral Thermal Emission`;
+      regionId = nearestFac.id;
+      subtype = nearestFac.type;
+      primaryCategory = nearestFac.type.includes('Biosphere') || nearestFac.type.includes('Forest') ? 'wildfire' : (nearestFac.type.includes('Agrarian') ? 'agriculture' : 'industrial');
+      categoryGroup = nearestFac.type.includes('Solar') ? 'glint_filtered' : (primaryCategory === 'industrial' ? (isClose && nearestFac.type.includes('Refinery') ? 'routine_flare' : 'industrial_fire') : (primaryCategory === 'wildfire' ? 'forest_fire' : 'agriculture_fire'));
+      categoryLabel = isClose ? `${nearestFac.type} Operational Thermal Emission` : `${nearestFac.type} Peripheral Industrial Hotspot`;
+      matchedFacility = {
+        name: nearestFac.name,
+        type: nearestFac.type,
+        distanceMeters: Math.round(minDist),
+        osmId: `fac/${nearestFac.id}`
+      };
+    } else {
+      // Open regional natural / agrarian hotspot
+      name = `${geo.name} Thermal Hotspot`;
+      regionId = `geo_${Math.round(lat*10)}_${Math.round(lon*10)}`;
+      subtype = geo.type;
+      primaryCategory = geo.isForest ? "wildfire" : "agriculture";
+      categoryGroup = geo.isForest ? "forest_fire" : "agriculture_fire";
+      categoryLabel = geo.isForest ? "Protected Canopy Vegetation Wildfire" : "Agricultural Stubble / Open Biomass Burning";
+      matchedFacility = {
+        name: `Open Regional Terrain (${geo.state})`,
+        type: geo.type,
+        distanceMeters: Math.round(minDist),
+        osmId: `geo/${Math.round(lat*100)}_${Math.round(lon*100)}`
+      };
+    }
+
     let status = frp > 50 ? "high_priority" : (frp > 25 ? "elevated" : "normal");
     let statusLabel = status === "high_priority" ? "HIGH-PRIORITY ANOMALY" : (status === "elevated" ? "ELEVATED THERMAL FLUX" : "NORMAL OPERATIONAL BASELINE");
 
     const objId = det.clusterId || `HOTSPOT-${Math.round(lat*100)}-${Math.round(lon*100)}`;
-    const baseMean = isClose ? (frp > 30 ? 18.0 : frp * 0.7) : (isForest ? 12.0 : 8.0);
+    const baseMean = isNearby ? (frp > 30 ? 18.0 : frp * 0.7) : (geo.isForest ? 12.0 : 8.0);
     const deviationRatio = Math.round((frp / Math.max(baseMean, 1)) * 100) / 100;
 
     const dynamicObj = {
       id: objId,
-      name: isClose ? `${nearestFac.name} Active Hotspot` : `${nearestFac.city} Sector Thermal Detections`,
-      regionId: nearestFac.id,
+      name: name,
+      regionId: regionId,
       centroid: [lat, lon],
       coordinates: [lat, lon],
       categoryGroup: categoryGroup,
       primaryCategory: primaryCategory,
       categoryLabel: categoryLabel,
-      subtype: nearestFac.type,
+      subtype: subtype,
       status: status,
       statusLabel: statusLabel,
       evidenceScore: isClose ? 0.89 : 0.76,
       confidence: `${Math.round((isClose ? 0.89 : 0.76) * 100)}%`,
-      matchedFacility: {
-        name: nearestFac.name,
-        type: nearestFac.type,
-        distanceMeters: Math.round(minDist),
-        osmId: `fac/${nearestFac.id}`
-      },
+      matchedFacility: matchedFacility,
       thermal: {
         currentFRP: frp,
         historicalMeanFRP: Math.round(baseMean * 10) / 10,
@@ -724,13 +786,14 @@ export class HeatWatchMap {
     if (!fac) return null;
     return THERMAL_OBJECTS.find(o => {
       if (o.id === fac.id || o.regionId === fac.id || `FAC-${fac.id}` === o.id || `OBJ-${fac.id}` === o.id) return true;
-      if (fac.id === 'PWR-02' && o.id === 'OBJ-2019') return true;
-      if (fac.id === 'FOR-01' && o.id === 'OBJ-3041') return true;
-      if (fac.id === 'SOLAR-01' && o.id === 'OBJ-8021') return true;
-      if (fac.id === 'COAL-01' && o.id === 'OBJ-7011') return true;
-      if (fac.id === 'AGRI-01' && o.id === 'OBJ-4012') return true;
-      if (fac.id === 'REF-04' && o.id === 'OBJ-1082') return true;
-      if (fac.id === 'REF-01' && o.id === 'OBJ-1045') return true;
+      if ((fac.id === 'REF-01' || fac.id === 'jamnagar') && o.id === 'OBJ-1045') return true;
+      if ((fac.id === 'CHEM-03' || fac.id === 'hazira') && o.id === 'OBJ-1082') return true;
+      if ((fac.id === 'PWR-02' || fac.id === 'korba') && o.id === 'OBJ-2019') return true;
+      if ((fac.id === 'PWR-01' || fac.id === 'singrauli') && o.id === 'OBJ-5012') return true;
+      if ((fac.id === 'FOR-01' || fac.id === 'simlipal') && o.id === 'OBJ-3041') return true;
+      if ((fac.id === 'SOL-01' || fac.id === 'bhadla') && o.id === 'OBJ-8021') return true;
+      if ((fac.id === 'MINE-01' || fac.id === 'jharia') && o.id === 'OBJ-7011') return true;
+      if ((fac.id === 'AGR-01' || fac.id === 'patiala') && o.id === 'OBJ-4012') return true;
       return false;
     });
   }

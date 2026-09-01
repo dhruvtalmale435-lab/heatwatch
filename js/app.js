@@ -139,6 +139,17 @@ class HeatWatchApp {
   }
 
   setupNavigation() {
+    // Brand Logo Click -> Reset to Command Map All-India Overview
+    const brandLogoBtn = document.getElementById('brand-logo-btn');
+    if (brandLogoBtn) {
+      brandLogoBtn.addEventListener('click', () => {
+        this.switchView('command-map');
+        if (this.mapInstance && this.mapInstance.map) {
+          this.mapInstance.map.flyTo([22.5, 79.5], 5, { duration: 1.0 });
+        }
+      });
+    }
+
     // Primary Tab Buttons
     const navButtons = document.querySelectorAll('.nav-tab-btn:not(.dropdown-trigger-btn)');
     navButtons.forEach(btn => {
@@ -477,24 +488,35 @@ class HeatWatchApp {
     const selectEl = document.getElementById('select-study-region');
     if (!selectEl) return;
 
-    const categories = [
-      { key: "REF", label: "🛢️ Oil Refineries & Petrochemicals (11)" },
-      { key: "STP", label: "⚡ Super Thermal Power Stations (12)" },
-      { key: "STL", label: "🏭 Integrated Steel Plants (8)" },
-      { key: "LNG", label: "⛽ LNG & Gas Terminals (5)" },
-      { key: "COAL", label: "⛏️ Coal Mining & Seam Fires (6)" },
-      { key: "FERT", label: "🧪 Fertilizer & Chemical Hubs (6)" },
-      { key: "BIO", label: "🌲 Biosphere & Crop Residue (5)" }
-    ];
-
     let html = `
-      <option value="all_india" selected>🇮🇳 All-India Overview (50+ Industrial Facilities)</option>
+      <optgroup label="Core Demonstration Hubs">
+        <option value="all_india" selected>🇮🇳 All-India Overview (50+ Industrial Facilities)</option>
+        <option value="jamnagar">🏭 Jamnagar Petrochem (Gujarat)</option>
+        <option value="hazira">🔥 Hazira Heavy Industry & LNG Hub</option>
+        <option value="korba">⚡ Korba Super Thermal Power & Aluminum</option>
+        <option value="singrauli">⛏️ Singrauli Coal Basin & Pithead STPS</option>
+        <option value="jharia">🔥 Jharia Coalfield Mine Seam Fires</option>
+        <option value="simlipal">🌲 Simlipal Biosphere Wildfire (Forest)</option>
+        <option value="patiala">🌾 Patiala Agrarian Stubble (Punjab)</option>
+        <option value="bhadla">☀️ Bhadla Mega Solar Park (Rajasthan)</option>
+      </optgroup>
     `;
+
+    const categories = [
+      { key: "REF", label: "🛢️ Oil Refineries & Petrochemicals" },
+      { key: "PWR", label: "⚡ Super Thermal Power Stations" },
+      { key: "STL", label: "🏭 Integrated Steel Plants & Smelters" },
+      { key: "MINE", label: "⛏️ Coal Mining & Mineral Basins" },
+      { key: "CHEM", label: "🧪 Chemical & Industrial Parks" },
+      { key: "FOR", label: "🌲 Forest Fire & Biosphere Hotspots" },
+      { key: "AGR", label: "🌾 Agricultural Crop Stubble Zones" },
+      { key: "SOL", label: "☀️ Mega Solar Parks (False Alarm Suppression)" }
+    ];
 
     categories.forEach(cat => {
       const facs = ALL_INDIA_FACILITIES.filter(f => f.id.startsWith(cat.key));
       if (facs.length > 0) {
-        html += `<optgroup label="${cat.label}">`;
+        html += `<optgroup label="${cat.label} (${facs.length})">`;
         facs.forEach(f => {
           html += `<option value="${f.id}">${f.name} (${f.state})</option>`;
         });
@@ -525,7 +547,8 @@ class HeatWatchApp {
       { key: "MINE", label: "Coal Basins & Mines" },
       { key: "CHEM", label: "Chemical & Fertilizer Plants" },
       { key: "FOR", label: "Forest Fire Hotspots" },
-      { key: "AGR", label: "Agricultural Fire Hotspots" }
+      { key: "AGR", label: "Agricultural Fire Hotspots" },
+      { key: "SOL", label: "Mega Solar Parks & Glint Suppression" }
     ];
 
     categories.forEach(cat => {
@@ -938,14 +961,29 @@ class HeatWatchApp {
     const inspectorSidebar = document.getElementById('map-sidebar-inspector');
     const toggleInspectorBtn = document.getElementById('btn-toggle-inspector');
     const toggleInspectorIcon = document.getElementById('icon-toggle-inspector');
+    const closeHudBtn = document.getElementById('btn-close-hud-sidebar');
+
+    const updateSidebarToggleIcon = () => {
+      if (!inspectorSidebar || !toggleInspectorIcon) return;
+      const isCollapsed = inspectorSidebar.classList.contains('collapsed');
+      toggleInspectorIcon.setAttribute('data-lucide', isCollapsed ? 'chevron-left' : 'chevron-right');
+      if (window.lucide) lucide.createIcons();
+    };
+
     if (inspectorSidebar && toggleInspectorBtn) {
       toggleInspectorBtn.addEventListener('click', () => {
         inspectorSidebar.classList.toggle('collapsed');
-        const isCollapsed = inspectorSidebar.classList.contains('collapsed');
-        if (toggleInspectorIcon) {
-          toggleInspectorIcon.setAttribute('data-lucide', isCollapsed ? 'chevron-left' : 'chevron-right');
-          if (window.lucide) lucide.createIcons();
+        updateSidebarToggleIcon();
+        if (this.mapInstance && this.mapInstance.map) {
+          setTimeout(() => this.mapInstance.map.invalidateSize(), 310);
         }
+      });
+    }
+
+    if (inspectorSidebar && closeHudBtn) {
+      closeHudBtn.addEventListener('click', () => {
+        inspectorSidebar.classList.add('collapsed');
+        updateSidebarToggleIcon();
         if (this.mapInstance && this.mapInstance.map) {
           setTimeout(() => this.mapInstance.map.invalidateSize(), 310);
         }
@@ -1148,9 +1186,18 @@ class HeatWatchApp {
   getAllCategorizedObjects() {
     let list = [...THERMAL_OBJECTS];
 
+    // Merge live satellite clusters if available
+    if (this.liveClusters && this.liveClusters.length > 0) {
+      this.liveClusters.forEach(cl => {
+        if (!list.some(o => o.id === cl.id)) {
+          list.push(cl);
+        }
+      });
+    }
+
     if (this.mapInstance) {
       ALL_INDIA_FACILITIES.forEach(fac => {
-        if (!list.some(o => o.id === fac.id || o.regionId === fac.id || o.id === `FAC-${fac.id}`)) {
+        if (!list.some(o => o.id === fac.id || o.regionId === fac.id || o.id === `FAC-${fac.id}` || `FAC-${fac.id}` === o.id)) {
           const synth = this.mapInstance.synthesizeObjectFromFacility(fac);
           if (fac.type.includes('Refinery') || fac.type.includes('Chemical') || fac.type.includes('Petro')) {
             synth.categoryGroup = synth.status === 'high_priority' ? 'industrial_fire' : 'routine_flare';
@@ -1376,7 +1423,18 @@ class HeatWatchApp {
     // 2. Geospatial Context Engine
     if (obj.matchedFacility) {
       setTxt('hud-context-facility-name', obj.matchedFacility.name);
-      setTxt('hud-context-facility-dist', `${obj.matchedFacility.distanceMeters} m (${obj.matchedFacility.distanceMeters < 500 ? 'Inside Perimeter' : 'Adjacent Area'})`);
+      const distM = obj.matchedFacility.distanceMeters || 0;
+      let distText = '';
+      if (distM < 500) {
+        distText = `${distM} m (Inside Facility Perimeter)`;
+      } else if (distM < 2500) {
+        distText = `${distM} m (Adjacent Industrial Buffer)`;
+      } else if (distM <= 12000) {
+        distText = `${(distM / 1000).toFixed(1)} km (Peripheral Corridor)`;
+      } else {
+        distText = `> ${(distM / 1000).toFixed(0)} km (Open Regional Sector)`;
+      }
+      setTxt('hud-context-facility-dist', distText);
     } else {
       setTxt('hud-context-facility-name', obj.name);
       setTxt('hud-context-facility-dist', '0 m (Registered Footprint)');
@@ -2019,15 +2077,8 @@ class HeatWatchApp {
     const tbody = document.getElementById('alerts-table-body');
     if (!tbody) return;
 
-    // 1. Gather all active alerts (curated objects + any live satellite clusters)
-    let allAlerts = [...THERMAL_OBJECTS];
-    if (this.liveClusters && this.liveClusters.length > 0) {
-      this.liveClusters.forEach(cl => {
-        if (!allAlerts.find(o => o.id === cl.id)) {
-          allAlerts.push(cl);
-        }
-      });
-    }
+    // 1. Gather all active alerts (curated benchmark objects + live satellite detections + all 58 Indian facilities)
+    let allAlerts = this.getAllCategorizedObjects();
 
     // 2. Compute category counts for tab badges
     const counts = {
@@ -2098,6 +2149,9 @@ class HeatWatchApp {
         (o.subtype && o.subtype.toLowerCase().includes(q))
       );
     }
+
+    // Sort alerts by current sort order
+    displayedAlerts = this.sortObjects(displayedAlerts, this.currentSortOrder || 'frp_desc');
 
     if (displayedAlerts.length === 0) {
       tbody.innerHTML = `

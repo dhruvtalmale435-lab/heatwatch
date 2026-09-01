@@ -27,10 +27,37 @@
        ========================================================================== -->
   <header class="app-header">
     <div class="brand-container">
-      <div class="brand-logo">
-        <i data-lucide="flame" class="brand-flame-icon"></i>
-        <span class="brand-name">Heat<span class="brand-accent">Watch</span></span>
-        <span class="brand-dot"></span>
+      <div class="brand-logo" id="brand-logo-btn" title="HeatWatch - Satellite Industrial Thermal Intelligence">
+        <div class="brand-logo-icon-wrap">
+          <svg width="34" height="34" viewBox="0 0 40 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="hwFlameGrad" x1="20" y1="2" x2="20" y2="40" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#FF9E1B" />
+                <stop offset="45%" stop-color="#FF5722" />
+                <stop offset="100%" stop-color="#E63900" />
+              </linearGradient>
+              <linearGradient id="hwInnerFlame" x1="18" y1="26" x2="18" y2="38" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#FFFFFF" />
+                <stop offset="100%" stop-color="#FFF3E0" />
+              </linearGradient>
+            </defs>
+            <!-- Vertical digital data bars above flame -->
+            <rect x="13" y="6" width="2.8" height="6.5" rx="1.4" fill="url(#hwFlameGrad)" />
+            <rect x="18" y="1.5" width="3" height="9.5" rx="1.5" fill="url(#hwFlameGrad)" />
+            <rect x="23" y="5" width="2.8" height="7.5" rx="1.4" fill="url(#hwFlameGrad)" />
+            <rect x="28" y="8" width="2.8" height="5.5" rx="1.4" fill="url(#hwFlameGrad)" />
+            <!-- Main outer flame body -->
+            <path d="M20 12C20 12 25.5 17.5 27.5 22.5C30 28 28 34.5 23 38C17 42 9.5 38 8 30.5C7 25 10.5 19.5 14 17C13.5 19.5 14 21.5 15.5 23C15.5 17.5 18.5 14 20 12Z" fill="url(#hwFlameGrad)" />
+            <!-- Inner flame negative space -->
+            <path d="M19.5 27C19.5 27 23 30 22 34C21 36.5 18.5 38 16.5 37C14.5 36 13.5 34 14 32C14.5 30 16.5 29 17.5 29.5C17.5 28 18.8 27.2 19.5 27Z" fill="url(#hwInnerFlame)" />
+          </svg>
+        </div>
+        <div class="brand-text-col">
+          <div class="brand-name-row">
+            <span class="brand-heat">Heat</span><span class="brand-watch">Watch</span>
+          </div>
+          <div class="brand-tagline">MONITOR &amp; ALERT</div>
+        </div>
       </div>
     </div>
 
@@ -289,18 +316,19 @@
                 <option value="jharia">🔥 Jharia Coalfield Mine Seam Fires</option>
                 <option value="simlipal">🌲 Simlipal Biosphere Wildfire (Forest)</option>
                 <option value="patiala">🌾 Patiala Agrarian Stubble (Punjab)</option>
+                <option value="bhadla">☀️ Bhadla Mega Solar Park (Rajasthan)</option>
               </optgroup>
               <optgroup label="All-India Critical Infrastructure (50+ Facilities)">
-                <option value="FAC-01">BPCL Kochi Refinery (Kerala)</option>
-                <option value="FAC-02">IOCL Paradip Mega Refinery (Odisha)</option>
-                <option value="FAC-03">Tata Steel Works Jamshedpur (Jharkhand)</option>
-                <option value="FAC-04">JSW Steel Vijayanagar Plant (Karnataka)</option>
-                <option value="FAC-05">SAIL Bhilai Steel Plant (Chhattisgarh)</option>
-                <option value="FAC-06">NTPC Vindhyachal Super Thermal (MP)</option>
-                <option value="FAC-07">NTPC Ramagundam STPS (Telangana)</option>
-                <option value="FAC-08">Vedanta Jharsuguda Aluminum Smelter (Odisha)</option>
-                <option value="FAC-09">Hindalco Mahan Aluminum Complex (MP)</option>
-                <option value="FAC-10">Bhadla Solar Park Ultra-Mega Phase-IV (Rajasthan)</option>
+                <option value="REF-07">BPCL Kochi Refinery (Kerala)</option>
+                <option value="REF-08">IOCL Paradip Mega-Refinery (Odisha)</option>
+                <option value="STL-01">Tata Steel Jamshedpur Works (Jharkhand)</option>
+                <option value="STL-05">JSW Steel Vijayanagar Works (Karnataka)</option>
+                <option value="STL-02">SAIL Bhilai Steel Plant (Chhattisgarh)</option>
+                <option value="PWR-01">NTPC Vindhyachal Super Thermal (MP)</option>
+                <option value="PWR-05">NTPC Ramagundam STPS (Telangana)</option>
+                <option value="MINE-01">Jharia Coalfield Mine Fires (Jharkhand)</option>
+                <option value="CHEM-03">Hazira Heavy Industrial Zone (Gujarat)</option>
+                <option value="SOL-01">Bhadla Solar Park Phase I-IV (Rajasthan)</option>
               </optgroup>
             </select>
           </div>
@@ -409,16 +437,21 @@
         </div>
 
         <!-- Right Sidebar: Thermal Object & Telemetry Inspector (Collapsible) -->
-        <aside class="map-sidebar-inspector" id="map-sidebar-inspector">
+        <aside class="map-sidebar-inspector collapsed" id="map-sidebar-inspector">
           <!-- Sidebar Floating Collapse / Expand Toggle Button -->
           <button class="sidebar-toggle-tab" id="btn-toggle-inspector" title="Toggle Evidence Inspector HUD (Click to Collapse/Expand)">
-            <i data-lucide="chevron-right" id="icon-toggle-inspector"></i>
+            <i data-lucide="chevron-left" id="icon-toggle-inspector"></i>
           </button>
 
           <div class="sidebar-header">
-            <div class="object-badge-row">
-              <span class="object-id-code" id="hud-obj-id">OBJ-1045</span>
-              <span class="severity-tag high-priority" id="hud-obj-severity">HIGH-PRIORITY ANOMALY</span>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;">
+              <div class="object-badge-row">
+                <span class="object-id-code" id="hud-obj-id">OBJ-1045</span>
+                <span class="severity-tag high-priority" id="hud-obj-severity">HIGH-PRIORITY ANOMALY</span>
+              </div>
+              <button class="btn-close-hud" id="btn-close-hud-sidebar" title="Close Evidence Inspector HUD">
+                <i data-lucide="x" style="width:14px; height:14px;"></i>
+              </button>
             </div>
             <h2 class="object-title" id="hud-obj-title">Jamnagar Polypropylene Cracker Flare Complex #4</h2>
             <p class="object-subtitle" id="hud-obj-category">Probable Persistent Industrial Source &bull; Petrochemical</p>
@@ -965,20 +998,22 @@
             </div>
           </div>
 
-          <table class="table-custom">
-            <thead>
-              <tr>
-                <th>1. Satellite Detection (NASA FIRMS)</th>
-                <th>2. Geospatial Context</th>
-                <th>3. Baseline &amp; Risk Model</th>
-                <th>4. AI Classification</th>
-                <th>5. Human Verification &amp; Triage</th>
-              </tr>
-            </thead>
-            <tbody id="alerts-table-body">
-              <!-- Dynamically populated -->
-            </tbody>
-          </table>
+          <div class="alert-table-wrapper" id="alert-table-scroll-container">
+            <table class="table-custom">
+              <thead>
+                <tr>
+                  <th>1. Satellite Detection (NASA FIRMS)</th>
+                  <th>2. Geospatial Context</th>
+                  <th>3. Baseline &amp; Risk Model</th>
+                  <th>4. AI Classification</th>
+                  <th>5. Human Verification &amp; Triage</th>
+                </tr>
+              </thead>
+              <tbody id="alerts-table-body">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
         </div>
 
       </div>
@@ -1059,20 +1094,22 @@
           <div style="padding:1rem 1.25rem; font-weight:700; font-size:0.9rem; color:#fff; border-bottom:1px solid var(--border-subtle);">
             Facility-Level Comparison Matrix
           </div>
-          <table class="table-custom">
-            <thead>
-              <tr>
-                <th>Thermal Entity</th>
-                <th>NASA Static Classification</th>
-                <th>HeatWatch AI Attribution</th>
-                <th>Status Assessment</th>
-                <th>Scientific & Operational Value-Add</th>
-              </tr>
-            </thead>
-            <tbody id="nasa-matrix-body">
-              <!-- Dynamically populated -->
-            </tbody>
-          </table>
+          <div class="alert-table-wrapper">
+            <table class="table-custom">
+              <thead>
+                <tr>
+                  <th>Thermal Entity</th>
+                  <th>NASA Static Classification</th>
+                  <th>HeatWatch AI Attribution</th>
+                  <th>Status Assessment</th>
+                  <th>Scientific & Operational Value-Add</th>
+                </tr>
+              </thead>
+              <tbody id="nasa-matrix-body">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
         </div>
 
       </div>
