@@ -91,6 +91,14 @@ class DevHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=DIRECTORY, **kwargs)
 
+    def end_headers(self):
+        # Force browsers to always fetch fresh JS/CSS — critical for development
+        if any(self.path.endswith(ext) for ext in ('.js', '.css', '.html')):
+            self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
+            self.send_header('Pragma', 'no-cache')
+            self.send_header('Expires', '0')
+        super().end_headers()
+
     def do_GET(self):
         if self.path == '/api/health':
             status_obj = {
