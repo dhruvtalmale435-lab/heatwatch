@@ -655,7 +655,7 @@ export class HeatWatchMap {
       return { name: "Central India Agro-Forest Mosaic", state: "Madhya Pradesh / Maharashtra", type: "Deciduous Forest & Farming", isForest: lat >= 22.5, isAgri: lat < 22.5 };
     } else if (lat >= 19.0 && lat < 24.5 && lon >= 82.5 && lon < 88.0) {
       return { name: "Eastern Highlands & Chhota Nagpur", state: "Odisha / Jharkhand / Chhattisgarh", type: "Forest Canopy & Mineral Basin", isForest: true, isAgri: false };
-    } else if (lat >= 15.0 && lat < 21.0 && lon >= 72.5 and lon < 76.5) {
+    } else if (lat >= 15.0 && lat < 21.0 && lon >= 72.5 && lon < 76.5) {
       return { name: "Maharashtra Western Ghats Ridge", state: "Maharashtra", type: "Western Ghats Scrub & Forest", isForest: true, isAgri: false };
     } else if (lat >= 13.5 && lat < 19.5 && lon >= 77.0 && lon < 84.5) {
       return { name: "Deccan Krishna-Godavari Basin", state: "Telangana / Andhra Pradesh", type: "Deccan Farmland & Scrub Matrix", isForest: false, isAgri: true };
