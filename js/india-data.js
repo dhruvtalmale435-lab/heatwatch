@@ -172,7 +172,7 @@ export const ALL_INDIA_FACILITIES = [
     state: "Madhya Pradesh",
     city: "Bina (Sagar)",
     type: "Petrochemical & Refinery",
-    coordinates: [24.1300, 78.1570],  // Wikipedia: 24°07'48"N 78°09'25"E — BPCL Bina Refinery near Bina town
+    coordinates: [24.2517, 78.1618],  // Overpass OSM node "Bina Refinery" — verified industrial site tag
     capacity: "7.8 MMTPA",
     status: "inactive",
     operator: "Bharat Petroleum Corporation Ltd",
