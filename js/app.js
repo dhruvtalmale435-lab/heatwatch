@@ -1358,7 +1358,11 @@ class HeatWatchApp {
     }
     const focusSelect = document.getElementById('select-study-region');
     if (focusSelect) {
-      focusSelect.value = obj.regionId || obj.id || 'all_india';
+      if (obj.matchedFacility?.isInsideFacility && obj.regionId && obj.regionId !== 'all_india') {
+        focusSelect.value = obj.regionId;
+      } else {
+        focusSelect.value = 'all_india';
+      }
     }
 
     // 2. Update Inspector HUD
@@ -1422,19 +1426,17 @@ class HeatWatchApp {
 
     // 2. Geospatial Context Engine
     if (obj.matchedFacility) {
-      setTxt('hud-context-facility-name', obj.matchedFacility.name);
+      const isInside = obj.matchedFacility.isInsideFacility !== false && (obj.matchedFacility.distanceMeters || 0) <= 2000;
       const distM = obj.matchedFacility.distanceMeters || 0;
-      let distText = '';
-      if (distM < 500) {
-        distText = `${distM} m (Inside Facility Perimeter)`;
-      } else if (distM < 2500) {
-        distText = `${distM} m (Adjacent Industrial Buffer)`;
-      } else if (distM <= 12000) {
-        distText = `${(distM / 1000).toFixed(1)} km (Peripheral Corridor)`;
+      
+      if (isInside) {
+        setTxt('hud-context-facility-name', `🏭 ${obj.matchedFacility.name}`);
+        setTxt('hud-context-facility-dist', `${distM} m (Inside Facility Perimeter)`);
       } else {
-        distText = `> ${(distM / 1000).toFixed(0)} km (Open Regional Sector)`;
+        const nearestPlant = obj.matchedFacility.nearestKnownPlant || obj.matchedFacility.name;
+        setTxt('hud-context-facility-name', `🌾 Open Farmland / Rural Sector (${obj.state || 'India'})`);
+        setTxt('hud-context-facility-dist', `⚠️ Non-Industrial (${(distM / 1000).toFixed(1)} km from nearest plant: ${nearestPlant})`);
       }
-      setTxt('hud-context-facility-dist', distText);
     } else {
       setTxt('hud-context-facility-name', obj.name);
       setTxt('hud-context-facility-dist', '0 m (Registered Footprint)');
@@ -1445,8 +1447,13 @@ class HeatWatchApp {
     setTxt('hud-context-landcover', lcSummary);
 
     // 3. Anomaly & Baseline Model
-    setTxt('hud-stat-frp-dev', hasData && obj.thermal.currentFRP > 0 ? `${obj.thermal.frpDeviationRatio}× Baseline` : '1.0× Baseline');
-    setTxt('hud-stat-baseline-val', hasData && obj.thermal.historicalMeanFRP ? `${obj.thermal.historicalMeanFRP} MW 30d Baseline` : 'Nominal Baseline');
+    const isNonIndustrial = obj.matchedFacility && obj.matchedFacility.isInsideFacility === false;
+    setTxt('hud-stat-frp-dev', hasData && obj.thermal.currentFRP > 0 ? (isNonIndustrial ? `${obj.thermal.currentFRP} MW (Harvest Spike)` : `${obj.thermal.frpDeviationRatio}× Baseline`) : '1.0× Baseline');
+    
+    const baselineValText = isNonIndustrial 
+      ? '0.0 MW (Transient Agricultural Burn — No Stack Baseline)' 
+      : (hasData && obj.thermal.historicalMeanFRP ? `${obj.thermal.historicalMeanFRP} MW 30d Baseline` : 'Nominal Baseline');
+    setTxt('hud-stat-baseline-val', baselineValText);
     
     const riskEl = document.getElementById('hud-stat-risk-level');
     const riskSubEl = document.getElementById('hud-stat-risk-sub');

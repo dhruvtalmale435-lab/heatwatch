@@ -1435,7 +1435,12 @@ export function getHistoricalFrpForObject(objOrId) {
   const benchmarkObj = THERMAL_OBJECTS.find(o => o.id === objId || o.id === cleanId);
   const targetObj = isObject ? objOrId : benchmarkObj;
 
+  const isHotspot = cleanId.startsWith('HOTSPOT') || cleanId.startsWith('NASA') || targetObj?.matchedFacility?.isInsideFacility === false;
+  const isWildfire = fac?.id?.startsWith('FOR') || targetObj?.primaryCategory === 'wildfire' || targetObj?.categoryGroup === 'forest_fire';
+  const isAgri = (isHotspot && !isWildfire) || fac?.id?.startsWith('AGR') || targetObj?.primaryCategory === 'agriculture' || targetObj?.categoryGroup === 'agriculture_fire';
+
   const defaultCategoryBaseline = 
+    isHotspot ? 0.0 :
     cleanId.startsWith('REF') || fac?.type?.includes('Refinery') ? 36.0 :
     cleanId.startsWith('PWR') || cleanId.startsWith('STP') || fac?.type?.includes('Power') ? 55.0 :
     cleanId.startsWith('STL') || fac?.type?.includes('Steel') ? 44.0 :
@@ -1444,7 +1449,7 @@ export function getHistoricalFrpForObject(objOrId) {
     cleanId.startsWith('LNG') || fac?.type?.includes('LNG') ? 25.0 :
     cleanId.startsWith('FOR') || cleanId.startsWith('BIO') || fac?.type?.includes('Forest') ? 12.0 :
     cleanId.startsWith('AGR') || fac?.type?.includes('Crop') || fac?.type?.includes('Agri') ? 18.0 :
-    cleanId.startsWith('SOL') || fac?.type?.includes('Solar') ? 0.0 : 32.5;
+    cleanId.startsWith('SOL') || fac?.type?.includes('Solar') ? 0.0 : 0.0;
 
   const baseMean = (targetObj?.thermal?.historicalMeanFRP !== undefined)
     ? Number(targetObj.thermal.historicalMeanFRP)
@@ -1455,8 +1460,6 @@ export function getHistoricalFrpForObject(objOrId) {
     : (fac?.currentFRP !== undefined ? Number(fac.currentFRP) : (fac?.status === 'high_priority' ? baseMean * 2.8 : (baseMean > 0 ? baseMean * 1.04 : 0)));
 
   const isSurge = targetObj?.status === 'high_priority' || fac?.status === 'high_priority' || (currentFRP > baseMean * 1.8 && baseMean > 0);
-  const isWildfire = fac?.id?.startsWith('FOR') || targetObj?.primaryCategory === 'wildfire' || targetObj?.categoryGroup === 'forest_fire';
-  const isAgri = fac?.id?.startsWith('AGR') || targetObj?.primaryCategory === 'agriculture' || targetObj?.categoryGroup === 'agriculture_fire';
 
   const list = [];
   const startDate = new Date("2026-06-01T00:00:00Z");
@@ -1469,7 +1472,19 @@ export function getHistoricalFrpForObject(objOrId) {
     let frpVal;
     let status = "normal";
 
-    if (baseMean === 0 && !isWildfire && !isAgri) {
+    if (isHotspot) {
+      // Ephemeral open-field hotspot: 0 MW baseline for 88 days, emerged yesterday/today
+      if (dayIdx < 88) {
+        frpVal = 0.0;
+        status = "nominal";
+      } else if (dayIdx === 88) {
+        frpVal = Math.round(currentFRP * 0.45 * 10) / 10;
+        status = "initial_ignition";
+      } else {
+        frpVal = currentFRP;
+        status = isWildfire ? "wildfire_active" : "crop_burn_active";
+      }
+    } else if (baseMean === 0 && !isWildfire && !isAgri) {
       frpVal = 0;
       status = "nominal";
     } else if (isSurge) {
@@ -1501,7 +1516,7 @@ export function getHistoricalFrpForObject(objOrId) {
     }
 
     frpVal = Math.max(0, Math.round(frpVal * 10) / 10);
-    const threshold = Math.round(baseMean * 2.0 * 10) / 10;
+    const threshold = Math.round(Math.max(baseMean * 2.0, 5.0) * 10) / 10;
 
     list.push({
       dayIndex: dayIdx + 1,
